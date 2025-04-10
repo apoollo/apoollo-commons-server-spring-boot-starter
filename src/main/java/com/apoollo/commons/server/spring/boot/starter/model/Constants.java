@@ -35,5 +35,5 @@ public interface Constants {
 
 	public static final String HEADER_NEED_RESET_PASSWORD = "NeedResetPassword";
 
-	public static final String CONFIGURATION_PREFIX = "hisign.commons.server";
+	public static final String CONFIGURATION_PREFIX = "apoollo.commons.server";
 }

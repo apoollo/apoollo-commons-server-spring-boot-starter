@@ -5,12 +5,12 @@
 
 	<property name="FILE_LOG_CHARSET" value="UTF-8" />
 	<property name="FILE_LOG_THRESHOLD" value="TRACE" />
-	<springProperty name="FILE_LOG_PATH" scope="context" source="hisign.commons.server.log.file-log-path"/>
+	<springProperty name="FILE_LOG_PATH" scope="context" source="apoollo.commons.server.log.file-log-path"/>
 	
 	<property name="MESSAGE_LOG_CHARSET" value="UTF-8" />
 	<property name="MESSAGE_LOG_THRESHOLD" value="TRACE" />
-	<springProperty name="MESSAGE_LOG_PATH" scope="context" source="hisign.commons.server.log.message-log-path"/>
-	<springProperty name="MESSAGE_LOGGER_NAME" scope="context" source="hisign.commons.server.log.message-logger-name"/>
+	<springProperty name="MESSAGE_LOG_PATH" scope="context" source="apoollo.commons.server.log.message-log-path"/>
+	<springProperty name="MESSAGE_LOGGER_NAME" scope="context" source="apoollo.commons.server.log.message-logger-name"/>
 
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

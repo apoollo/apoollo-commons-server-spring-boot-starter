@@ -56,7 +56,7 @@ public class RequestBodySecretKeyTokenAccessAdvice extends RequestBodyAdviceAdap
                         CompatibleUtils.compatibleStringSpace(userKeyPair.getSecretKey()));
             } else {
                 throw new AppException(
-                        "crossAccessRequestBodyAdvice body must is a com.hisign.commons.util.request.context.User");
+                        "crossAccessRequestBodyAdvice body must is a com.apoollo.commons.util.request.context.User");
             }
         }
         return super.afterBodyRead(body, inputMessage, parameter, targetType, converterType);
