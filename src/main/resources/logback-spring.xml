@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="CONSOLE_LOG_CHARSET" value="UTF-8" />
+	<property name="CONSOLE_LOG_THRESHOLD" value="TRACE" />
+
+	<property name="FILE_LOG_CHARSET" value="UTF-8" />
+	<property name="FILE_LOG_THRESHOLD" value="TRACE" />
+	<springProperty name="FILE_LOG_PATH" scope="context" source="hisign.commons.server.log.file-log-path"/>
+	
+	<property name="MESSAGE_LOG_CHARSET" value="UTF-8" />
+	<property name="MESSAGE_LOG_THRESHOLD" value="TRACE" />
+	<springProperty name="MESSAGE_LOG_PATH" scope="context" source="hisign.commons.server.log.message-log-path"/>
+	<springProperty name="MESSAGE_LOGGER_NAME" scope="context" source="hisign.commons.server.log.message-logger-name"/>
+
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>${CONSOLE_LOG_THRESHOLD}</level>
+		</filter>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5p --- [%t] %C.%M\(%F:%L\) : %X{request-id} %m%n</pattern>
+			<charset>${CONSOLE_LOG_CHARSET}</charset>
+		</encoder>
+	</appender>
+	<if condition='!property("FILE_LOG_PATH").isEmpty()'>
+		<then>
+			<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>${FILE_LOG_THRESHOLD}</level>
+				</filter>
+				<encoder>
+					<pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5p --- [%t] %C.%M\(%F:%L\) : %X{request-id} %m%n</pattern>
+					<charset>${FILE_LOG_CHARSET}</charset>
+				</encoder>
+				<file>${FILE_LOG_PATH}</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+					<fileNamePattern>${FILE_LOG_PATH}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+					<cleanHistoryOnStart>false</cleanHistoryOnStart>
+					<maxFileSize>100MB</maxFileSize>
+					<totalSizeCap>1GB</totalSizeCap>
+					<maxHistory>7</maxHistory>
+				</rollingPolicy>
+			</appender>
+		</then>
+	</if>
+	<if condition='!property("MESSAGE_LOG_PATH").isEmpty()'>
+		<then>		
+			<appender name="MESSAGE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>${MESSAGE_LOG_THRESHOLD}</level>
+				</filter>
+				<encoder>
+					<pattern>%m%n</pattern>
+					<charset>${MESSAGE_LOG_CHARSET}</charset>
+				</encoder>
+				<file>${MESSAGE_LOG_PATH}</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+					<fileNamePattern>${MESSAGE_LOG_PATH}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+					<cleanHistoryOnStart>false</cleanHistoryOnStart>
+					<maxFileSize>100MB</maxFileSize>
+					<totalSizeCap>1GB</totalSizeCap>
+					<maxHistory>7</maxHistory>
+				</rollingPolicy>
+			</appender>
+			<if condition='!property("MESSAGE_LOGGER_NAME").isEmpty()'>
+				<then>	
+					<logger name="${MESSAGE_LOGGER_NAME}" level="INFO">
+						<appender-ref ref="MESSAGE" />
+					</logger>
+				/</then>
+			</if>
+		</then>
+	</if>
+	
+	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR" />
+	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR" />
+	<logger name="org.apache.catalina.loader.WebappClassLoaderBase" level="WARN" />
+	<logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN" />
+	<logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN" />
+	<logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN" />
+	<logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR" />
+	<logger name="org.hibernate.validator.internal.util.Version" level="WARN" />
+	<logger name="org.springframework.boot.actuate.endpoint.jmx" level="WARN" />
+	<logger name="org.redisson" level="WARN" />
+	
+	<if condition='!property("FILE_LOG_PATH").isEmpty()'>
+		<then>
+			<root level="INFO">
+				<appender-ref ref="CONSOLE" />
+				<appender-ref ref="FILE" />
+			</root>
+		</then>
+		<else>
+			<root level="INFO">
+				<appender-ref ref="CONSOLE" />
+			</root>
+		</else>
+	</if>
+</configuration>

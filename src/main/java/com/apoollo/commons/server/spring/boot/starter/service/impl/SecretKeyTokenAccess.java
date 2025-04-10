@@ -1,0 +1,40 @@
+/**
+ * 
+ */
+package com.apoollo.commons.server.spring.boot.starter.service.impl;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
+import com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess;
+import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
+import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
+import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
+import com.apoollo.commons.util.exception.AppForbbidenException;
+import com.apoollo.commons.util.exception.detailed.TokenEmptyExcetion;
+import com.apoollo.commons.util.redis.service.CountLimiter;
+import com.apoollo.commons.util.request.context.Authorization;
+import com.apoollo.commons.util.request.context.User;
+
+/**
+ * @author liuyulong
+ */
+public class SecretKeyTokenAccess extends AbstractAccess<String> {
+
+	public SecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization,
+			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter flowLimiter,
+			AccessProperties accessProperties) {
+		super(userManager, authorization, commonsServerRedisKey, countLimiter, flowLimiter, accessProperties);
+	}
+
+	@Override
+	public void limitTokenAccess(User user, String token) {
+		if (StringUtils.isBlank(token)) {
+			throw new TokenEmptyExcetion("[token] must not be blank");
+		}
+		if (!StringUtils.equals(user.getSecretKey(), token)) {
+			throw new AppForbbidenException("secretKey verify failed");
+		}
+	}
+
+}
