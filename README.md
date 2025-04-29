@@ -1,3 +1,5 @@
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 Apoollo Commons Server Spring Boot Starter
 ====
 `apoollo-commons-server` 是一个`SpringBoot Starter`，随 SpringBoot 启动自动加载生效，旨在帮助 Java 开发快速构建 `Web Server` 服务。应用该 Starter 后，会快速获得管理接口的能力。
@@ -46,3 +48,15 @@ spring:
           time-between-eviction-runs: 60000
 ```
 
+快速使用
+```Java
+@RestController
+public class DemoController {
+
+	@GetMapping("/demo1")
+	@RequestResource(name = "演示1")
+	public String demo1() {
+		return "OK";
+	}
+}
+```
