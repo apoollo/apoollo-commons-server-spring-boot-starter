@@ -58,7 +58,7 @@ spring:
           time-between-eviction-runs: 60000
 ```
 
-使用
+以注解注入资源
 ----
 
 将 `@RequestResource` 注入到 @RestController 中的函数上，该函数就拥有了一系列的魔法能力
@@ -73,15 +73,40 @@ public class DemoController {
 	}
 }
 ```
-尝试请求该函数则返回一个JSON, code 属性为 `Forbidden`
+尝试请求该函数则返回一个JSON, code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON
 
 ```JSON
 {
-    "requestId": "A94816603126426A9DC7F126B88F3569",
+    "requestId": "0F0BD9D421764E4D9EBC0336575C8EF7",
     "success": false,
     "code": "Forbidden",
-    "message": "访问无权限:signature expired",
-    "elapsedTime": 151,
+    "message": "访问无权限:authorizationJwtToken must not be blank",
+    "elapsedTime": 7,
     "data": null
 }
 ```
+
+如何获得Token
+----
+
+Web前端，用户登录后获取Token
+```Java
+@Autowired
+private UserManager userManager;
+
+Stirng token = userManager.login(//
+		"id", // 用户id
+		"accessKey", //用户名称
+		"secretKey", //用户密码
+		"secretKeySaltValue", //密码盐值，设置后可以实现单点登录，通常设置为一个随机数或者UUID
+		true, //是否支持续期，设置为true后，response header 中会在过期时长超过3/2的时候返回 x-renewal-authorization 字段，来替换旧的Token，前端可以替换使用
+		null, // Ip 白名单列表，配置apoollo.commons.server.access.limit-ip.enable=true 后才生效
+		List.of("/demo1"), // 该用户被允许请求的列表，支持AntPathMatcher表达式 /**,/abc/* 等
+		null, // 该用户的角色列表，如果用户角色跟资源角色匹配的话，也可以允许被访问，资源角色指的是 @RequestResource roles 属性
+		null, // 用户其他属性附件，可用于业务处理； 通过 RequestContext.getRequired(); 来获取上下文信息
+		null, // 提醒用户更换密码的最后时间
+		30L, // token 过期时长
+		TimeUnit.MINUTES //token 过期时长的单位时间
+		);
+```
+
