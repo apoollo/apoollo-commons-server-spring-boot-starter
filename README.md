@@ -19,7 +19,17 @@ Install
 每个项目根目录都需要先执行 Maven 安装命令
 
 ```Bash
-mvn clean install -Dmaven.test.skip=true
+git clone https://github.com/apoollo/apoollo-dependencies-jdk17 & \
+cd apoollo-dependencies-jdk17 & \
+mvn clean install -Dmaven.test.skip=true & \
+cd .. & \
+git clone https://github.com/apoollo/apoollo-commons-util & \
+cd apoollo-commons-util & \
+mvn clean install -Dmaven.test.skip=true & \
+cd .. & \
+git clone https://github.com/apoollo/apoollo-commons-server-spring-boot-starter & \
+cd apoollo-commons-server-spring-boot-starter & \
+mvn clean install -Dmaven.test.skip=true & \
 ```
 
 引入Maven POM
