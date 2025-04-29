@@ -4,7 +4,7 @@ Apoollo Commons Server Spring Boot Starter
 ====
 `apoollo-commons-server` 是一个`SpringBoot Starter`，随 SpringBoot 启动自动加载生效，旨在帮助 Java 开发快速构建 `Web Server` 服务。应用该 Starter 后，会快速获得管理接口的能力。
 比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
-单打独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
+单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
 
 Required
 ----
@@ -48,7 +48,10 @@ spring:
           time-between-eviction-runs: 60000
 ```
 
-快速使用
+使用
+----
+
+将 `@RequestResource` 注入到 @RestController 中的函数上，该函数就拥有了一系列的魔法能力
 ```Java
 @RestController
 public class DemoController {
@@ -58,5 +61,17 @@ public class DemoController {
 	public String demo1() {
 		return "OK";
 	}
+}
+```
+尝试请求该函数则返回一个JSON, code 属性为 `Forbidden`
+
+```JSON
+{
+    "requestId": "A94816603126426A9DC7F126B88F3569",
+    "success": false,
+    "code": "Forbidden",
+    "message": "访问无权限:signature expired",
+    "elapsedTime": 151,
+    "data": null
 }
 ```
