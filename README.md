@@ -73,7 +73,11 @@ public class DemoController {
 	}
 }
 ```
-尝试请求该函数则返回一个JSON, code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON
+尝试请求该函数则返回如下JSON
+
+```Bash
+curl --location 'http://127.0.0.1:8080/demo1'
+```
 
 ```JSON
 {
@@ -85,6 +89,8 @@ public class DemoController {
     "data": null
 }
 ```
+code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
+
 
 如何获得Token
 ----
@@ -107,6 +113,24 @@ Stirng token = userManager.login(//
 		null, // 提醒用户更换密码的最后时间
 		30L, // token 过期时长
 		TimeUnit.MINUTES //token 过期时长的单位时间
-		);
+	);
 ```
-
+token返回值为：
+```Txt
+Bearer eyJraWQiOiJhY2Nlc3NLZXkxIiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE3NDYwMTA1NzAsImV4cCI6MTc0NjAxMjM3MH0.RR2NqbZocOBYf90Z8ln3_MEeyTFOEKv5XPpdwLvmwJc
+```
+带token请求该函数则返回如下JSON
+```Bash
+curl --location 'http://127.0.0.1:8080/demo1' \
+--header 'Authorization: Bearer eyJraWQiOiJhY2Nlc3NLZXkxIiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE3NDYwMTA1NzAsImV4cCI6MTc0NjAxMjM3MH0.RR2NqbZocOBYf90Z8ln3_MEeyTFOEKv5XPpdwLvmwJc'
+```
+```JSON
+{
+    "requestId": "1446E45F531B4493BB54EEEEA3467024",
+    "success": true,
+    "code": "Ok",
+    "message": "通过",
+    "elapsedTime": 197,
+    "data": "OK"
+}
+```
