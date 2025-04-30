@@ -115,14 +115,11 @@ Stirng token = userManager.login(//
 		TimeUnit.MINUTES //token 过期时长的单位时间
 	);
 ```
-token返回值为：
-```Txt
-Bearer eyJraWQiOiJhY2Nlc3NLZXkxIiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE3NDYwMTA1NzAsImV4cCI6MTc0NjAxMjM3MH0.RR2NqbZocOBYf90Z8ln3_MEeyTFOEKv5XPpdwLvmwJc
-```
+
 带token请求该函数则返回如下JSON
 ```Bash
 curl --location 'http://127.0.0.1:8080/demo1' \
---header 'Authorization: Bearer eyJraWQiOiJhY2Nlc3NLZXkxIiwiYWxnIjoiSFMyNTYiLCJ0eXAiOiJKV1QifQ.eyJpYXQiOjE3NDYwMTA1NzAsImV4cCI6MTc0NjAxMjM3MH0.RR2NqbZocOBYf90Z8ln3_MEeyTFOEKv5XPpdwLvmwJc'
+--header 'Authorization: ${token}'
 ```
 ```JSON
 {
