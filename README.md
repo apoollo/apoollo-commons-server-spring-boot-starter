@@ -9,7 +9,7 @@ Apoollo Commons Server Spring Boot Starter
 Required
 ----
 项目依赖的环境列表
-* \>= Jdk8 , 如果需要更换Jdk版本，可以变更`apoollo-dependencies-jdk17`中相关的版本, 具体版本会受SpringBoot版本制约， 默认版本为Jdk17
+* \>= Jdk17 , 如果需要更换Jdk版本，可以变更`apoollo-dependencies-jdk17`中相关的版本, 具体版本会受SpringBoot版本制约， 默认版本为Jdk17
 * \>= SpringBoot3.2.4 ，如果需要更换SpringBoot版本，可以变更`apoollo-dependencies-jdk17`中相关的版本，默认版本为SpringBoot3.2.4
 * \>= Maven3.9.3 
 
@@ -69,7 +69,7 @@ public class DemoController {
 	@GetMapping("/demo1")
 	@RequestResource(name = "演示1")
 	public String demo1() {
-		return "OK";
+		return "I'm OK";
 	}
 }
 ```
@@ -92,13 +92,13 @@ curl --location 'http://127.0.0.1:8080/demo1'
 code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
 
 
-如何获得Token
+用户登录的方式获取Token
 ----
 
-Web前端，用户登录后获取Token
+Web前端，用户登录后的情况获取Token，执行以下函数，表示用户登录成功后向缓存设置登录信息，并返回登录token
 ```Java
 @Autowired
-private UserManager userManager;
+private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
 Stirng token = userManager.login(//
 		"id", // 用户id
@@ -115,7 +115,6 @@ Stirng token = userManager.login(//
 		TimeUnit.MINUTES //token 过期时长的单位时间
 	);
 ```
-
 带token请求该函数则返回如下JSON
 ```Bash
 curl --location 'http://127.0.0.1:8080/demo1' \
@@ -128,8 +127,58 @@ curl --location 'http://127.0.0.1:8080/demo1' \
     "code": "Ok",
     "message": "通过",
     "elapsedTime": 197,
-    "data": "OK"
+    "data": "I'm OK"
 }
 ```
-code 为 OK ，表示请求成功，并且data字段返回了函数的值OK，这样就完成一次请求私有函数的验证
+code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
+
+客户端请求的方式获取Token
+----
+
+服务端设置用户
+```Java
+@Autowired
+private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
+
+userManager.setUser(
+        new com.apoollo.commons.util.request.context.def.DefaultUser(...), 按照User参数设置
+	null,// 服务端设置用户一般不设置超时时间
+	null // 服务端设置用户一般不设置超时时间
+);
+```
+
+客户端生成Token
+```Java
+String token = com.apoollo.commons.util.JwtUtils.generateJwtToken(
+	 "accesskey", //用户名
+ 	 "secretKey,// 密码
+	 null, // 用于单点登录，设置null值
+	 new Date(),// 颁发时间，当前时间
+	 new Date(System.currentTimeMillis() + 10000) // 过期截止时间，一般设置10s以后
+);
+```
+带token请求该函数则返回如下JSON
+```Bash
+curl --location 'http://127.0.0.1:8080/demo1' \
+--header 'Authorization: ${token}'
+```
+```JSON
+{
+    "requestId": "1446E45F531B4493BB54EEEEA3467024",
+    "success": true,
+    "code": "Ok",
+    "message": "通过",
+    "elapsedTime": 197,
+    "data": "I'm OK"
+}
+```
+code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
+
+@RequestResource 属性
+----
+enable： 是否启用注解特性，默认true
+resourcePin: 唯一标识符，默认为Controller名称 + Method 名换，首字母小写
+name: 名称，用于日志打印时显示
+
+
 
