@@ -154,7 +154,7 @@ String token = com.apoollo.commons.util.JwtUtils.generateJwtToken(
  	 "secretKey,// 密码
 	 null, // 用于单点登录，设置null值
 	 new Date(),// 颁发时间，当前时间
-	 new Date(System.currentTimeMillis() + 10000) // 过期截止时间，一般设置10s以后
+	 new Date(System.currentTimeMillis() + 10000) // 过期截止时间，建议设置10s左右
 );
 ```
 带token请求该函数则返回如下JSON
@@ -176,9 +176,9 @@ code 为 OK ，表示后端验证通过，请求成功，并且data字段返回�
 
 @RequestResource 属性
 ----
-enable： 是否启用注解特性，默认true
-resourcePin: 唯一标识符，默认为Controller名称 + Method 名换，首字母小写
-name: 名称，用于日志打印时显示
+enable： 是否启用注解特性，默认true </br>
+resourcePin: 唯一标识符，默认为Controller名称 + Method 名换，首字母小写 </br>
+name: 名称，用于日志打印时显示 </br>
 
 
 
