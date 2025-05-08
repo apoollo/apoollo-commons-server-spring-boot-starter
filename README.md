@@ -187,7 +187,7 @@ code 为 OK ，表示后端验证通过，请求成功，并且data字段返回�
 enable             |true                                                                                              |是否启用注解特性
 resourcePin        |Controller名称(首字母小写) +  Method 名换                                                           |唯一标识符
 name               |resourcePin 属性的值                                                                               |名称，用于日志打印时显示
-requestMappingPath |跟@RequestMapping注解的值一致                                                                       |请求资源路径，用于路径匹配
+requestMappingPath |跟@RequestMapping注解的值一致                                                                       |请求资源路径，用于路径匹配，RequestMapping不建议使用多个URL
 accessStrategy     |PRIVATE_REQUEST 私有访问                                                                           |请求资源访问策略，私有访问需要在Header中放入 Authorization 的Jwt Token完成鉴权，设置 PUBLIC_REQUEST 后则无需鉴权Token即可访问
 limtUserQps        |-1 不限制                                                                                          |请求资源用户维度QPS
 limtPlatformQps    |-1 关闭平台限流                                                                                     |请求资源平台维度QPS
