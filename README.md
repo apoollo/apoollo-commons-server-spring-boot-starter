@@ -177,10 +177,10 @@ curl --location 'http://127.0.0.1:8080/demo1' \
 ```
 code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
 
-@RequestResource 注解
+静态注入资源 @RequestResource
 ----
-全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，
-注入该注解会接管接口请求的输入输出格式、权限访问、日志打印，QPS 等能力
+全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，此注解表示一个静态资源实体，
+注入该注解会接管接口请求的输入输出格式、权限访问、日志打印，QPS 等能力，除了静态标注以外，还支持动态注入
 
 属性               |默认值                                                                                            |说明
 -------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------
@@ -193,6 +193,16 @@ limtUserQps        |-1 不限制                                                
 limtPlatformQps    |-1 关闭平台限流                                                                                     |请求资源平台维度QPS
 roles              |User 默认资源角色为用户角色                                                                          |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
 enableSync         |false 允许并发请求                                                                                  |设置true 该请求资源只允许序列请求，不允许并发请求
+
+动态注入资源
+----
+执行以下函数，动态注入资源
+```
+@Autowired
+private com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager requestResourceManager;
+
+requestResourceManager.setRequestResource(new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...)); // 按照参数设置值，具体与@RequestResource大同小异
+```
 
 
 
