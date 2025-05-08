@@ -57,8 +57,11 @@ spring:
           max-idle: 8
           time-between-eviction-runs: 60000
 ```
+注意
+----
+@SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
 
-以注解注入资源
+以注解的方式接管资源
 ----
 
 将 `@RequestResource` 注入到 @RestController 中的函数上，该函数就拥有了一系列的魔法能力
@@ -177,8 +180,8 @@ code 为 OK ，表示后端验证通过，请求成功，并且data字段返回�
 @RequestResource 属性
 ----
 enable： 是否启用注解特性，默认true </br>
-resourcePin: 唯一标识符，默认为Controller名称 + Method 名换，首字母小写 </br>
-name: 名称，用于日志打印时显示 </br>
+resourcePin：唯一标识符，默认为Controller名称 + Method 名换，首字母小写 </br>
+name：名称，用于日志打印时显示 </br>
 
 
 
