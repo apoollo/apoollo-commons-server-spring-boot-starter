@@ -197,7 +197,7 @@ enableSync         |false 允许并发请求                                    
 动态注入资源
 ----
 执行以下函数，动态注入资源
-```
+```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager requestResourceManager;
 
