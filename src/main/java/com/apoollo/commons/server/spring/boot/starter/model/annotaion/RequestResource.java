@@ -79,7 +79,7 @@ public @interface RequestResource {
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_REQUEST;
 
 	/**
-	 * 请求资源用户维度QPS，默认用户限流2个qps
+	 * 请求资源用户维度QPS，默认不限制
 	 * 
 	 * @return 请求资源用户维度QPS
 	 */
@@ -93,7 +93,7 @@ public @interface RequestResource {
 	public long limtPlatformQps() default -1;
 
 	/**
-	 * 请求资源类型默认，为静态类型
+	 * 请求资源类型，默认为静态类型
 	 * 
 	 * @return 请求资源类型
 	 */
@@ -107,7 +107,7 @@ public @interface RequestResource {
 	public String[] roles() default { "User" };
 
 	/**
-	 * 如果设置为TRUE，那么该请求资源将会只允许单次通过
+	 * 设置true 该请求资源只允许序列请求，不允许并发请求
 	 * 
 	 * @return 是否开启同步模式
 	 */
