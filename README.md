@@ -202,7 +202,7 @@ enableSync         |false 允许并发请求                                    
 private com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager requestResourceManager;
 
 requestResourceManager.setRequestResource(
-    new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...) // 按照参数设置值，具体与@RequestResource大同小异
+    new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...) // 具体参数与@RequestResource大同小异
 ); 
 ```
 
