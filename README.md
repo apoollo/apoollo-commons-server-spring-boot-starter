@@ -177,17 +177,23 @@ curl --location 'http://127.0.0.1:8080/demo1' \
 ```
 code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
 
-@RequestResource 属性
+@RequestResource 注解
 ----
-enable： 是否启用注解特性，默认true </br>
-resourcePin：唯一标识符，默认为Controller名称 + Method 名换，首字母小写 </br>
-name：名称，用于日志打印时显示，默认名称为 resourcePin 属性的值 </br>
-requestMappingPath：请求资源路径，用于路径匹配，默认跟RequestMapping一致 </br>
-accessStrategy：请求资源访问策略，默认私有请求，需要在Header中放入 Authorization 的Jwt Token完成鉴权，设置 com.apoollo.commons.util.request.context.def.AccessStrategy.PUBLIC_REQUEST 后则无需鉴权Token即可访问</br>
-limtUserQps：请求资源用户维度QPS，默认不限制</br>
-limtPlatformQps：请求资源平台维度QPS，默认关闭平台限流</br>
-roles：如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色: User</br>
-enableSync：如果设置为TRUE，那么该请求资源将会只允许单次通过，默认false</br>
+```Txt
+注入该注解会接管接口请求的输入输出格式、权限访问、日志打印，QPS 等能力
+```
+属性               |默认值                                                                                            |说明
+-------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------
+enable             |true                                                                                              |是否启用注解特性
+resourcePin        |Controller名称(首字母小写) +  Method 名换                                                           |唯一标识符
+name               |resourcePin 属性的值                                                                               |名称，用于日志打印时显示
+requestMappingPath |跟@RequestMapping注解的值一致                                                                       |请求资源路径，用于路径匹配
+accessStrategy     |PRIVATE_REQUEST 私有访问                                                                           |请求资源访问策略，私有访问需要在Header中放入 Authorization 的Jwt Token完成鉴权，设置 PUBLIC_REQUEST 后则无需鉴权Token即可访问
+limtUserQps        |-1 不限制                                                                                          |请求资源用户维度QPS
+limtPlatformQps    |-1 关闭平台限流                                                                                     |请求资源平台维度QPS
+roles              |User 默认资源角色为用户角色                                                                          |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
+enableSync         |false 允许并发请求                                                                                  |设置true 该请求资源只允许序列请求，不允许并发请求
+
 
 
 
