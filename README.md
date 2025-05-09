@@ -118,22 +118,6 @@ Stirng token = userManager.login(//
 		TimeUnit.MINUTES //token 过期时长的单位时间
 	);
 ```
-带token请求该函数则返回如下JSON
-```Bash
-curl --location 'http://127.0.0.1:8080/demo1' \
---header 'Authorization: ${token}'
-```
-```JSON
-{
-    "requestId": "1446E45F531B4493BB54EEEEA3467024",
-    "success": true,
-    "code": "Ok",
-    "message": "通过",
-    "elapsedTime": 197,
-    "data": "I'm OK"
-}
-```
-code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
 
 客户端请求的方式获取Token
 ----
@@ -160,6 +144,9 @@ String token = com.apoollo.commons.util.JwtUtils.generateJwtToken(
 	 new Date(System.currentTimeMillis() + 10000) // 过期截止时间，建议设置10s左右
 );
 ```
+
+带token的方式请求私有资源
+----
 带token请求该函数则返回如下JSON
 ```Bash
 curl --location 'http://127.0.0.1:8080/demo1' \
