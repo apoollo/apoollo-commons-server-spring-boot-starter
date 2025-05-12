@@ -164,6 +164,30 @@ curl --location 'http://127.0.0.1:8080/demo1' \
 ```
 code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
 
+日志
+----
+单次请求的业务日志，包含了 MDC 标记、请求标记、访问URI、请求IP、入参内容、出参内容、请求耗时、结束标记
+```Java
+2025-05-12T10:20:12.480+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:64) :  17DE7A345C3840EDB7C5FAEA87A3B720 请求进入标记
+2025-05-12T10:20:12.480+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:65) :  17DE7A345C3840EDB7C5FAEA87A3B720 访问URI：/demo1
+2025-05-12T10:20:12.480+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:66) :  17DE7A345C3840EDB7C5FAEA87A3B720 访问IP：127.0.0.1
+2025-05-12T10:20:12.491+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultUserManager.getUser(DefaultUserManager.java:77) :  17DE7A345C3840EDB7C5FAEA87A3B720 getUser elapsedTime：1ms
+2025-05-12T10:20:12.522+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization.getAuthorized(DefaultAuthorization.java:94) :  17DE7A345C3840EDB7C5FAEA87A3B720 authorized by allowRequestAntPathPattern: /demo1
+2025-05-12T10:20:12.522+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization.getAuthorized(DefaultAuthorization.java:111) :  17DE7A345C3840EDB7C5FAEA87A3B720 authorized elapsedTime：31ms
+2025-05-12T10:20:12.522+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess.access(AbstractAccess.java:94) :  17DE7A345C3840EDB7C5FAEA87A3B720 accesskey：[accessKey1] accessed
+2025-05-12T10:20:12.535+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:75) :  17DE7A345C3840EDB7C5FAEA87A3B720 [演示1入参]: 无
+2025-05-12T10:20:12.536+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:89) :  17DE7A345C3840EDB7C5FAEA87A3B720 [演示1出参]: I'm OK
+2025-05-12T10:20:12.536+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:95) :  17DE7A345C3840EDB7C5FAEA87A3B720 [演示1耗时]: 56(ms)
+2025-05-12T10:20:12.540+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus.transport(DefaultRequestContextDataBus.java:23) :  17DE7A345C3840EDB7C5FAEA87A3B720 request elapsedTime：58ms
+2025-05-12T10:20:12.540+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.lambda$2(RequestContextInterceptor.java:90) :  17DE7A345C3840EDB7C5FAEA87A3B720 请求结束标记
+```
+
+正常情况下，被@RequestResource注解的请求资源会自动打印出入参日志。特殊情况下可能不想打印，或者特殊属性需要脱敏显示。这个情况可以由@Logable 调整。全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.Logable，设置在函数上是针对返回值的内容，设置在参数上针对参数
+属性               |默认值                                                                                            |说明
+-------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------
+enable             |true 启动                                                                                          |false 会关闭日志打印
+maskProperies      | {}  空对象，显示所有字段                                                                            |设置字段后，会对字段做 *** 打印的方式。仅对对象属性有效
+
 静态注入资源 @RequestResource
 ----
 全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，此注解表示一个静态资源实体，仅对Controller 中的@RequestMapping、@GetMapping、@PostMapping、@PutMapping、@DeleteMapping生效
@@ -192,13 +216,7 @@ requestResourceManager.setRequestResource(
     new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...) // 具体参数与@RequestResource大同小异
 ); 
 ```
-打印出入参日志@Logable
-----
-正常情况下，被@RequestResource注解的请求资源会自动打印出入参日志。特殊情况下可能不想打印，或者特殊属性需要掩饰显示。这个情况可以由@Logable 调整。全路径：com.hisign.commons.server.spring.boot.starter.model.annotaion.Logable，设置在函数上是针对返回值的内容，设置在参数上针对参数
-属性               |默认值                                                                                            |说明
--------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------
-enable             |true 启动                                                                                          |false 会关闭日志打印
-maskProperies      | {}  没有被掩饰的字段                                                                               | 设置字段后，会对字段做 *** 打印的方式。仅对对象属性有效
+
 
 
 
