@@ -6,7 +6,8 @@ Apoollo Commons Server Spring Boot Starter
 比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
 单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
 
-![image](https://github.com/user-attachments/assets/d42135dd-26f3-4326-8fb2-1d5d50440776)
+![image](https://github.com/user-attachments/assets/26c990b0-0677-4f00-8aba-fad0ff099037)
+
 
 
 Required
