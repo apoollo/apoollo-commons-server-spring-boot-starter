@@ -34,6 +34,7 @@ public class RequestResourceAspect {
 	@Around(value = "@annotation(requestResource)")
 	public Object advice(ProceedingJoinPoint point, RequestResource requestResource) throws Throwable {
 
+		long startTime = System.currentTimeMillis();
 		RequestContext requestContext = RequestContext.getRequired();
 
 		MethodSignature signature = (MethodSignature) point.getSignature();
@@ -93,7 +94,7 @@ public class RequestResourceAspect {
 		}
 
 		LOGGER.info(StringUtils.join("[", requestContext.getRequestResource().getName(), "耗时]: ",
-				System.currentTimeMillis() - requestContext.getRequestTime(), "(ms)"));
+				System.currentTimeMillis() - startTime, "(ms)"));
 
 		return object;
 	}
