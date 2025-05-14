@@ -3,7 +3,9 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.model.annotaion;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -31,6 +33,18 @@ public class RequestResourceAspect {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestResourceAspect.class);
 
+	public Annotation getAnnotation(Annotation[][] paramAnnotations, int getIndex, Class<?> annotationClass) {
+		if (null != paramAnnotations && paramAnnotations.length > getIndex) {
+			Annotation[] annotations = paramAnnotations[getIndex];
+			if (null != annotations) {
+
+				return Arrays.stream(annotations).filter(annotation -> annotation.annotationType() == annotationClass)
+						.findAny().orElse(null);
+			}
+		}
+		return null;
+	}
+
 	@Around(value = "@annotation(requestResource)")
 	public Object advice(ProceedingJoinPoint point, RequestResource requestResource) throws Throwable {
 
@@ -44,13 +58,17 @@ public class RequestResourceAspect {
 		Object[] parameterValues = point.getArgs();
 
 		String requestLogName = StringUtils.join("[", requestContext.getRequestResource().getName(), "入参]: ");
-		if (ArrayUtils.isNotEmpty(parameterTypes)) {
-			List<RequestResourceParameter> requestResourceParameters = IntStream.range(0, parameterTypes.length)
+		if (ArrayUtils.isNotEmpty(parameterNames)) {
+
+			Annotation[][] paramAnnotations = signature.getMethod().getParameterAnnotations();
+
+			List<RequestResourceParameter> requestResourceParameters = IntStream.range(0, parameterNames.length)
 					.mapToObj(i -> {
 						Class<?> parameterType = parameterTypes[i];
 						String parameterName = parameterNames[i];
 						Object parameterValue = parameterValues[i];
-						Logable logable = parameterType.getAnnotation(Logable.class);
+						// Logable logable = parameterType.getAnnotation(Logable.class);
+						Logable logable = (Logable) getAnnotation(paramAnnotations, i, Logable.class);
 						return new RequestResourceParameter(i, parameterType, parameterName, parameterValue, logable);
 					})//
 					.filter(parameter -> parameter.getParameterType() != HttpServletRequest.class
