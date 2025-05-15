@@ -52,7 +52,7 @@ cd apoollo-commons-server-spring-boot-starter & \
 mvn clean install -Dmaven.test.skip=true & \
 ```
 
-引入单个Maven POM
+引入单个Maven POM, 需要指定apoollo-commons-server-spring-boot-starter版本
 ```Xml
 <dependency>
   <groupId>com.apoollo</groupId>
@@ -60,7 +60,7 @@ mvn clean install -Dmaven.test.skip=true & \
   <version>${dependencies-jdk17.version}</version>
 </dependency>
 ```
-或者集成式引入Maven POM
+或者集成式引入Maven POM，需指定apoollo-dependencies-jdk17版本
 ```Xml
 <parent>
   <groupId>com.apoollo</groupId>
