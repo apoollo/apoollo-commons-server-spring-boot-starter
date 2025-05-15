@@ -127,6 +127,7 @@ public class RequestResourceRegister {
 				DefaultRequestResource requestResourceObject = new DefaultRequestResource();
 				requestResourceObject.setEnable(requestResourceAnnotaion.enable());
 				requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy().getAccessStrategyPin());
+				requestResourceObject.setCustomizeAccessStrategyClass(requestResourceAnnotaion.customizeAccessStrategyClass());
 				requestResourceObject.setResourcePin(resourcePin);
 				requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
 				requestResourceObject.setRequestMappingPath(requestMappingPath);

@@ -54,7 +54,7 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 			requestContext.setResponseTime(System.currentTimeMillis());
 			responseBody.setElapsedTime(requestContext.getElapsedTime());
 			responseBody.setRequestId(requestContext.getRequestId());
-			codeNameHandler.restResponse(requestContext.getRequestBody(), responseBody);
+			codeNameHandler.resetResponse(requestContext.getRequestBody(), responseBody);
 			requestContext.beforeBodyWrite(responseBody);
 		} else {
 			if (body instanceof Response) {

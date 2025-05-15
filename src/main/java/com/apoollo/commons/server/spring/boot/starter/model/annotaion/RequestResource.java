@@ -10,7 +10,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.apoollo.commons.util.request.context.RequestResourceAccessStrategy;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
+import com.apoollo.commons.util.request.context.def.PrivateRequestResourceAccessStrategy;
 import com.apoollo.commons.util.request.context.def.ResourceType;
 
 /**
@@ -77,6 +79,13 @@ public @interface RequestResource {
 	 */
 
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_REQUEST;
+
+	/**
+	 * 自定义访问策略的Class
+	 * 
+	 * @return Class<RequestResourceAccessStrategy>
+	 */
+	public Class<? extends RequestResourceAccessStrategy> customizeAccessStrategyClass() default PrivateRequestResourceAccessStrategy.class;
 
 	/**
 	 * 请求资源用户维度QPS，默认不限制
