@@ -69,10 +69,6 @@ mvn clean install -Dmaven.test.skip=true & \
 </parent>
 <dependencies>
   <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-  </dependency>
-  <dependency>
     <groupId>com.apoollo</groupId>
     <artifactId>apoollo-commons-server-spring-boot-starter</artifactId>
     <version>${dependencies-jdk17.version}</version>
