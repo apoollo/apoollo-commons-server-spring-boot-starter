@@ -6,9 +6,23 @@ Apoollo Commons Server Spring Boot Starter
 比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
 单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
 
-![image](https://github.com/user-attachments/assets/26c990b0-0677-4f00-8aba-fad0ff099037)
+![image](https://github.com/user-attachments/assets/0a0c5adf-9da5-48e9-89da-f1aa3a10b7f4)
 
-
+阶段                               |说明 
+-----------------------------------|----------------------------------------
+Xss Filter                         |跨站脚本攻击过滤
+RequestResource                    |一个请求资源，可以理解成MVC函数
+Limit Async                        |限制请求为同步请求
+Limit PlatformFlow                 |限制平台流量的QPS
+User                               |当前请求的用户
+Limit IP                           |限制请求的IP白名单
+Validate Token                     |验证请求的Token是否合法，支持JWT、AppKey两种方式
+Authorized User Request Resource   |验证用户请求资源的合法性
+Limit UserFlow                     |限制用户流量的QPS
+LimitDailyTimes                    |限制用户每天的请求的次数
+Method Log                         |打印函数入参出参等日志信息
+Taget MVC Method                   |目标MVC函数
+Wrapper Return Value               |包装返回值
 
 Required
 ----
