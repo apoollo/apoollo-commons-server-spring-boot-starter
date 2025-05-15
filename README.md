@@ -229,17 +229,18 @@ maskProperies      | {}  空对象，显示所有字段                         
 全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，此注解表示一个静态资源实体，仅对Controller 中的@RequestMapping、@GetMapping、@PostMapping、@PutMapping、@DeleteMapping生效
 注入该注解会接管接口请求的输入输出格式、权限访问、日志打印，QPS 等能力，除了静态标注以外，还支持动态注入
 
-属性               |默认值                                                                                            |说明
--------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------
-enable             |true                                                                                              |是否启用注解特性
-resourcePin        |Controller名称(首字母小写) +  Method 名换                                                           |唯一标识符
-name               |resourcePin 属性的值                                                                               |名称，用于日志打印时显示
-requestMappingPath |跟@RequestMapping注解的值一致                                                                       |请求资源路径，用于路径匹配，RequestMapping不建议使用多个URL
-accessStrategy     |PRIVATE_REQUEST 私有访问                                                                           |请求资源访问策略，私有访问需要在Header中放入 Authorization 的Jwt Token完成鉴权，设置 PUBLIC_REQUEST 后则无需鉴权Token即可访问
-limtUserQps        |-1 不限制                                                                                          |请求资源用户维度QPS
-limtPlatformQps    |-1 关闭平台限流                                                                                     |请求资源平台维度QPS
-roles              |User 默认资源角色为用户角色                                                                          |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
-enableSync         |false 允许并发请求                                                                                  |设置true 该请求资源只允许序列请求，不允许并发请求
+属性                         |默认值                                                       |说明
+-----------------------------|-------------------------------------------------------------|---------------------------------------------------------
+enable                       |true                                                         |是否启用注解特性
+resourcePin                  |Controller名称(首字母小写) +  Method 名换                      |唯一标识符
+name                         |resourcePin 属性的值                                          |名称，用于日志打印时显示
+requestMappingPath           |跟@RequestMapping注解的值一致                                  |请求资源路径，用于路径匹配，RequestMapping不建议使用多个URL
+accessStrategy               |PRIVATE_REQUEST 私有访问                                      |请求资源访问策略 1. PRIVATE_REQUEST ：私有访问，需要在Header中放入 Authorization 的Jwt Token完成鉴权 2. PUBLIC_REQUEST：公有访问， 无需鉴权Token，可直接访问 3. CUSTOMIZE: 自定义访问策略，需要设置customizeAccessStrategyClass字段来设置访问策略
+customizeAccessStrategyClass | PrivateRequestResourceAccessStrategy.class                  |  仅当 accessStrategy 的值为CUSTOMIZE时，此字段必填，默认值是无效的。需要实现RequestResourceAccessStrategy，设置实现类的Class
+limtUserQps                  |-1 表示不限流                                                 |请求资源用户维度QPS
+limtPlatformQps              |-1 表示不限流                                                 |请求资源平台维度QPS
+roles                        |User 默认资源角色为用户角色                                    |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
+enableSync                   |false 表示允许并发请求                                        |设置true 该请求资源只允许序列请求，不允许并发请求
 
 动态注入资源
 ----
