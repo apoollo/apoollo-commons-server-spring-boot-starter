@@ -2,9 +2,9 @@
 
 Apoollo Commons Server Spring Boot Starter
 ====
-`apoollo-commons-server` 是一个`SpringBoot Starter`，随 SpringBoot 启动自动加载生效，旨在帮助 Java 开发快速构建 `Web Server` 服务。应用该 Starter 后，会快速获得管理接口的能力。
+`apoollo-commons-server` 是一个`SpringBoot Starter`，随 SpringBoot 启动自动加载生效，旨在帮助 Java 开发者快速构建 `Web Server` 服务。应用该 Starter 后，会快速获得管理接口的能力。
 比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
-单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
+单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发者专注于业务逻辑实现。
 
 工作原理
 ----
