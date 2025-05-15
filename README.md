@@ -6,6 +6,8 @@ Apoollo Commons Server Spring Boot Starter
 比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
 单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发人员专注于业务逻辑实现。
 
+工作原理
+----
 ![image](https://github.com/user-attachments/assets/0a0c5adf-9da5-48e9-89da-f1aa3a10b7f4)
 
 阶段                               |说明 
@@ -50,7 +52,7 @@ cd apoollo-commons-server-spring-boot-starter & \
 mvn clean install -Dmaven.test.skip=true & \
 ```
 
-引入Maven POM
+引入单个Maven POM
 ```Xml
 <dependency>
   <groupId>com.apoollo</groupId>
@@ -58,6 +60,26 @@ mvn clean install -Dmaven.test.skip=true & \
   <version>${dependencies-jdk17.version}</version>
 </dependency>
 ```
+或者集成式引入Maven POM
+```Xml
+<parent>
+  <groupId>com.apoollo</groupId>
+  <artifactId>hisign-dependencies-jdk17</artifactId>
+  <version>3.2.4-SNAPSHOT</version>
+</parent>
+<dependencies>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+  <dependency>
+    <groupId>com.apoollo</groupId>
+    <artifactId>apoollo-commons-server-spring-boot-starter</artifactId>
+    <version>${dependencies-jdk17.version}</version>
+  </dependency>
+</dependencies>
+```
+
 依赖Redis环境配置，Redis配置方式以及版本跟SpringBoot版本一致
 ```Yaml
 spring:
