@@ -140,18 +140,18 @@ Web前端，用户登录后的情况获取Token，执行以下函数，表示用
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
 Stirng token = userManager.login(//
-		"id", // 用户id
-		"accessKey", //用户名称
-		"secretKey", //用户密码
-		"secretKeySaltValue", //密码盐值，设置后可以实现单点登录，通常设置为一个随机数或者UUID
-		true, //是否支持续期，设置为true后，response header 中会在过期时长超过3/2的时候返回 x-renewal-authorization 字段，来替换旧的Token，前端可以替换使用
-		null, // Ip 白名单列表，配置apoollo.commons.server.access.limit-ip.enable=true 后才生效
-		List.of("/demo1"), // 该用户被允许请求的列表，支持AntPathMatcher表达式 /**,/abc/* 等
-		null, // 该用户的角色列表，如果用户角色跟资源角色匹配的话，也可以允许被访问，资源角色指的是 @RequestResource roles 属性
-		null, // 用户其他属性附件，可用于业务处理； 通过 RequestContext.getRequired(); 来获取上下文信息
-		null, // 提醒用户更换密码的最后时间
-		30L, // token 过期时长
-		TimeUnit.MINUTES //token 过期时长的单位时间
+	"id", // 用户id
+	"accessKey", //用户名称
+	"secretKey", //用户密码
+	"secretKeySaltValue", //密码盐值，设置后可以实现单点登录，通常设置为一个随机数或者UUID
+	true, //是否支持续期，设置为true后，response header 中会在过期时长超过3/2的时候返回 x-renewal-authorization 字段，来替换旧的Token，前端可以替换使用
+	null, // Ip 白名单列表，配置apoollo.commons.server.access.limit-ip.enable=true 后才生效
+	List.of("/demo1"), // 该用户被允许请求的列表，支持AntPathMatcher表达式 /**,/abc/* 等
+	null, // 该用户的角色列表，如果用户角色跟资源角色匹配的话，也可以允许被访问，资源角色指的是 @RequestResource roles 属性
+	null, // 用户其他属性附件，可用于业务处理； 通过 RequestContext.getRequired(); 来获取上下文信息
+	null, // 提醒用户更换密码的最后时间
+	30L, // token 过期时长
+	TimeUnit.MINUTES //token 过期时长的单位时间
 	);
 ```
 
