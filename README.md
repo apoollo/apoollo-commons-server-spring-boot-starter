@@ -64,7 +64,7 @@ mvn clean install -Dmaven.test.skip=true & \
 ```Xml
 <parent>
   <groupId>com.apoollo</groupId>
-  <artifactId>hisign-dependencies-jdk17</artifactId>
+  <artifactId>apoollo-dependencies-jdk17</artifactId>
   <version>3.2.4-SNAPSHOT</version>
 </parent>
 <dependencies>
