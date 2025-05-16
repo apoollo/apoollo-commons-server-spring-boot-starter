@@ -66,7 +66,7 @@ public @interface RequestResource {
 	public String name() default "";
 
 	/**
-	 * 请求资源路径，用于路径匹配
+	 * 请求资源路径，用于路径匹配 , controller mapping path + method mapping path
 	 * 
 	 * @return 请求资源路径
 	 */
@@ -121,5 +121,20 @@ public @interface RequestResource {
 	 * @return 是否开启同步模式
 	 */
 	public boolean enableSync() default false;
+
+	/**
+	 * 启用 Body 签名，需要客户端将body签名的值放入Header， Key=Digest，Value需要加密
+	 * ，Digest的加密方式为：DESede/ECB/PKCS5Padding 并 base64 encode
+	 * 
+	 * @return 是否开始请求体摘要验证
+	 */
+	public boolean enableBodyDigestValidate() default false;
+
+	/**
+	 * base64 encode
+	 * 
+	 * @return 请求体摘要秘钥
+	 */
+	public String bodyDigestSecret() default "";
 
 }

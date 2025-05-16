@@ -74,7 +74,7 @@ public class RequestResourceAspect {
 		}
 		return null;
 	}
-
+	
 	private String toLogContent(Logable logable, Class<?> parameterClass, String parameterName, Object parameterValue) {
 		String[] maskProperies = null == logable ? null : logable.maskProperies();
 		String valueContent = null;

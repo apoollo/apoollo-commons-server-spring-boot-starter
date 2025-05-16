@@ -116,30 +116,37 @@ public class RequestResourceRegister {
 					requestMappingPath = FALLING_PATH_JOINNER.joinRootPath(controllerPath, methodPath);
 				}
 			}
-
 			if (StringUtils.isNotBlank(requestMappingPath)) {
 				String resourcePin = requestResourceAnnotaion.resourcePin();
 				if (StringUtils.isBlank(resourcePin)) {
 					resourcePin = StringUtils.join(WordUtils.uncapitalize(controllerClass.getSimpleName()),
 							WordUtils.capitalize(method.getName()));
 				}
-
-				DefaultRequestResource requestResourceObject = new DefaultRequestResource();
-				requestResourceObject.setEnable(requestResourceAnnotaion.enable());
-				requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy().getAccessStrategyPin());
-				requestResourceObject.setCustomizeAccessStrategyClass(requestResourceAnnotaion.customizeAccessStrategyClass());
-				requestResourceObject.setResourcePin(resourcePin);
-				requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
-				requestResourceObject.setRequestMappingPath(requestMappingPath);
-				requestResourceObject.setLimtPlatformQps(requestResourceAnnotaion.limtPlatformQps());
-				requestResourceObject.setLimtUserQps(requestResourceAnnotaion.limtUserQps());
-				requestResourceObject.setRoles(requestResourceAnnotaion.roles());
-				requestResourceObject.setEnableSync(requestResourceAnnotaion.enableSync());
-				requestResourceMapping = new RequestResourceMapping(requestResourceObject, requestResourceAnnotaion);
+				requestResourceMapping = new RequestResourceMapping(
+						getDefaultRequestResource(requestResourceAnnotaion, resourcePin, requestMappingPath),
+						requestResourceAnnotaion);
 			}
 
 		}
 		return requestResourceMapping;
+	}
+
+	public DefaultRequestResource getDefaultRequestResource(RequestResource requestResourceAnnotaion,
+			String resourcePin, String requestMappingPath) {
+		DefaultRequestResource requestResourceObject = new DefaultRequestResource();
+		requestResourceObject.setEnable(requestResourceAnnotaion.enable());
+		requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy().getAccessStrategyPin());
+		requestResourceObject.setCustomizeAccessStrategyClass(requestResourceAnnotaion.customizeAccessStrategyClass());
+		requestResourceObject.setResourcePin(resourcePin);
+		requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
+		requestResourceObject.setRequestMappingPath(requestMappingPath);
+		requestResourceObject.setLimtPlatformQps(requestResourceAnnotaion.limtPlatformQps());
+		requestResourceObject.setLimtUserQps(requestResourceAnnotaion.limtUserQps());
+		requestResourceObject.setRoles(requestResourceAnnotaion.roles());
+		requestResourceObject.setEnableSync(requestResourceAnnotaion.enableSync());
+		requestResourceObject.setEnableBodyDigestValidate(requestResourceAnnotaion.enableBodyDigestValidate());
+		requestResourceObject.setBodyDigestSecret(requestResourceAnnotaion.bodyDigestSecret());
+		return requestResourceObject;
 	}
 
 	public String getRequestMappingPath(RequestMapping mapping) {
