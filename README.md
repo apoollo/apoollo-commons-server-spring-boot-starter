@@ -139,10 +139,10 @@ curl --location 'http://127.0.0.1:8080/demo1'
 code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
 
 
-用户登录的方式获取Token
+以登录方式获取Token
 ----
 
-Web前端，用户登录后的情况获取Token，执行以下函数，表示用户登录成功后向缓存设置登录信息，并返回登录token
+浏览器窗口，用户登录后的情况下获取Token，执行以下函数，表示用户登录成功后向缓存设置登录信息，并返回登录token
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
@@ -163,10 +163,9 @@ Stirng token = userManager.login(//
 	);
 ```
 
-客户端请求的方式获取Token
+以服务之间相互调用的方式获取Token
 ----
-
-服务端设置用户
+服务端需要提前设置有效用户
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
@@ -178,7 +177,7 @@ userManager.setUser(
 );
 ```
 
-客户端生成Token
+客户端需要通过有效用户的accessKey、secretKey生成Token请求目标接口
 ```Java
 String token = com.apoollo.commons.util.JwtUtils.generateJwtToken(
 	 "accesskey", //用户名
