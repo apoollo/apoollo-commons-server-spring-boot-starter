@@ -8,6 +8,7 @@ Apoollo Commons Server Spring Boot Starter
 
 工作原理
 ----
+将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数，需要过一些列的安全检查
 ![image](https://github.com/user-attachments/assets/0a0c5adf-9da5-48e9-89da-f1aa3a10b7f4)
 
 阶段                               |说明 
