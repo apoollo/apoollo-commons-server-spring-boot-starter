@@ -95,7 +95,14 @@ spring:
 ```
 注意
 ----
-@SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
+1. @SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
+2. 多个项目公用同一个Redis实例或者集群会发生Key冲突，此时应该给每个子项目设置自己的Prefix，具体配置如下
+```Java
+@Bean
+RedisNameSpaceKey getRedisNameSpaceKey() {
+	return () -> "apoollo.demo";
+}
+```
 
 以注解的方式接管资源
 ----
