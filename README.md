@@ -8,7 +8,10 @@ Apoollo Commons Server Spring Boot Starter
 
 工作原理
 ----
+
 ![image](https://github.com/user-attachments/assets/0a0c5adf-9da5-48e9-89da-f1aa3a10b7f4)
+
+#### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插
 
 阶段                               |说明 
 -----------------------------------|----------------------------------------
@@ -95,7 +98,14 @@ spring:
 ```
 注意
 ----
-@SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
+1. @SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
+2. 多个项目公用同一个Redis实例或者集群会发生Key冲突，此时应该给每个子项目设置自己的Prefix，具体配置如下
+```Java
+@Bean
+RedisNameSpaceKey getRedisNameSpaceKey() {
+	return () -> "apoollo.demo";
+}
+```
 
 以注解的方式接管资源
 ----
@@ -131,10 +141,10 @@ curl --location 'http://127.0.0.1:8080/demo1'
 code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
 
 
-用户登录的方式获取Token
+以登录方式获取Token
 ----
 
-Web前端，用户登录后的情况获取Token，执行以下函数，表示用户登录成功后向缓存设置登录信息，并返回登录token
+浏览器窗口，用户登录后的情况下获取Token，执行以下函数，表示用户登录成功后向缓存设置登录信息，并返回登录token
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
@@ -155,10 +165,9 @@ Stirng token = userManager.login(//
 	);
 ```
 
-客户端请求的方式获取Token
+以服务之间相互调用的方式获取Token
 ----
-
-服务端设置用户
+服务端需要提前设置有效用户
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
@@ -170,7 +179,7 @@ userManager.setUser(
 );
 ```
 
-客户端生成Token
+客户端需要通过有效用户的accessKey、secretKey生成Token请求目标接口
 ```Java
 String token = com.apoollo.commons.util.JwtUtils.generateJwtToken(
 	 "accesskey", //用户名
