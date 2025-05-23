@@ -6,7 +6,7 @@ package com.apoollo.commons.server.spring.boot.starter.service.impl;
 import java.util.List;
 
 import com.apoollo.commons.server.spring.boot.starter.model.InterceptorConfigMerger;
-import com.apoollo.commons.server.spring.boot.starter.properties.InterceptorCommonsProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestContextInterceptorPath;
 
 /**
@@ -20,8 +20,8 @@ public class DefaultRequestContextInterceptorPath implements RequestContextInter
 	 * @param commonsIntercetptor
 	 * @param requestContextIntercetptor
 	 */
-	public DefaultRequestContextInterceptorPath(InterceptorCommonsProperties commonsIntercetptor,
-			InterceptorCommonsProperties requestContextIntercetptor) {
+	public DefaultRequestContextInterceptorPath(PathProperties commonsIntercetptor,
+			PathProperties requestContextIntercetptor) {
 		super();
 		interceptorConfigMerger = new InterceptorConfigMerger(commonsIntercetptor, requestContextIntercetptor);
 	}

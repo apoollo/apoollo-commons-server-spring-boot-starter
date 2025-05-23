@@ -12,38 +12,19 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CommonsServerProperties {
+public class CommonsServerProperties extends EnablePorperties {
 
-	private Boolean enable;
-	
-	private LoggerProperties log;
-	
-	private FilterProperties xssFilter;
+	private PathProperties path;
 
-	private InterceptorCommonsProperties commonsIntercetptor;
+	private String bodySignatureDefaultSecret;
 
-	private RequestContextInterceptorProperties requestContextInterceptor;
+	private String keyPairAccessKeyProperty;
 
-	private RequestResourceInterceptorProperties requestResourceInterceptor;
-
-	private RequestHeaderJwtTokenAccessInterceptorProperties requestHeaderJwtTokenAccessInterceptor;
-
-	private RequestSecretKeyTokenAccessInterceptorProperties requestSecretKeyTokenAccessInterceptor;
-
-	private EnablePorperties requestBodyKeepParameterAdvice;
-	
-	private RequestBodyDigestValidateAdviceProperties requestBodyDigestValidateAdvice;
-
-	private EnablePorperties requestBodyJwtTokenAccessAdvice;
-	
-	private EnablePorperties requestBodySecretKeyTokenAccessAdvice;
-
-	private EnablePorperties responseBodyContext;
+	private String keyPairSecretKeyProperty;
 
 	private RabcProperties rbac;
 
 	private AccessProperties access;
-	
-	private CacheProperties cache;
 
+	private LoggerProperties log;
 }

@@ -28,7 +28,7 @@ public class DynamicResourceController {
 	private CaptchaService captchaService;
 
 	@GetMapping(value = "/public/get/captcha/stream")
-	@RequestResource(name = "获取验证码图像流", accessStrategy = AccessStrategy.PUBLIC_REQUEST, limtPlatformQps = 6, enableSync = true)
+	@RequestResource(name = "获取验证码图像流", accessStrategy = AccessStrategy.PUBLIC, limtPlatformQps = 6, enableSync = true)
 	public void writeCaptcha(HttpServletResponse response, String token) throws IOException {
 		captchaService.writeCaptchaImage(response, token, Duration.ofSeconds(60));
 	}

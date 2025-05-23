@@ -18,7 +18,7 @@ import com.apoollo.commons.util.request.context.def.AccessStrategy;
 public class WelcomeController {
 
 	@GetMapping("/public")
-	@RequestResource(name = "欢迎", accessStrategy = AccessStrategy.PUBLIC_REQUEST)
+	@RequestResource(name = "欢迎", accessStrategy = AccessStrategy.PUBLIC)
 	public String welcome() {
 		return "welcome!";
 	}

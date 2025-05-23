@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.apoollo.commons.server.spring.boot.starter.properties.InterceptorCommonsProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
 
 import lombok.Getter;
@@ -14,14 +14,14 @@ import lombok.Getter;
  */
 @Getter
 public class InterceptorConfigMerger {
-	
+
 	private List<String> pathPatterns = new ArrayList<>();
 	private List<String> excludePathPatterns = new ArrayList<>();
 
-	public InterceptorConfigMerger(InterceptorCommonsProperties... propertiesArray) {
+	public InterceptorConfigMerger(PathProperties... propertiesArray) {
 
 		LangUtils.getStream(propertiesArray).forEach(properties -> {
-			LangUtils.getStream(properties.getPathPatterns()).forEach(pathPatterns::add);
+			LangUtils.getStream(properties.getIncludePathPatterns()).forEach(pathPatterns::add);
 			LangUtils.getStream(properties.getExcludePathPatterns()).forEach(excludePathPatterns::add);
 		});
 		pathPatterns = LangUtils.getStream(pathPatterns).distinct().collect(Collectors.toList());

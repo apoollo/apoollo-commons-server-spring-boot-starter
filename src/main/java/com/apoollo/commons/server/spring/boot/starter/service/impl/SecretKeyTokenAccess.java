@@ -4,6 +4,8 @@
 package com.apoollo.commons.server.spring.boot.starter.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess;
@@ -21,6 +23,8 @@ import com.apoollo.commons.util.request.context.User;
  */
 public class SecretKeyTokenAccess extends AbstractAccess<String> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(SecretKeyTokenAccess.class);
+
 	public SecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization,
 			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter flowLimiter,
 			AccessProperties accessProperties) {
@@ -35,6 +39,7 @@ public class SecretKeyTokenAccess extends AbstractAccess<String> {
 		if (!StringUtils.equals(user.getSecretKey(), token)) {
 			throw new AppForbbidenException("secretKey verify failed");
 		}
+		LOGGER.info("secret key equals access");
 	}
 
 }

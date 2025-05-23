@@ -37,6 +37,7 @@ public class JwtTokenAccess extends AbstractAccess<JwtToken> {
 	public void limitTokenAccess(User user, JwtToken jwtToken) {
 		try {
 			JwtUtils.jwtVerify(jwtToken.getJwtTokenDecoded(), user.getSecretKey(), user.getSecretKeySaltValue());
+			LOGGER.info("jwt token verify success");
 		} catch (TokenExpiredException e) {
 			LOGGER.error("signature expired:", e);
 			throw new AppForbbidenException("signature expired");

@@ -51,161 +51,161 @@ import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
 @ControllerAdvice
 public class ExceptionControllerAdvice {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
 
-    @ResponseBody
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public <T> ResponseEntity<Response<T>> handleException(NoHandlerFoundException e) {
-        return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(NoHandlerFoundException.class)
+	public <T> ResponseEntity<Response<T>> handleException(NoHandlerFoundException e) {
+		return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(NoResourceFoundException.class)
-    public <T> ResponseEntity<Response<T>> handleException(NoResourceFoundException e) {
-        return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(NoResourceFoundException.class)
+	public <T> ResponseEntity<Response<T>> handleException(NoResourceFoundException e) {
+		return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppNoRequestResourceException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppNoRequestResourceException e) {
-        return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppNoRequestResourceException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppNoRequestResourceException e) {
+		return response(HttpCodeNameHandler::getNoHandlerFound, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public <T> ResponseEntity<Response<T>> handleException(HttpRequestMethodNotSupportedException e) {
-        return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public <T> ResponseEntity<Response<T>> handleException(HttpRequestMethodNotSupportedException e) {
+		return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public <T> ResponseEntity<Response<T>> handleException(HttpMediaTypeNotSupportedException e) {
-        return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+	public <T> ResponseEntity<Response<T>> handleException(HttpMediaTypeNotSupportedException e) {
+		return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public <T> ResponseEntity<Response<T>> handleException(HttpMessageNotReadableException e) {
-        return response(HttpCodeNameHandler::getIllegalArgument, null, e, "Http Message Not Readable");
-    }
+	@ResponseBody
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public <T> ResponseEntity<Response<T>> handleException(HttpMessageNotReadableException e) {
+		return response(HttpCodeNameHandler::getIllegalArgument, null, e, "Http Message Not Readable");
+	}
 
-    @ResponseBody
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public <T> ResponseEntity<Response<T>> handleException(MethodArgumentNotValidException e) {
-        List<String> filedList = null;
-        BindingResult bindingResult = e.getBindingResult();
-        if (null != bindingResult) {
-            filedList = LangUtils.getStream(bindingResult.getAllErrors()).map(objectError -> {
-                String filed = null;
-                if (objectError instanceof FieldError) {
-                    FieldError fieldError = (FieldError) objectError;
-                    filed = fieldError.getField();
-                }
-                return filed;
-            }).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        }
-        return response(HttpCodeNameHandler::getIllegalArgument, filedList.toArray(), e, null);
-    }
+	@ResponseBody
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public <T> ResponseEntity<Response<T>> handleException(MethodArgumentNotValidException e) {
+		List<String> filedList = null;
+		BindingResult bindingResult = e.getBindingResult();
+		if (null != bindingResult) {
+			filedList = LangUtils.getStream(bindingResult.getAllErrors()).map(objectError -> {
+				String filed = null;
+				if (objectError instanceof FieldError) {
+					FieldError fieldError = (FieldError) objectError;
+					filed = fieldError.getField();
+				}
+				return filed;
+			}).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+		}
+		return response(HttpCodeNameHandler::getIllegalArgument, filedList.toArray(), e, null);
+	}
 
-    @ResponseBody
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public <T> ResponseEntity<Response<T>> handleException(MaxUploadSizeExceededException e) {
-        return response(HttpCodeNameHandler::getAppMaxUploadSizeExceededException, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+	public <T> ResponseEntity<Response<T>> handleException(MaxUploadSizeExceededException e) {
+		return response(HttpCodeNameHandler::getAppMaxUploadSizeExceededException, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppForbbidenException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppForbbidenException e) {
-        return response(HttpCodeNameHandler::getForbbiden, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppForbbidenException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppForbbidenException e) {
+		return response(HttpCodeNameHandler::getForbbiden, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppExceedingDailyMaximumUseTimesLimitException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppExceedingDailyMaximumUseTimesLimitException e) {
-        return response(HttpCodeNameHandler::getExceedingDailyMaximumUseTimesLimit, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppExceedingDailyMaximumUseTimesLimitException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppExceedingDailyMaximumUseTimesLimitException e) {
+		return response(HttpCodeNameHandler::getExceedingDailyMaximumUseTimesLimit, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppIllegalArgumentException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppIllegalArgumentException e) {
-        return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppIllegalArgumentException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppIllegalArgumentException e) {
+		return response(HttpCodeNameHandler::getIllegalArgument, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(TimeoutIllegalArgumentException.class)
-    public <T> ResponseEntity<Response<T>> handleException(TimeoutIllegalArgumentException e) {
-        return response(HttpCodeNameHandler::getTimeoutIllegalArgument, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(TimeoutIllegalArgumentException.class)
+	public <T> ResponseEntity<Response<T>> handleException(TimeoutIllegalArgumentException e) {
+		return response(HttpCodeNameHandler::getTimeoutIllegalArgument, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AccessKeyEmptyException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AccessKeyEmptyException e) {
-        return response(HttpCodeNameHandler::getAccessKeyEmpty, null, e, e.getMessage());
+	@ResponseBody
+	@ExceptionHandler(AccessKeyEmptyException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AccessKeyEmptyException e) {
+		return response(HttpCodeNameHandler::getAccessKeyEmpty, null, e, e.getMessage());
 
-    }
+	}
 
-    @ResponseBody
-    @ExceptionHandler(TokenEmptyExcetion.class)
-    public <T> ResponseEntity<Response<T>> handleException(TokenEmptyExcetion e) {
-        return response(HttpCodeNameHandler::getTokenEmpty, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(TokenEmptyExcetion.class)
+	public <T> ResponseEntity<Response<T>> handleException(TokenEmptyExcetion e) {
+		return response(HttpCodeNameHandler::getTokenEmpty, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(IpLimterException.class)
-    public <T> ResponseEntity<Response<T>> handleException(IpLimterException e) {
-        return response(HttpCodeNameHandler::getIpLimit, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(IpLimterException.class)
+	public <T> ResponseEntity<Response<T>> handleException(IpLimterException e) {
+		return response(HttpCodeNameHandler::getIpLimit, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppHttpCodeMessageException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppHttpCodeMessageException e) {
-        return response((httpCodeNameHandler) -> e.getHttpCodeName(), e.getMessageCompileArgs(), e, null);
-    }
+	@ResponseBody
+	@ExceptionHandler(AppHttpCodeMessageException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppHttpCodeMessageException e) {
+		return response((httpCodeNameHandler) -> e.getHttpCodeName(), e.getMessageCompileArgs(), e, null);
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppRequestTimeoutLimitException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppRequestTimeoutLimitException e) {
-        return response(HttpCodeNameHandler::getTimeoutLimit, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppRequestTimeoutLimitException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppRequestTimeoutLimitException e) {
+		return response(HttpCodeNameHandler::getTimeoutLimit, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppServerOverloadedException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppServerOverloadedException e) {
-        return response(HttpCodeNameHandler::getServerOverloaded, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppServerOverloadedException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppServerOverloadedException e) {
+		return response(HttpCodeNameHandler::getServerOverloaded, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(AppException.class)
-    public <T> ResponseEntity<Response<T>> handleException(AppException e) {
-        return response(HttpCodeNameHandler::getServerError, null, e, e.getMessage());
-    }
+	@ResponseBody
+	@ExceptionHandler(AppException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppException e) {
+		return response(HttpCodeNameHandler::getServerError, null, e, e.getMessage());
+	}
 
-    @ResponseBody
-    @ExceptionHandler(Exception.class)
-    public <T> ResponseEntity<Response<T>> handleException(Exception e) {
-        return response(HttpCodeNameHandler::getServerError, null, e, null);
-    }
+	@ResponseBody
+	@ExceptionHandler(Exception.class)
+	public <T> ResponseEntity<Response<T>> handleException(Exception e) {
+		return response(HttpCodeNameHandler::getServerError, null, e, null);
+	}
 
-    private <T> ResponseEntity<Response<T>> response(
-            Function<HttpCodeNameHandler, HttpCodeName<String, String>> httpCodeGetter, Object[] messageCompileArgs,
-            Exception e, String appendMessage) {
+	private <T> ResponseEntity<Response<T>> response(
+			Function<HttpCodeNameHandler, HttpCodeName<String, String>> httpCodeGetter, Object[] messageCompileArgs,
+			Exception e, String appendMessage) {
 
-        RequestContext requestContext = RequestContext.get();
-        HttpCodeNameHandler httpCodeNameHandler = null;
-        T data = null;
-        if (null != requestContext) {
-            httpCodeNameHandler = requestContext.getDefaultResourceAccessStrategy().getHttpCodeNameHandler();
-            data = requestContext.getHintOfExceptionCatchedData();
-        } else {
-            httpCodeNameHandler = new DefaultHttpCodeNameHandler();
-        }
-        HttpCodeName<String, String> codeMessage = httpCodeGetter.apply(httpCodeNameHandler);
+		RequestContext requestContext = RequestContext.get();
+		HttpCodeNameHandler httpCodeNameHandler = null;
+		T data = null;
+		if (null != requestContext) {
+			httpCodeNameHandler = requestContext.getRequestResource().getHttpCodeNameHandler();
+			data = requestContext.getHintOfExceptionCatchedData();
+		} else {
+			httpCodeNameHandler = new DefaultHttpCodeNameHandler();
+		}
+		HttpCodeName<String, String> codeMessage = httpCodeGetter.apply(httpCodeNameHandler);
 
-        LOGGER.error(HttpCodeNameHandler.getDefaultMessage(codeMessage.getName(), messageCompileArgs, appendMessage),
-                e);
+		LOGGER.error(HttpCodeNameHandler.getDefaultMessage(codeMessage.getName(), messageCompileArgs, appendMessage),
+				e);
 
-        return new ResponseEntity<>(
-                httpCodeNameHandler.getResponse(codeMessage, messageCompileArgs, appendMessage, data),
-                HttpStatusCode.valueOf(codeMessage.getHttpCode()));
-    }
+		return new ResponseEntity<>(
+				httpCodeNameHandler.getResponse(codeMessage, messageCompileArgs, appendMessage, data),
+				HttpStatusCode.valueOf(codeMessage.getHttpCode()));
+	}
 }

@@ -3,6 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.model.annotaion;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.InterceptorCommonsProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
 import com.apoollo.commons.util.request.context.def.DefaultRequestResource;
-import com.apoollo.commons.util.request.context.def.ResourceType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,14 +41,14 @@ public class RequestResourceRegister {
 
 	private ApplicationContext applicationContext;
 
-	private InterceptorCommonsProperties commonsProperties;
+	private PathProperties pathProperties;
 	private List<DefaultRequestResource> requestResources;
 
 	public RequestResourceRegister(ApplicationContext applicationContext,
 			CommonsServerProperties commonsServerProperties) {
 		super();
 		this.applicationContext = applicationContext;
-		this.commonsProperties = commonsServerProperties.getCommonsIntercetptor();
+		this.pathProperties = commonsServerProperties.getPath();
 		this.requestResources = commonsServerProperties.getRbac().getRequestResources();
 	}
 
@@ -78,10 +78,8 @@ public class RequestResourceRegister {
 				.filter(Objects::nonNull)//
 				.forEach(requestResourceMapping -> {
 					DefaultRequestResource requestResourceObject = requestResourceMapping.getRequestResourceObject();
-					if (ResourceType.STATIC == requestResourceMapping.getRequestResourceAnnotaion().resourceType()) {
-						requestResources.add(requestResourceObject);
-					}
-					commonsProperties.getPathPatterns().add(requestResourceObject.getRequestMappingPath());
+					requestResources.add(requestResourceObject);
+					pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
 				});
 	}
 
@@ -131,12 +129,24 @@ public class RequestResourceRegister {
 		return requestResourceMapping;
 	}
 
+	public <T> T instance(Class<? extends T> clazz) {
+		try {
+			T instance = applicationContext.getBean(clazz);
+			if (null == instance) {
+				instance = clazz.getDeclaredConstructor().newInstance();
+			}
+			return instance;
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
+				| RuntimeException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public DefaultRequestResource getDefaultRequestResource(RequestResource requestResourceAnnotaion,
 			String resourcePin, String requestMappingPath) {
 		DefaultRequestResource requestResourceObject = new DefaultRequestResource();
 		requestResourceObject.setEnable(requestResourceAnnotaion.enable());
-		requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy().getAccessStrategyPin());
-		requestResourceObject.setCustomizeAccessStrategyClass(requestResourceAnnotaion.customizeAccessStrategyClass());
+		requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy());
 		requestResourceObject.setResourcePin(resourcePin);
 		requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
 		requestResourceObject.setRequestMappingPath(requestMappingPath);
@@ -144,8 +154,12 @@ public class RequestResourceRegister {
 		requestResourceObject.setLimtUserQps(requestResourceAnnotaion.limtUserQps());
 		requestResourceObject.setRoles(requestResourceAnnotaion.roles());
 		requestResourceObject.setEnableSync(requestResourceAnnotaion.enableSync());
-		requestResourceObject.setEnableBodyDigestValidate(requestResourceAnnotaion.enableBodyDigestValidate());
-		requestResourceObject.setBodyDigestSecret(requestResourceAnnotaion.bodyDigestSecret());
+		requestResourceObject.setEnableBodySignatureValidate(requestResourceAnnotaion.enableBodySignatureValidate());
+		requestResourceObject.setBodySignatureDecyptorSecret(requestResourceAnnotaion.bodySignatureDecyptorSecret());
+		requestResourceObject.setBodySignatureDecyptor(instance(requestResourceAnnotaion.bodySignatureDecyptorClass()));
+		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
+		requestResourceObject.setContentEscapeMethod(instance(requestResourceAnnotaion.contentEscapeMethodClass()));
+		requestResourceObject.setHttpCodeNameHandler(instance(requestResourceAnnotaion.httpCodeNameHandlerClass()));
 		return requestResourceObject;
 	}
 

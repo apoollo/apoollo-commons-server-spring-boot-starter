@@ -1,0 +1,110 @@
+/**
+ * 
+ */
+package com.apoollo.commons.server.spring.boot.starter.component.filter;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
+
+import com.apoollo.commons.server.spring.boot.starter.model.Constants;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
+import com.apoollo.commons.util.request.context.RequestContext;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * @author liuyulong
+ * @since 2025-05-19
+ */
+public abstract class AbstractSecureFilter implements Filter {
+
+	private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
+	private static final String ONE_MATCHES_REQUEST_ATTRIBUTE = "oneMatchesRequest";
+
+	private PathProperties pathProperties;
+
+	public AbstractSecureFilter(PathProperties pathProperties) {
+		super();
+		this.pathProperties = pathProperties;
+	}
+
+	@Override
+	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletRequest request = (HttpServletRequest) servletRequest;
+		HttpServletResponse response = (HttpServletResponse) servletResponse;
+		if (matches(request)) {
+			try {
+				doSecureFilter(request, response, chain);
+			} catch (Throwable e) {
+				request.setAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION, e);
+				request.getRequestDispatcher(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH).forward(request, response);
+			} finally {
+				cleanupMatches(request, response, chain);
+			}
+		} else {
+			try {
+				chain.doFilter(request, response);
+			} finally {
+				cleanupNoMaches(request, response, chain);
+			}
+		}
+	}
+
+	public abstract void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException;
+
+	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
+
+	}
+
+	public void cleanupNoMaches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
+		
+	}
+	
+	protected void cleanAttribute(HttpServletRequest request) {
+		request.removeAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE);
+	}
+
+	public boolean matches(HttpServletRequest request) {
+		Boolean matches = (Boolean) request.getAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE);
+		if (null == matches) {
+			String requestMappingPath = RequestContext.getRequestMappingPath(request.getContextPath(),
+					request.getRequestURI());
+			request.setAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE, matches = matches(requestMappingPath));
+		}
+		return matches;
+	}
+
+	public boolean matches(String requestMappingPath) {
+		boolean result = true;
+		if (null != pathProperties) {
+			if (matches(false, pathProperties.getExcludePathPatterns(), requestMappingPath)) {
+				result = false;
+			} else {
+				result = matches(true, pathProperties.getExcludePathPatterns(), requestMappingPath);
+			}
+		}
+		return result;
+	}
+
+	public boolean matches(boolean initail, List<String> pathPatterns, String requestMappingPath) {
+		boolean result = initail;
+		if (CollectionUtils.isNotEmpty(pathPatterns)) {
+			result = pathProperties.getExcludePathPatterns().stream()
+					.filter(pattern -> PATH_MATCHER.match(pattern, requestMappingPath)).findAny().isPresent();
+		}
+		return result;
+	}
+
+}

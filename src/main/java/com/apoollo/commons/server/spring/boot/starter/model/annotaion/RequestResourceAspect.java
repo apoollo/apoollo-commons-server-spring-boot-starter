@@ -74,7 +74,7 @@ public class RequestResourceAspect {
 		}
 		return null;
 	}
-	
+
 	private String toLogContent(Logable logable, Class<?> parameterClass, String parameterName, Object parameterValue) {
 		String[] maskProperies = null == logable ? null : logable.maskProperies();
 		String valueContent = null;
@@ -103,6 +103,10 @@ public class RequestResourceAspect {
 		}
 	}
 
+	public String getLoggingName(String requestResourceName, String ioName, Object... others) {
+		return StringUtils.join("\"", requestResourceName, "\" - " + ioName + ": ") + StringUtils.join(others);
+	}
+
 	@Around(value = "@annotation(requestResource)")
 	public Object advice(ProceedingJoinPoint point, RequestResource requestResource) throws Throwable {
 
@@ -117,7 +121,7 @@ public class RequestResourceAspect {
 		String requestResourceName = requestContext.getRequestResource().getName();
 
 		// 打印入参
-		String requestLogName = StringUtils.join("[", requestResourceName, "]入参: ");
+		String requestLogName = getLoggingName(requestResourceName, "入参");
 		List<String> requestLogContent = null;
 		if (ArrayUtils.isNotEmpty(parameterNames)) {
 			Annotation[][] paramAnnotations = method.getParameterAnnotations();
@@ -144,7 +148,7 @@ public class RequestResourceAspect {
 		Object object = point.proceed();
 
 		// 出参打印日志
-		String responseLogName = StringUtils.join("[", requestResourceName, "]出参: ");
+		String responseLogName = getLoggingName(requestResourceName, "出参");
 		List<String> responseLogContent = null;
 		if (method.getReturnType() != void.class && method.getReturnType() != Void.class) {
 			Logable logable = method.getAnnotation(Logable.class);
@@ -153,8 +157,8 @@ public class RequestResourceAspect {
 				print(responseLogName, responseLogContent);
 			}
 		}
-		LOGGER.info(StringUtils.join("[", requestResourceName, "]", "耗时: ", System.currentTimeMillis() - startTime,
-				"(ms)"));
+
+		LOGGER.info(getLoggingName(requestResourceName, "耗时", System.currentTimeMillis() - startTime, "(ms)"));
 
 		return object;
 	}

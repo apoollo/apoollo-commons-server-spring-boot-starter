@@ -10,10 +10,13 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.apoollo.commons.util.request.context.RequestResourceAccessStrategy;
+import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.SignatureDecryptor;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
-import com.apoollo.commons.util.request.context.def.PrivateRequestResourceAccessStrategy;
-import com.apoollo.commons.util.request.context.def.ResourceType;
+import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.def.DefaultSignatureDecryptor;
 
 /**
  * <p>
@@ -34,7 +37,7 @@ import com.apoollo.commons.util.request.context.def.ResourceType;
  * </p>
  * 
  * @author liuyulong
- * @since 2023年11月20日
+ * @since 2025年3月20日
  * @see com.apoollo.commons.server.spring.boot.starter.model.annotaion.Logable
  * 
  */
@@ -59,7 +62,7 @@ public @interface RequestResource {
 	public String resourcePin() default "";
 
 	/**
-	 * 请求资源名称，用于日志打印时显示的名称
+	 * 请求资源名称，用于日志打印时显示的名称，默认值为resourcePin 属性的值
 	 * 
 	 * @return 请求资源名称
 	 */
@@ -78,14 +81,7 @@ public @interface RequestResource {
 	 * @return 请求资源访问策略
 	 */
 
-	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_REQUEST;
-
-	/**
-	 * 自定义访问策略的Class
-	 * 
-	 * @return Class<RequestResourceAccessStrategy>
-	 */
-	public Class<? extends RequestResourceAccessStrategy> customizeAccessStrategyClass() default PrivateRequestResourceAccessStrategy.class;
+	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_HEADER_JWT_TOKEN;
 
 	/**
 	 * 请求资源用户维度QPS，默认不限制
@@ -102,13 +98,6 @@ public @interface RequestResource {
 	public long limtPlatformQps() default -1;
 
 	/**
-	 * 请求资源类型，默认为静态类型
-	 * 
-	 * @return 请求资源类型
-	 */
-	public ResourceType resourceType() default ResourceType.STATIC;
-
-	/**
 	 * 如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色
 	 * 
 	 * @return 资源所属的角色列表
@@ -123,18 +112,50 @@ public @interface RequestResource {
 	public boolean enableSync() default false;
 
 	/**
-	 * 启用 Body 签名，需要客户端将body签名的值放入Header， Key=Digest，Value需要加密
-	 * ，Digest的加密方式为：DESede/ECB/PKCS5Padding 并 base64 encode
+	 * 启用 Body 签名，需要客户端将body 签名Md5的值放入Header <br/>
+	 * key=x-signature <br/>
+	 * value=Hex(SM4(MD5($requestBody,$bodySignatureDecyptorSecret())));<br/>
+	 * 
+	 * 签名Digest的加密方式为：SM4/ECB/PKCS5Padding 并 Hex encode
 	 * 
 	 * @return 是否开始请求体摘要验证
 	 */
-	public boolean enableBodyDigestValidate() default false;
+	public boolean enableBodySignatureValidate() default false;
 
 	/**
-	 * base64 encode
 	 * 
-	 * @return 请求体摘要秘钥
+	 * @return Hex, 客户端请求体摘要签名加密的秘钥
 	 */
-	public String bodyDigestSecret() default "";
+	public String bodySignatureDecyptorSecret() default "";
+
+	/**
+	 * 
+	 * 要么类有无参构造，要么实例注入到Spring环境中
+	 * 
+	 * @return 自定义请求体签名解密方式的Class
+	 */
+	public Class<? extends SignatureDecryptor> bodySignatureDecyptorClass() default DefaultSignatureDecryptor.class;
+
+	/**
+	 * 启用后会过滤Xss字符
+	 * 
+	 * @return 是否启用请求内容转义
+	 */
+	public boolean enableContentEscape() default false;
+
+	/**
+	 * 要么类有无参构造，要么实例注入到Spring环境中
+	 * 
+	 * @return 转义方式实现类的Class
+	 */
+
+	public Class<? extends EscapeMethod> contentEscapeMethodClass() default DefaultEscapeXss.class;
+
+	/**
+	 * 自定义异常code与返回值样式，要么类有无参构造，要么实例注入到Spring环境中
+	 * 
+	 * @return httpCodeNameHandlerClass
+	 */
+	public Class<? extends HttpCodeNameHandler> httpCodeNameHandlerClass() default DefaultHttpCodeNameHandler.class;
 
 }

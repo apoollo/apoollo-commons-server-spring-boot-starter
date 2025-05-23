@@ -1,16 +1,17 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.component.interceptor;
+package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
+import java.io.IOException;
 import java.time.Duration;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.web.servlet.ModelAndView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.properties.InterceptorCommonsProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.AbstractInternalHandlerInterceptor;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SyncService;
@@ -20,14 +21,18 @@ import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author liuyulong
- * @since 2023年9月25日
+ * @since 2025-05-19
  */
-public class RequestResourceInterceptor extends AbstractInternalHandlerInterceptor {
+public class RequestResourceFilter extends AbstractSecureFilter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestResourceFilter.class);
 
 	private static final String ASYNC_KEY = "request-resource";
 
@@ -35,18 +40,17 @@ public class RequestResourceInterceptor extends AbstractInternalHandlerIntercept
 	private FlowLimiter flowLimiter;
 	private SyncService syncService;
 
-	public RequestResourceInterceptor(InterceptorCommonsProperties interceptorProperties,
-			RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncService syncService) {
-		super(interceptorProperties);
+	public RequestResourceFilter(PathProperties pathProperties, RequestResourceManager requestResourceManager,
+			FlowLimiter flowLimiter, SyncService syncService) {
+		super(pathProperties);
 		this.requestResourceManager = requestResourceManager;
 		this.flowLimiter = flowLimiter;
 		this.syncService = syncService;
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
-
+	public void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 		RequestContext requestContext = RequestContext.getRequired();
 		RequestResource requestResource = requestResourceManager
 				.getRequestResource(requestContext.getRequestMappingPath());
@@ -60,32 +64,20 @@ public class RequestResourceInterceptor extends AbstractInternalHandlerIntercept
 		}
 		if (BooleanUtils.isTrue(requestResource.getEnableSync())) {
 			if (!syncService.lock(ASYNC_KEY, Duration.ofSeconds(30))) {
-				throw new AppServerOverloadedException("没有抢到同步锁");
+				throw new AppServerOverloadedException("当前操作只能同步执行");
 			}
 		}
 		flowLimiter.tryAccess(null, requestResource.getResourcePin(), requestResource.getLimtPlatformQps());
-		return true;
-	}
 
-	@Override
-	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-			ModelAndView modelAndView) throws Exception {
-		RequestContext requestContext = RequestContext.getRequired();
-		RequestResource requestResource = requestContext.getRequestResource();
+		LOGGER.info("request resource accessed");
+		//
+		chain.doFilter(new RequestContextHttpServletRequestWrapper(request, requestContext), response);
+
+		//
 		if (BooleanUtils.isTrue(requestResource.getEnableSync())) {
 			syncService.unlock(ASYNC_KEY);
 		}
-	}
 
-	@Override
-	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
-			throws Exception {
-
-	}
-
-	@Override
-	public int getOrder() {
-		return Constants.REQUEST_RESOUCE_INTERCEPTOR_ORDER;
 	}
 
 }

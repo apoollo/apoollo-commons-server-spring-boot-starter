@@ -40,9 +40,7 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 		RequestContext requestContext = RequestContext.get();
 		Response<?> responseBody = null;
 		if (null != requestContext) {
-
-			HttpCodeNameHandler codeNameHandler = requestContext.getDefaultResourceAccessStrategy()
-					.getHttpCodeNameHandler();
+			HttpCodeNameHandler codeNameHandler = requestContext.getRequestResource().getHttpCodeNameHandler();
 			if (body instanceof Response) {
 				responseBody = (Response<?>) body;
 				if (null == responseBody.getSuccess()) {
@@ -55,7 +53,7 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 			responseBody.setElapsedTime(requestContext.getElapsedTime());
 			responseBody.setRequestId(requestContext.getRequestId());
 			codeNameHandler.resetResponse(requestContext.getRequestBody(), responseBody);
-			requestContext.beforeBodyWrite(responseBody);
+			requestContext.setResponse(responseBody);
 		} else {
 			if (body instanceof Response) {
 				responseBody = (Response<?>) body;

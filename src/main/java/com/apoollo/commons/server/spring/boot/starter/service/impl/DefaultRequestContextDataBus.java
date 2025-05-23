@@ -20,9 +20,9 @@ public class DefaultRequestContextDataBus implements RequestContextDataBus {
 	@Override
 	public void transport(RequestContext requestContext) {
 		if (null != requestContext.getResponseTime()) {
-			LOGGER.info("request elapsedTime：" + requestContext.getElapsedTime() + "ms");
+			LOGGER.info("request total elapsedTime：" + requestContext.getElapsedTime() + "ms");
 		} else {
-			LOGGER.info("request elapsedTime：" + (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
+			LOGGER.info("request total elapsedTime：" + (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
 		}
 	}
 

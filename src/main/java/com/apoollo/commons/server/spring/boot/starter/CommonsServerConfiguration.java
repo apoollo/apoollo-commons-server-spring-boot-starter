@@ -10,7 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -19,7 +18,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -28,56 +26,50 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyDigestValidateAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyJwtTokenAccessAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyKeepParameterAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodySecretKeyTokenAccessAdvice;
+import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyKeyPairAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.XssFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor;
-import com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestHeaderJwtTokenAccessInterceptor;
-import com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestResourceInterceptor;
-import com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestSecretKeyTokenAccessInterceptor;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestBodySignatureValidateFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderJwtTokenAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderKeyPairAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestParameterKeyPairAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestResourceFilter;
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
+import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.CacheProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.EnablePorperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.FilterProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.InterceptorCommonsProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.RequestContextInterceptorProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.RequestHeaderJwtTokenAccessInterceptorProperties;
-import com.apoollo.commons.server.spring.boot.starter.properties.RequestResourceInterceptorProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
+import com.apoollo.commons.server.spring.boot.starter.service.ContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
-import com.apoollo.commons.server.spring.boot.starter.service.InternalHandlerInterceptor;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SyncService;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
-import com.apoollo.commons.server.spring.boot.starter.service.XssHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
+import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultSyncService;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultUserManager;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultXssHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtAuthorizationRenewal;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtTokenAccess;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SecretKeyTokenAccess;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SlidingWindowLimiterImpl;
+import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.redis.service.CountLimiter;
@@ -86,60 +78,49 @@ import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.Authorization;
+import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
+import com.apoollo.commons.util.request.context.SignatureDecryptor;
+import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.def.DefaultSignatureDecryptor;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;
+
+import jakarta.servlet.Filter;
 
 /**
  * @author liuyulong
  * @since 2023年8月22日
  */
+@EnableCaching
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX, name = "enable", matchIfMissing = true)
-@Import({ ApplicationReady.class, WelcomeController.class, DynamicResourceController.class })
+@Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
+		ExceptionController.class, DynamicResourceController.class })
 public class CommonsServerConfiguration {
 
 	@Bean
 	@ConfigurationProperties(Constants.CONFIGURATION_PREFIX)
 	CommonsServerProperties getCommonsServerProperties() {
-
-		InterceptorCommonsProperties commonsProperties = new InterceptorCommonsProperties();
-		commonsProperties.setPathPatterns(new ArrayList<>());
+		PathProperties pathProperties = new PathProperties();
+		pathProperties.setExcludePathPatterns(new ArrayList<>());
+		pathProperties.setIncludePathPatterns(new ArrayList<>());
 
 		RabcProperties rabcProperties = new RabcProperties();
 		rabcProperties.setRequestResources(new ArrayList<>());
 
 		CommonsServerProperties commonsServerProperties = new CommonsServerProperties();
-
 		commonsServerProperties.setEnable(true);
-		commonsServerProperties.setRequestContextInterceptor(new RequestContextInterceptorProperties(true));
-		commonsServerProperties.setRequestResourceInterceptor(new RequestResourceInterceptorProperties(true));
-		commonsServerProperties
-				.setRequestHeaderJwtTokenAccessInterceptor(new RequestHeaderJwtTokenAccessInterceptorProperties(true));
-		commonsServerProperties.setResponseBodyContext(new EnablePorperties(true));
-		commonsServerProperties.setCache(new CacheProperties(true));
+		commonsServerProperties.setPath(pathProperties);
 		commonsServerProperties.setAccess(new AccessProperties(null, null, true));
 
-		commonsServerProperties.setCommonsIntercetptor(commonsProperties);
 		commonsServerProperties.setRbac(rabcProperties);
 		return commonsServerProperties;
-	}
-
-	// @Bean
-	// CacheManagerService getCacheManagerService(@Nullable CacheManager
-	// cacheManager) {
-	// return new DefaultCacheManagerService(cacheManager);
-	// }
-
-	@Bean
-	CommonsServerWebMvcConfigurer getCommonsServerWebMvcConfigurer(ApplicationContext applicationContext,
-			CommonsServerProperties commonsServerProperties,
-			List<InternalHandlerInterceptor> internalHandlerInterceptors) {
-		return new CommonsServerWebMvcConfigurer(applicationContext, commonsServerProperties,
-				internalHandlerInterceptors);
 	}
 
 	@Bean
@@ -261,178 +242,138 @@ public class CommonsServerConfiguration {
 		return threadPoolExecutor;
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-context-interceptor", name = "enable", matchIfMissing = true)
-	public static class RequestContextInterceptorConfiguration {
-		@Bean
-		RequestContextInterceptor getRequestContextInterceptor(CommonsServerProperties commonsServerProperties,
-				RequestContextInitail requestContextInitail, ThreadPoolExecutor threadPoolExecutorForTimeOut,
-				CountLimiter countLimiter, LoggerWriter logWitter) {
-			return new RequestContextInterceptor(commonsServerProperties.getRequestContextInterceptor(),
-					requestContextInitail, threadPoolExecutorForTimeOut, countLimiter, logWitter);
-		}
-
+	@Bean
+	CacheManager cacheManager() {
+		CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+		cacheManager.setCaffeine(Caffeine.newBuilder()//
+				.expireAfterWrite(5, TimeUnit.MINUTES)//
+				.initialCapacity(500)//
+				.maximumSize(2000)//
+		);
+		return cacheManager;
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-resource-interceptor", name = "enable", matchIfMissing = true)
-	public static class RequestResourceInterceptorConfiguration {
-
-		@Bean
-		RequestResourceInterceptor getRequestResourceInterceptor(CommonsServerProperties commonsServerProperties,
-				RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncService syncService) {
-			return new RequestResourceInterceptor(commonsServerProperties.getRequestResourceInterceptor(),
-					requestResourceManager, flowLimiter, syncService);
-		}
+	@Bean
+	@ConditionalOnMissingBean
+	HttpCodeNameHandler getHttpCodeNameHandler() {
+		return new DefaultHttpCodeNameHandler();
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-header-jwt-token-access-interceptor", name = "enable", matchIfMissing = true)
-	public static class RequestHeaderJwtTokenAccessInterceptorConfiguration {
-
-		@Bean
-		@ConditionalOnMissingBean
-		JwtAuthorizationRenewal getJwtAuthorizationRenewal(UserManager userManager) {
-			return new JwtAuthorizationRenewal(userManager);
-		}
-
-		@Bean
-		RequestHeaderJwtTokenAccessInterceptor getRequestHeaderJwtTokenAccessInterceptor(
-				CommonsServerProperties commonsServerProperties,
-				AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
-				Access<JwtToken> jwtTokenAccess, JwtAuthorizationRenewal authorizationRenewal) {
-			return new RequestHeaderJwtTokenAccessInterceptor(
-					commonsServerProperties.getRequestHeaderJwtTokenAccessInterceptor(),
-					authorizationJwtTokenJwtTokenDecoder, jwtTokenAccess, authorizationRenewal);
-		}
+	@Bean
+	@ConditionalOnMissingBean
+	JwtAuthorizationRenewal getJwtAuthorizationRenewal(UserManager userManager) {
+		return new JwtAuthorizationRenewal(userManager);
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-secret-key-token-access-interceptor", name = "enable", matchIfMissing = false)
-	public static class RequestSecretKeyTokenAccessInterceptorConfiguration {
-
-		@Bean
-		RequestSecretKeyTokenAccessInterceptor getRequestSecretKeyTokenAccessInterceptor(
-				CommonsServerProperties commonsServerProperties, Access<String> secretKeyTokenAccess) {
-			return new RequestSecretKeyTokenAccessInterceptor(
-					commonsServerProperties.getRequestSecretKeyTokenAccessInterceptor(), secretKeyTokenAccess);
-		}
+	@Bean
+	@ConditionalOnMissingBean
+	EscapeMethod getEscapeXss() {
+		return new DefaultEscapeXss();
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-body-keep-parameter-advice", name = "enable", matchIfMissing = false)
-	public static class RequestBodyKeepParameterAdviceConfiguration {
-
-		@Bean
-		RequestBodyKeepParameterAdvice getRequestBodyKeepParameterAdvice() {
-			return new RequestBodyKeepParameterAdvice();
-		}
-
+	@Bean
+	@ConditionalOnMissingBean
+	ContentEscapeHandler getXssHandler(EscapeMethod escapeXss) {
+		return new DefaultContentEscapeHandler(escapeXss);
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-body-digest-validate-advice", name = "enable", matchIfMissing = false)
-	public static class RequestBodyDigestValidateAdviceConfiguration {
-
-		@Bean
-		RequestBodyDigestValidateAdvice getRequestBodyDigestValidateAdvice(
-				CommonsServerProperties commonsServerProperties) {
-			return new RequestBodyDigestValidateAdvice(commonsServerProperties.getRequestBodyDigestValidateAdvice());
-		}
-
+	@Bean
+	@ConditionalOnMissingBean
+	SignatureDecryptor getSignatureDecryptor(CommonsServerProperties commonsServerProperties) {
+		return new DefaultSignatureDecryptor(commonsServerProperties.getBodySignatureDefaultSecret());
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-body-jwt-token-access-advice", name = "enable", matchIfMissing = false)
-	public static class RequestBodyJwtTokenAccessAdviceConfiguration {
-
-		@Bean
-		RequestBodyJwtTokenAccessAdvice getRequestBodyJwtTokenAccessAdvice(
-				AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
-				Access<JwtToken> jwtTokenAccess) {
-			return new RequestBodyJwtTokenAccessAdvice(authorizationJwtTokenJwtTokenDecoder, jwtTokenAccess);
-		}
+	@Bean
+	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
+			RequestContextInitail requestContextInitail, CountLimiter countLimiter, LoggerWriter logWitter,
+			CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(new RequestContextFilter(commonsServerProperties.getPath(),
+				requestContextInitail, countLimiter, logWitter), Constants.REQUEST_CONTEXT_FILTER_ORDER);
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".request-body-secret-key-token-access-advice", name = "enable", matchIfMissing = false)
-	public static class RequestBodySecretKeyTokenAccessAdviceConfiguration {
-
-		@Bean
-		RequestBodySecretKeyTokenAccessAdvice getRequestBodySecretKeyTokenAccessAdvice(
-				Access<String> secretKeyTokenAccess) {
-			return new RequestBodySecretKeyTokenAccessAdvice(secretKeyTokenAccess);
-		}
+	@Bean
+	FilterRegistrationBean<RequestResourceFilter> getRequestResourceFilterRegistrationBean(
+			RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncService syncService,
+			CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(new RequestResourceFilter(commonsServerProperties.getPath(),
+				requestResourceManager, flowLimiter, syncService), Constants.REQUEST_RESOURCE_FILTER_ORDER);
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".response-body-context", name = "enable", matchIfMissing = true)
-	public static class ResponseContextBodyAdviceConfiguration {
-
-		@Bean
-		ResponseBodyContextAdvice getResponseContextBodyAdvice() {
-			return new ResponseBodyContextAdvice();
-		}
-
-		@Bean
-		ExceptionControllerAdvice getExceptionControllerAdvice() {
-			return new ExceptionControllerAdvice();
-		}
-
+	@Bean
+	FilterRegistrationBean<RequestBodySignatureValidateFilter> getRequestBodySignatureValidateFilterRegistrationBean(
+			SignatureDecryptor signatureDecryptor, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestBodySignatureValidateFilter(commonsServerProperties.getPath(), signatureDecryptor),
+				Constants.REQUEST_BODY_SIGNATURE_VALIDATE_FILTER_ORDER);
 	}
 
-	@EnableCaching
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX + ".cache", name = "enable", matchIfMissing = true)
-	public static class CacheConfig {
-
-		@Bean
-		CacheManager cacheManager() {
-			CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-			cacheManager.setCaffeine(Caffeine.newBuilder()//
-					.expireAfterWrite(5, TimeUnit.MINUTES)//
-					.initialCapacity(500)//
-					.maximumSize(2000)//
-			);
-			return cacheManager;
-		}
+	@Bean
+	FilterRegistrationBean<RequestContentEscapeFilter> getRequestContentEscapeFilterRegistrationBean(
+			ContentEscapeHandler contentEscapeHandler, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestContentEscapeFilter(commonsServerProperties.getPath(), contentEscapeHandler),
+				Constants.REQUEST_CONTENT_ESCAPE_FILTER_ORDER);
 	}
 
-	@Configuration(proxyBeanMethods = true)
-	@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX
-			+ ".xss-filter", name = "enable", matchIfMissing = false)
-	public static class XssFilterConfiguration {
+	@Bean
+	FilterRegistrationBean<RequestHeaderJwtTokenAccessFilter> getRequestHeaderJwtTokenAccessFilterRegistrationBean(
+			AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder, Access<JwtToken> access,
+			JwtAuthorizationRenewal authorizationRenewal, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestHeaderJwtTokenAccessFilter(commonsServerProperties.getPath(),
+						authorizationJwtTokenJwtTokenDecoder, access, authorizationRenewal),
+				Constants.REQUEST_HEADER_JWT_TOKEN_ACCESS_FILTER_ORDER);
+	}
 
-		@Bean
-		@ConditionalOnMissingBean
-		XssHandler getXssHandler() {
-			return new DefaultXssHandler();
-		}
+	@Bean
+	FilterRegistrationBean<RequestHeaderKeyPairAccessFilter> getRequestHeaderKeyPairAccessFilterRegistrationBean(
+			Access<String> access, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestHeaderKeyPairAccessFilter(commonsServerProperties.getPath(), access,
+						commonsServerProperties.getKeyPairAccessKeyProperty(),
+						commonsServerProperties.getKeyPairSecretKeyProperty()),
+				Constants.REQUEST_HEADER_KEY_PAIR_ACCESS_FILTER_ORDER);
+	}
 
-		@Bean
-		FilterRegistrationBean<XssFilter> getXssFilterRegistrationBean(XssHandler xssHandler,
-				CommonsServerProperties commonsServerProperties) {
-			FilterRegistrationBean<XssFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-			filterRegistrationBean.setFilter(new XssFilter(xssHandler));
-			filterRegistrationBean.setOrder(Constants.XSS_FILTER_ORDER);
-			filterRegistrationBean.setEnabled(true);
-			FilterProperties filterProperties = commonsServerProperties.getXssFilter();
-			if (null != filterProperties && CollectionUtils.isNotEmpty(filterProperties.getPathPatterns())) {
-				filterRegistrationBean.setUrlPatterns(filterProperties.getPathPatterns());
-			} else {
-				filterRegistrationBean.addUrlPatterns("/*");
-			}
-			return filterRegistrationBean;
-		}
+	@Bean
+	FilterRegistrationBean<RequestParameterKeyPairAccessFilter> getRequestParameterKeyPairAccessFilterRegistrationBean(
+			Access<String> access, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestParameterKeyPairAccessFilter(commonsServerProperties.getPath(), access,
+						commonsServerProperties.getKeyPairAccessKeyProperty(),
+						commonsServerProperties.getKeyPairSecretKeyProperty()),
+				Constants.REQUEST_PARAMETER_KEY_PAIR_ACCESS_FILTER_ORDER);
+	}
+
+	private <T extends Filter> FilterRegistrationBean<T> newFilterRegistrationBean(T filter, int order) {
+		FilterRegistrationBean<T> filterRegistrationBean = new FilterRegistrationBean<>();
+		filterRegistrationBean.setFilter(filter);
+		filterRegistrationBean.setOrder(order);
+		filterRegistrationBean.setEnabled(true);
+		filterRegistrationBean.setUrlPatterns(List.of("/*"));
+		return filterRegistrationBean;
+	}
+
+	@Bean
+	RequestBodyJwtTokenAccessAdvice getRequestBodyJwtTokenAccessAdvice(
+			AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
+			Access<JwtToken> jwtTokenAccess) {
+		return new RequestBodyJwtTokenAccessAdvice(authorizationJwtTokenJwtTokenDecoder, jwtTokenAccess);
+	}
+
+	@Bean
+	RequestBodyKeyPairAccessAdvice getRequestBodyKeyPairAccessAdvice(Access<String> secretKeyTokenAccess) {
+		return new RequestBodyKeyPairAccessAdvice(secretKeyTokenAccess);
+	}
+
+	@Bean
+	ResponseBodyContextAdvice getResponseContextBodyAdvice() {
+		return new ResponseBodyContextAdvice();
+	}
+
+	@Bean
+	ExceptionControllerAdvice getExceptionControllerAdvice() {
+		return new ExceptionControllerAdvice();
 	}
 
 	@Bean
