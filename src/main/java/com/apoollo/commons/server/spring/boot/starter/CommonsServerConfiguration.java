@@ -28,6 +28,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
+import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyJwtTokenAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyKeyPairAccessAdvice;
@@ -43,7 +44,6 @@ import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResource
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
@@ -355,6 +355,7 @@ public class CommonsServerConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	RequestBodyJwtTokenAccessAdvice getRequestBodyJwtTokenAccessAdvice(
 			AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
 			Access<JwtToken> jwtTokenAccess) {
@@ -362,21 +363,25 @@ public class CommonsServerConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	RequestBodyKeyPairAccessAdvice getRequestBodyKeyPairAccessAdvice(Access<String> secretKeyTokenAccess) {
 		return new RequestBodyKeyPairAccessAdvice(secretKeyTokenAccess);
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ResponseBodyContextAdvice getResponseContextBodyAdvice() {
 		return new ResponseBodyContextAdvice();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ExceptionControllerAdvice getExceptionControllerAdvice() {
 		return new ExceptionControllerAdvice();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	public RequestResourceAspect getRequestResourceAspect() {
 		return new RequestResourceAspect();
 	}

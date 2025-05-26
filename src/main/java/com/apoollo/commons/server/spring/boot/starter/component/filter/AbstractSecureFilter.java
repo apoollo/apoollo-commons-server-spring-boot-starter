@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public abstract class AbstractSecureFilter implements Filter {
 
 	private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
-	private static final String ONE_MATCHES_REQUEST_ATTRIBUTE = "oneMatchesRequest";
+	private static final String ONCE_MATCHES_REQUEST_ATTRIBUTE = AbstractSecureFilter.class + "onceMatchesRequest";
 
 	private PathProperties pathProperties;
 
@@ -69,19 +69,19 @@ public abstract class AbstractSecureFilter implements Filter {
 	}
 
 	public void cleanupNoMaches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
-		
+
 	}
-	
+
 	protected void cleanAttribute(HttpServletRequest request) {
-		request.removeAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE);
+		request.removeAttribute(ONCE_MATCHES_REQUEST_ATTRIBUTE);
 	}
 
 	public boolean matches(HttpServletRequest request) {
-		Boolean matches = (Boolean) request.getAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE);
+		Boolean matches = (Boolean) request.getAttribute(ONCE_MATCHES_REQUEST_ATTRIBUTE);
 		if (null == matches) {
 			String requestMappingPath = RequestContext.getRequestMappingPath(request.getContextPath(),
 					request.getRequestURI());
-			request.setAttribute(ONE_MATCHES_REQUEST_ATTRIBUTE, matches = matches(requestMappingPath));
+			request.setAttribute(ONCE_MATCHES_REQUEST_ATTRIBUTE, matches = matches(requestMappingPath));
 		}
 		return matches;
 	}

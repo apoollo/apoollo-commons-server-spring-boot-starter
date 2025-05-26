@@ -114,9 +114,9 @@ public @interface RequestResource {
 	/**
 	 * 启用 Body 签名，需要客户端将body 签名Md5的值放入Header <br/>
 	 * key=x-signature <br/>
-	 * value=Hex(SM4(MD5($requestBody,$bodySignatureDecyptorSecret())));<br/>
+	 * value=Base64.encode(SM4(MD5($requestBody,$bodySignatureDecyptorSecret())));<br/>
 	 * 
-	 * 签名Digest的加密方式为：SM4/ECB/PKCS5Padding 并 Hex encode
+	 * 签名Digest的加密方式为：SM4/ECB/PKCS5Padding 并 Base64 encode
 	 * 
 	 * @return 是否开始请求体摘要验证
 	 */
@@ -124,7 +124,7 @@ public @interface RequestResource {
 
 	/**
 	 * 
-	 * @return Hex, 客户端请求体摘要签名加密的秘钥
+	 * @return 128 bit Hex, 客户端请求体摘要签名加密的秘钥
 	 */
 	public String bodySignatureDecyptorSecret() default "";
 
