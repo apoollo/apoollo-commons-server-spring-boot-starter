@@ -6,6 +6,7 @@ package com.apoollo.commons.server.spring.boot.starter.model;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,10 @@ public class CommonsHttpServletRequestWrapper extends HttpServletRequestWrapper 
 
 	public CommonsHttpServletRequestWrapper(HttpServletRequest request) {
 		super(request);
+	}
+
+	public Charset getCharset() {
+		return ServletInputStreamHelper.getCharset(getRequest());
 	}
 
 	@Override

@@ -3,6 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.service.impl;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -88,8 +89,8 @@ public class DefaultContentEscapeHandler implements ContentEscapeHandler {
 	}
 
 	@Override
-	public String escapeByContentType(String contentType, String content) {
-		return getRequestContextEscapeMethod().escapeByContentType(contentType, content);
+	public byte[] escapeByContentType(Charset charset, String contentType, byte[] content) {
+		return getRequestContextEscapeMethod().escapeByContentType(charset, contentType, content);
 	}
 
 	@Override

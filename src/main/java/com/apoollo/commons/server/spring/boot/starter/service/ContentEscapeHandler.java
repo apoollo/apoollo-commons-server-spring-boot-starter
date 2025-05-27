@@ -3,6 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.service;
 
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ public interface ContentEscapeHandler {
 
 	public Enumeration<String> escapes(Enumeration<String> enumeration);
 
-	public String escapeByContentType(String contentType, String content);
-	
+	public byte[] escapeByContentType(Charset charset, String contentType, byte[] content);
+
 	public List<String> getSupportEscapeContentTypes();
 }

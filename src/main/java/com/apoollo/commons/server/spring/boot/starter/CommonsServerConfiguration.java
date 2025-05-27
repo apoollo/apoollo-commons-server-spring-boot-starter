@@ -33,7 +33,7 @@ import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.Excep
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyJwtTokenAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyKeyPairAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestBodySignatureValidateFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSignatureValidateFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderJwtTokenAccessFilter;
@@ -82,10 +82,8 @@ import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
-import com.apoollo.commons.util.request.context.SignatureDecryptor;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
-import com.apoollo.commons.util.request.context.def.DefaultSignatureDecryptor;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -277,11 +275,6 @@ public class CommonsServerConfiguration {
 		return new DefaultContentEscapeHandler(escapeXss);
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	SignatureDecryptor getSignatureDecryptor(CommonsServerProperties commonsServerProperties) {
-		return new DefaultSignatureDecryptor(commonsServerProperties.getBodySignatureDefaultSecret());
-	}
 
 	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
@@ -300,11 +293,12 @@ public class CommonsServerConfiguration {
 	}
 
 	@Bean
-	FilterRegistrationBean<RequestBodySignatureValidateFilter> getRequestBodySignatureValidateFilterRegistrationBean(
-			SignatureDecryptor signatureDecryptor, CommonsServerProperties commonsServerProperties) {
+	FilterRegistrationBean<RequestSignatureValidateFilter> getRequestSignatureValidateFilterRegistrationBean(
+			CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(
-				new RequestBodySignatureValidateFilter(commonsServerProperties.getPath(), signatureDecryptor),
-				Constants.REQUEST_BODY_SIGNATURE_VALIDATE_FILTER_ORDER);
+				new RequestSignatureValidateFilter(commonsServerProperties.getPath(),
+						commonsServerProperties.getSignatureSecret()),
+				Constants.REQUEST_SIGNATURE_VALIDATE_FILTER_ORDER);
 	}
 
 	@Bean

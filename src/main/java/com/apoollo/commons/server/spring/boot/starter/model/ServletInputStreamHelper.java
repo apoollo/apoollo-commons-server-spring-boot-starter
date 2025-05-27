@@ -49,7 +49,7 @@ public class ServletInputStreamHelper {
 		return array;
 	}
 
-	public static byte[] getCacheBodyByteArray(ServletRequest request) throws IOException {
+	public static byte[] getCachingBodyByteArray(ServletRequest request) throws IOException {
 		byte[] array = null;
 		RequestContext requestContext = RequestContext.get();
 		if (null != requestContext) {
@@ -65,17 +65,14 @@ public class ServletInputStreamHelper {
 
 	}
 
-	public static ServletInputStream getCachingServletInputStream(ServletRequest request, Function<String, String> bodyMap)
-			throws IOException {
+	public static ServletInputStream getCachingServletInputStream(ServletRequest request,
+			Function<byte[], byte[]> bodyMap) throws IOException {
 		ServletInputStream servletInputStream = null;
-		byte[] bytes = getCacheBodyByteArray(request);
+		byte[] bytes = getCachingBodyByteArray(request);
 		if (null == bytes) {
 			servletInputStream = new EmptyServletInputStream();
 		} else {
-			Charset charset = getCharset(request);
-			String content = new String(bytes, charset);
-			String value = bodyMap.apply(content);
-			servletInputStream = new ByteArrayServletInputStream(value.getBytes(charset));
+			servletInputStream = new ByteArrayServletInputStream(bodyMap.apply(bytes));
 		}
 		return servletInputStream;
 	}

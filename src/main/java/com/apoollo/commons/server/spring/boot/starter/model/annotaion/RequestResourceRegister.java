@@ -5,6 +5,7 @@ package com.apoollo.commons.server.spring.boot.starter.model.annotaion;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -154,9 +155,16 @@ public class RequestResourceRegister {
 		requestResourceObject.setLimtUserQps(requestResourceAnnotaion.limtUserQps());
 		requestResourceObject.setRoles(requestResourceAnnotaion.roles());
 		requestResourceObject.setEnableSync(requestResourceAnnotaion.enableSync());
-		requestResourceObject.setEnableBodySignatureValidate(requestResourceAnnotaion.enableBodySignatureValidate());
-		requestResourceObject.setBodySignatureDecyptorSecret(requestResourceAnnotaion.bodySignatureDecyptorSecret());
-		requestResourceObject.setBodySignatureDecyptor(instance(requestResourceAnnotaion.bodySignatureDecyptorClass()));
+		requestResourceObject.setEnableSignature(requestResourceAnnotaion.enableSignature());
+		requestResourceObject.setSignatureSecret(requestResourceAnnotaion.signatureSecret());
+		requestResourceObject
+				.setSignatureExcludeHeaderNames(null != requestResourceAnnotaion.signatureExcludeHeaderNames()
+						? Arrays.stream(requestResourceAnnotaion.signatureExcludeHeaderNames()).toList()
+						: null);
+		requestResourceObject
+				.setSignatureIncludeHeaderNames(null != requestResourceAnnotaion.signatureIncludeHeaderNames()
+						? Arrays.stream(requestResourceAnnotaion.signatureIncludeHeaderNames()).toList()
+						: null);
 		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
 		requestResourceObject.setContentEscapeMethod(instance(requestResourceAnnotaion.contentEscapeMethodClass()));
 		requestResourceObject.setHttpCodeNameHandler(instance(requestResourceAnnotaion.httpCodeNameHandlerClass()));

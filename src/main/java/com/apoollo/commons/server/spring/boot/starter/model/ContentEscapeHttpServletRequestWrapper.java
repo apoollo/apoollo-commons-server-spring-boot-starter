@@ -34,7 +34,6 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 		this.contentEscapeHandler = contentEscapeHandler;
 	}
 
-
 	@Override
 	public String getHeader(String name) {
 		return contentEscapeHandler.escape(super.getHeader(name));
@@ -79,7 +78,8 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 			return StringUtils.startsWithIgnoreCase(contentType, supportContentType);
 		}).findAny().isPresent()) {
 			return ServletInputStreamHelper.getCachingServletInputStream(super.getRequest(), content -> {
-				return contentEscapeHandler.escapeByContentType(contentType, content);
+
+				return contentEscapeHandler.escapeByContentType(getCharset(), contentType, content);
 			});
 		}
 		return super.getInputStream();

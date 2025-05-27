@@ -16,7 +16,7 @@ public class CommonsServerProperties extends EnablePorperties {
 
 	private PathProperties path;
 
-	private String bodySignatureDefaultSecret;
+	private String signatureSecret;
 
 	private String keyPairAccessKeyProperty;
 

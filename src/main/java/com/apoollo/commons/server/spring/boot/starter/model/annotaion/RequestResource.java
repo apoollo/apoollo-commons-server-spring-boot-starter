@@ -12,11 +12,9 @@ import java.lang.annotation.Target;
 
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
-import com.apoollo.commons.util.request.context.SignatureDecryptor;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
-import com.apoollo.commons.util.request.context.def.DefaultSignatureDecryptor;
 
 /**
  * <p>
@@ -112,29 +110,29 @@ public @interface RequestResource {
 	public boolean enableSync() default false;
 
 	/**
-	 * 启用 Body 签名，需要客户端将body 签名Md5的值放入Header <br/>
-	 * key=x-signature <br/>
-	 * value=Base64.encode(SM4(MD5($requestBody,$bodySignatureDecyptorSecret())));<br/>
-	 * 
-	 * 签名Digest的加密方式为：SM4/ECB/PKCS5Padding 并 Base64 encode
+	 * 启用 Body 签名，需要客户端将签名放入Header
 	 * 
 	 * @return 是否开始请求体摘要验证
 	 */
-	public boolean enableBodySignatureValidate() default false;
+	public boolean enableSignature() default false;
 
 	/**
 	 * 
-	 * @return 128 bit Hex, 客户端请求体摘要签名加密的秘钥
+	 * @return 客户端请求摘要签名加密的秘钥, 此属性可替换默认值
 	 */
-	public String bodySignatureDecyptorSecret() default "";
+	public String signatureSecret() default "";
 
 	/**
 	 * 
-	 * 要么类有无参构造，要么实例注入到Spring环境中
-	 * 
-	 * @return 自定义请求体签名解密方式的Class
+	 * @return 签名排除的header名称列表
 	 */
-	public Class<? extends SignatureDecryptor> bodySignatureDecyptorClass() default DefaultSignatureDecryptor.class;
+	public String[] signatureExcludeHeaderNames() default {};
+
+	/**
+	 * 
+	 * @return 签名包含的header名称列表
+	 */
+	public String[] signatureIncludeHeaderNames() default {};
 
 	/**
 	 * 启用后会过滤Xss字符

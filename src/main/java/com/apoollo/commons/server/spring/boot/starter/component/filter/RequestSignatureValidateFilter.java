@@ -1,0 +1,114 @@
+/**
+ * 
+ */
+package com.apoollo.commons.server.spring.boot.starter.component.filter;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.function.Function;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.apoollo.commons.server.spring.boot.starter.model.Constants;
+import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
+import com.apoollo.commons.util.HttpContentUtils;
+import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.crypto.hash.HmacSHA256;
+import com.apoollo.commons.util.crypto.hash.MacHash;
+import com.apoollo.commons.util.exception.AppIllegalArgumentException;
+import com.apoollo.commons.util.request.context.RequestContext;
+import com.apoollo.commons.util.request.context.RequestResource;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * @author liuyulong
+ * @since 2025-05-19
+ */
+public class RequestSignatureValidateFilter extends AbstractSecureFilter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestSignatureValidateFilter.class);
+
+	private static final MacHash MAC_HASH = new HmacSHA256();
+	private String secret;
+
+	public RequestSignatureValidateFilter(PathProperties pathProperties, String secret) {
+		super(pathProperties);
+		this.secret = secret;
+	}
+
+	@Override
+	public void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+
+		RequestContext requestContext = RequestContext.getRequired();
+		RequestResource requestResource = requestContext.getRequestResource();
+
+		if (BooleanUtils.isTrue(requestResource.getEnableSignature())) {
+			String requestSignature = request.getHeader(Constants.REQUEST_SIGNATURE);
+			if (StringUtils.isBlank(requestSignature)) {
+				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_SIGNATURE + "] must not be null");
+			}
+
+			String targetSecret = LangUtils.defaultString(requestResource.getSignatureSecret(), this.secret);
+			if (StringUtils.isBlank(targetSecret)) {
+				throw new RuntimeException("secret must not be blank");
+			}
+
+			String signature = HttpContentUtils.getHttpContentSignature(MAC_HASH, Hex.decodeStrict(targetSecret),
+					ServletInputStreamHelper.getCharset(request), request.getMethod(), getRequestPath(requestContext),
+					request.getQueryString(),
+					getHeaders(request, requestResource.getSignatureExcludeHeaderNames(),
+							requestResource.getSignatureIncludeHeaderNames()),
+					ServletInputStreamHelper.getCachingBodyByteArray(request));
+
+			if (StringUtils.equals(requestSignature, signature)) {
+				throw new AppIllegalArgumentException("signature compared false ,body probably has been modified");
+			}
+			LOGGER.info("body signature validate accessed");
+
+		}
+		chain.doFilter(request, response);
+	}
+
+	public String getRequestPath(RequestContext requestContext) {
+		if (StringUtils.isBlank(requestContext.getContextPath())) {
+			return requestContext.getRequestUri();
+		} else {
+			return StringUtils.join(requestContext.getContextPath(), "/", requestContext.getRequestUri());
+		}
+	}
+
+	public TreeMap<String, String> getNameValues(Function<String, String> valueGetter, Iterator<String> names,
+			List<String> excludes, List<String> includes) {
+		TreeMap<String, String> treeMap = new TreeMap<>();
+		names.forEachRemaining(name -> {
+			if ((null == excludes || !excludes.contains(name)) && (null == includes || includes.contains(name))) {
+				String value = valueGetter.apply(name);
+				treeMap.put(name, value);
+			}
+		});
+		return treeMap;
+	}
+
+	public TreeMap<String, String> getHeaders(HttpServletRequest request, List<String> excludes,
+			List<String> includes) {
+		if (CollectionUtils.isEmpty(excludes)) {
+			excludes = List.of(Constants.REQUEST_SIGNATURE);
+		}
+		return getNameValues(headerName -> request.getHeader(headerName), request.getHeaderNames().asIterator(),
+				excludes, includes);
+	}
+
+}
