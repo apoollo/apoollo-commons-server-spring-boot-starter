@@ -4,9 +4,7 @@
 package com.apoollo.commons.server.spring.boot.starter.model;
 
 import java.io.IOException;
-
-import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper.ByteArrayServletInputStream;
-import com.apoollo.commons.util.request.context.RequestContext;
+import java.util.function.Function;
 
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,21 +15,14 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class RequestContextHttpServletRequestWrapper extends CommonsHttpServletRequestWrapper {
 
-	private RequestContext requestContext;
 
-	public RequestContextHttpServletRequestWrapper(HttpServletRequest request, RequestContext requestContext) {
+	public RequestContextHttpServletRequestWrapper(HttpServletRequest request) {
 		super(request);
-		this.requestContext = requestContext;
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
-		byte[] requestBody = requestContext.getRequestBody();
-		if (null == requestBody) {
-			requestBody = ServletInputStreamHelper.getBodyByteArray(getRequest());
-			requestContext.setRequestBody(requestBody);
-		}
-		return new ByteArrayServletInputStream(requestBody);
+		return ServletInputStreamHelper.getCachingServletInputStream(getRequest(), Function.identity());
 	}
 
 	

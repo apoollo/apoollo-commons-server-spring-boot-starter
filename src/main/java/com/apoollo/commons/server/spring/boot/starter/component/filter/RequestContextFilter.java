@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
+import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
@@ -64,10 +66,8 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		}
 		LOGGER.info("访问URI：" + reuqestUri);
 		LOGGER.info("访问IP：" + requestIp);
-
-		//
-		chain.doFilter(request, response);
-		//
+		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
+		chain.doFilter(new RequestContextHttpServletRequestWrapper(request), response);
 		response.setHeader(Constants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		User user = requestContext.getUser();
 		if (null != user) {

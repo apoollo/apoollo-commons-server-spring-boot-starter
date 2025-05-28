@@ -74,9 +74,14 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		String contentType = super.getContentType();
-		if (LangUtils.getStream(contentEscapeHandler.getSupportEscapeContentTypes()).filter(supportContentType -> {
-			return StringUtils.startsWithIgnoreCase(contentType, supportContentType);
-		}).findAny().isPresent()) {
+		if (LangUtils//
+				.getStream(contentEscapeHandler.getSupportEscapeContentTypes())//
+				.filter(supportContentType -> {
+					return StringUtils.startsWithIgnoreCase(contentType, supportContentType);
+				})//
+				.findAny()//
+				.isPresent()//
+		) {
 			return ServletInputStreamHelper.getCachingServletInputStream(super.getRequest(), content -> {
 
 				return contentEscapeHandler.escapeByContentType(getCharset(), contentType, content);

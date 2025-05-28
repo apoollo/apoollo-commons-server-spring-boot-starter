@@ -4,6 +4,7 @@
 package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -12,7 +13,6 @@ import java.util.function.Function;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,15 +66,23 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 				throw new RuntimeException("secret must not be blank");
 			}
 
-			String signature = HttpContentUtils.getHttpContentSignature(MAC_HASH, Hex.decodeStrict(targetSecret),
-					ServletInputStreamHelper.getCharset(request), request.getMethod(), getRequestPath(requestContext),
-					request.getQueryString(),
-					getHeaders(request, requestResource.getSignatureExcludeHeaderNames(),
-							requestResource.getSignatureIncludeHeaderNames()),
-					ServletInputStreamHelper.getCachingBodyByteArray(request));
+			String requestMehtod = request.getMethod();
+			String requestPath = getRequestPath(requestContext);
+			String queryString = request.getQueryString();
+			TreeMap<String, String> headers = getHeaders(request, requestResource.getSignatureExcludeHeaderNames(),
+					requestResource.getSignatureIncludeHeaderNames());
+			Charset charset = ServletInputStreamHelper.getCharset(request);
+			byte[] body = ServletInputStreamHelper.getCachingBodyByteArray(request);
 
-			if (StringUtils.equals(requestSignature, signature)) {
-				throw new AppIllegalArgumentException("signature compared false ,body probably has been modified");
+			String httpContent = HttpContentUtils.getHttpContent(charset, requestMehtod, requestPath, queryString,
+					headers, body);
+			String signature = HttpContentUtils.getHttpContentSignature(MAC_HASH, targetSecret, charset, httpContent);
+
+			if (!StringUtils.equals(requestSignature, signature)) {
+				LOGGER.error("secret:" + targetSecret);
+				LOGGER.error("signature:" + signature);
+				LOGGER.error("httpContent:\n" + httpContent);
+				throw new AppIllegalArgumentException("signature compared false");
 			}
 			LOGGER.info("body signature validate accessed");
 
@@ -94,7 +102,9 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 			List<String> excludes, List<String> includes) {
 		TreeMap<String, String> treeMap = new TreeMap<>();
 		names.forEachRemaining(name -> {
-			if ((null == excludes || !excludes.contains(name)) && (null == includes || includes.contains(name))) {
+			name = name.toLowerCase();
+			if ((null == excludes || excludes.isEmpty() || !excludes.contains(name))
+					&& (null == includes || includes.isEmpty() || includes.contains(name))) {
 				String value = valueGetter.apply(name);
 				treeMap.put(name, value);
 			}

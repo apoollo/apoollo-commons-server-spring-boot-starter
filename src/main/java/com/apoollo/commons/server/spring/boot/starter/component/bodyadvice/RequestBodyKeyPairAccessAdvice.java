@@ -6,6 +6,8 @@ package com.apoollo.commons.server.spring.boot.starter.component.bodyadvice;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpInputMessage;
@@ -27,6 +29,8 @@ import com.apoollo.commons.util.request.context.def.AccessStrategy;
  */
 @ControllerAdvice
 public class RequestBodyKeyPairAccessAdvice extends RequestBodyAdviceAdapter implements Ordered {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestBodyKeyPairAccessAdvice.class);
 
 	private Access<String> access;
 
@@ -58,6 +62,7 @@ public class RequestBodyKeyPairAccessAdvice extends RequestBodyAdviceAdapter imp
 					UserKeyPair userKeyPair = (UserKeyPair) body;
 					access.access(CompatibleUtils.compatibleStringSpace((userKeyPair.getAccessKey())),
 							CompatibleUtils.compatibleStringSpace(userKeyPair.getSecretKey()));
+					LOGGER.info("body key pair accessed");
 				} else {
 					throw new AppException("requestBody must implements [" + UserKeyPair.class + "]");
 				}

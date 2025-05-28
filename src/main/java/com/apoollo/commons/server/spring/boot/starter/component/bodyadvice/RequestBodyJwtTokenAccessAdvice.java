@@ -6,6 +6,8 @@ package com.apoollo.commons.server.spring.boot.starter.component.bodyadvice;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpInputMessage;
@@ -28,6 +30,8 @@ import com.apoollo.commons.util.request.context.def.AccessStrategy;
  */
 @ControllerAdvice
 public class RequestBodyJwtTokenAccessAdvice extends RequestBodyAdviceAdapter implements Ordered {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestBodyJwtTokenAccessAdvice.class);
 
 	private AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder;
 	private Access<JwtToken> access;
@@ -63,6 +67,7 @@ public class RequestBodyJwtTokenAccessAdvice extends RequestBodyAdviceAdapter im
 					JwtToken jwtToken = authorizationJwtTokenJwtTokenDecoder
 							.decode(tokenGetter.getAuthorizationJwtToken());
 					access.access(jwtToken.getAccessKey(), jwtToken);
+					LOGGER.info("body jwt token accessed");
 				} else {
 					throw new AppException("requestBody must implements [" + TokenGetter.class + "]");
 				}

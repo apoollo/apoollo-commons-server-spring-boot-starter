@@ -10,7 +10,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
@@ -71,7 +70,7 @@ public class RequestResourceFilter extends AbstractSecureFilter {
 
 		LOGGER.info("request resource accessed");
 		//
-		chain.doFilter(new RequestContextHttpServletRequestWrapper(request, requestContext), response);
+		chain.doFilter(request, response);
 
 		//
 		if (BooleanUtils.isTrue(requestResource.getEnableSync())) {
