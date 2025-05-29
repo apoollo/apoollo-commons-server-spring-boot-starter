@@ -33,13 +33,13 @@ import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.Excep
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyJwtTokenAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyKeyPairAccessAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSignatureValidateFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderJwtTokenAccessFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderKeyPairAccessFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestParameterKeyPairAccessFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestResourceFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSignatureValidateFilter;
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
@@ -53,6 +53,7 @@ import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTo
 import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.server.spring.boot.starter.service.ContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
+import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SyncService;
@@ -60,6 +61,7 @@ import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultContentEscapeHandler;
+import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultInstance;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestResourceManager;
@@ -79,9 +81,9 @@ import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.EscapeMethod;
-import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
+import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
@@ -147,6 +149,12 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	Instance getInstance() {
+		return new DefaultInstance();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	CommonsServerRedisKey getCommonsServerRedisKey(RedisNameSpaceKey redisNameSpaceKey) {
 		return () -> redisNameSpaceKey;
 	}
@@ -179,9 +187,10 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	RequestResourceManager getRequestResourceManager(StringRedisTemplate redisTemplate,
+	RequestResourceManager getRequestResourceManager(Instance instance, StringRedisTemplate redisTemplate,
 			CommonsServerRedisKey commonsServerRedisKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultRequestResourceManager(redisTemplate, commonsServerRedisKey, commonsServerProperties);
+		return new DefaultRequestResourceManager(instance, redisTemplate, commonsServerRedisKey,
+				commonsServerProperties);
 	}
 
 	@Bean
@@ -274,7 +283,6 @@ public class CommonsServerConfiguration {
 	ContentEscapeHandler getXssHandler(EscapeMethod escapeXss) {
 		return new DefaultContentEscapeHandler(escapeXss);
 	}
-
 
 	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(

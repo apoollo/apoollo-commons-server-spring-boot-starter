@@ -11,12 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 
 import com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceRegister;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.AfterApplicationReady;
+import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.util.LangUtils;
 
 /**
@@ -37,12 +37,12 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
 	// private RedisProperties redisProperties;
 
 	@Autowired
-	private ApplicationContext applicationContext;
+	private Instance instance;
 
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		Security.addProvider(new BouncyCastleProvider());
-		new RequestResourceRegister(applicationContext, commonsServerProperties).regist();
+		new RequestResourceRegister(instance, commonsServerProperties).regist();
 
 		LangUtils.getStream(afterApplicationReadys)
 				.forEach(afterApplicationReady -> afterApplicationReady.onApplicationEvent(event));

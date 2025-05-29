@@ -3,7 +3,6 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.model.annotaion;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
+import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
 import com.apoollo.commons.util.request.context.def.DefaultRequestResource;
@@ -40,21 +39,20 @@ public class RequestResourceRegister {
 
 	private static final LeftFallingPathJoinner FALLING_PATH_JOINNER = new LeftFallingPathJoinner();
 
-	private ApplicationContext applicationContext;
+	private Instance instance;
 
 	private PathProperties pathProperties;
 	private List<DefaultRequestResource> requestResources;
 
-	public RequestResourceRegister(ApplicationContext applicationContext,
-			CommonsServerProperties commonsServerProperties) {
+	public RequestResourceRegister(Instance instance, CommonsServerProperties commonsServerProperties) {
 		super();
-		this.applicationContext = applicationContext;
+		this.instance = instance;
 		this.pathProperties = commonsServerProperties.getPath();
 		this.requestResources = commonsServerProperties.getRbac().getRequestResources();
 	}
 
 	public void regist() {
-		Map<String, Object> controllers = applicationContext.getBeansWithAnnotation(Controller.class);
+		Map<String, Object> controllers = instance.getApplicationContext().getBeansWithAnnotation(Controller.class);
 		regist(controllers);
 
 	}
@@ -149,19 +147,6 @@ public class RequestResourceRegister {
 		return requestResourceMapping;
 	}
 
-	public <T> T instance(Class<? extends T> clazz) {
-		try {
-			T instance = applicationContext.getBean(clazz);
-			if (null == instance) {
-				instance = clazz.getDeclaredConstructor().newInstance();
-			}
-			return instance;
-		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException
-				| RuntimeException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public DefaultRequestResource getDefaultRequestResource(RequestResource requestResourceAnnotaion,
 			String resourcePin, String requestMappingPath) {
 		DefaultRequestResource requestResourceObject = new DefaultRequestResource();
@@ -185,9 +170,11 @@ public class RequestResourceRegister {
 						? Arrays.stream(requestResourceAnnotaion.signatureIncludeHeaderNames()).toList()
 						: null);
 		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
-		requestResourceObject.setContentEscapeMethod(instance(requestResourceAnnotaion.contentEscapeMethodClass()));
+		requestResourceObject
+				.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
 		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
-		requestResourceObject.setWrapResponseHandler(instance(requestResourceAnnotaion.wrapResponseHandlerClass()));
+		requestResourceObject
+				.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandlerClass()));
 		return requestResourceObject;
 	}
 

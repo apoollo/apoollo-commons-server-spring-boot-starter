@@ -67,7 +67,7 @@ public @interface RequestResource {
 	public String name() default "";
 
 	/**
-	 * 请求资源路径，用于路径匹配 , controller mapping path + method mapping path
+	 * 请求资源路径，用于路径匹配 , method mapping path
 	 * 
 	 * @return 请求资源路径
 	 */
