@@ -61,7 +61,8 @@ public class RequestBodyJwtTokenAccessAdvice extends RequestBodyAdviceAdapter im
 		RequestContext requestContext = RequestContext.get();
 		if (null != requestContext) {
 			RequestResource requestResource = requestContext.getRequestResource();
-			if (AccessStrategy.PRIVATE_BODY_JWT_TOKEN == requestResource.getAccessStrategy()) {
+			if (null != requestResource
+					&& AccessStrategy.PRIVATE_BODY_JWT_TOKEN == requestResource.getAccessStrategy()) {
 				if (body instanceof TokenGetter) {
 					TokenGetter tokenGetter = (TokenGetter) body;
 					JwtToken jwtToken = authorizationJwtTokenJwtTokenDecoder
@@ -78,7 +79,7 @@ public class RequestBodyJwtTokenAccessAdvice extends RequestBodyAdviceAdapter im
 
 	@Override
 	public int getOrder() {
-		return Constants.REQUEST_JWT_TOKEN_ACCESS_BODY_ADVICE_ORDER;
+		return Constants.REQUEST_BODY_JWT_TOKEN_ACCESS_ADVICE_ORDER;
 	}
 
 }

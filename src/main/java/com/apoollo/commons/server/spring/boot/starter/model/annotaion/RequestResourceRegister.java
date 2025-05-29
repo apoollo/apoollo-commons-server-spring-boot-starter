@@ -78,42 +78,59 @@ public class RequestResourceRegister {
 				.map(method -> getRequestResourceMapping(controllerClass, controllerRequestMapping, method))
 				.filter(Objects::nonNull)//
 				.forEach(requestResourceMapping -> {
-					DefaultRequestResource requestResourceObject = requestResourceMapping.getRequestResourceObject();
-					requestResources.add(requestResourceObject);
-					pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
+					if (requestResourceMapping.configed) {
+						DefaultRequestResource requestResourceObject = requestResourceMapping
+								.getRequestResourceObject();
+						requestResources.add(requestResourceObject);
+						pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
+					} else {
+						if (null != requestResourceMapping.getControllerMethodRequestMappingPath()) {
+							pathProperties.getExcludePathPatterns()
+									.add(requestResourceMapping.getControllerMethodRequestMappingPath());
+						}
+					}
 				});
+	}
+
+	public String getControllerMethodMappingPath(String controllerRequestMappingPath, Method method) {
+		String requestMappingPath = null;
+		String methodPath = null;
+		RequestMapping methodRequestMapping = null;
+		GetMapping getMapping = null;
+		PostMapping postMapping = null;
+		PutMapping putMapping = null;
+		DeleteMapping deleteMapping = null;
+		if (null != (methodRequestMapping = method.getAnnotation(RequestMapping.class))) {
+			methodPath = getRequestMappingPath(methodRequestMapping);
+		} else if (null != (getMapping = method.getAnnotation(GetMapping.class))) {
+			methodPath = getGetMappingPath(getMapping);
+		} else if (null != (postMapping = method.getAnnotation(PostMapping.class))) {
+			methodPath = getPostMappingPath(postMapping);
+		} else if (null != (putMapping = method.getAnnotation(PutMapping.class))) {
+			methodPath = getPutMappingPath(putMapping);
+		} else if (null != (deleteMapping = method.getAnnotation(DeleteMapping.class))) {
+			methodPath = getDeleteMappingPath(deleteMapping);
+		}
+		if (null != methodPath) {
+			requestMappingPath = FALLING_PATH_JOINNER.joinRootPath(controllerRequestMappingPath, methodPath);
+		}
+		return requestMappingPath;
 	}
 
 	public RequestResourceMapping getRequestResourceMapping(Class<?> controllerClass,
 			RequestMapping controllerRequestMapping, Method method) {
 		RequestResourceMapping requestResourceMapping = null;
+		String controllerRequestMappingPath = getRequestMappingPath(controllerRequestMapping);
 		if (method.isAnnotationPresent(RequestResource.class)) {
-
 			RequestResource requestResourceAnnotaion = method.getAnnotation(RequestResource.class);
+			String requestMappingPath = null;
+			String annotionConfigMappingPath = requestResourceAnnotaion.requestMappingPath();
 
-			String requestMappingPath = requestResourceAnnotaion.requestMappingPath();
-			if (StringUtils.isBlank(requestMappingPath)) {
-				String controllerPath = getRequestMappingPath(controllerRequestMapping);
-				String methodPath = null;
-				RequestMapping methodRequestMapping = null;
-				GetMapping getMapping = null;
-				PostMapping postMapping = null;
-				PutMapping putMapping = null;
-				DeleteMapping deleteMapping = null;
-				if (null != (methodRequestMapping = method.getAnnotation(RequestMapping.class))) {
-					methodPath = getRequestMappingPath(methodRequestMapping);
-				} else if (null != (getMapping = method.getAnnotation(GetMapping.class))) {
-					methodPath = getGetMappingPath(getMapping);
-				} else if (null != (postMapping = method.getAnnotation(PostMapping.class))) {
-					methodPath = getPostMappingPath(postMapping);
-				} else if (null != (putMapping = method.getAnnotation(PutMapping.class))) {
-					methodPath = getPutMappingPath(putMapping);
-				} else if (null != (deleteMapping = method.getAnnotation(DeleteMapping.class))) {
-					methodPath = getDeleteMappingPath(deleteMapping);
-				}
-				if (null != methodPath) {
-					requestMappingPath = FALLING_PATH_JOINNER.joinRootPath(controllerPath, methodPath);
-				}
+			if (StringUtils.isBlank(annotionConfigMappingPath)) {
+				requestMappingPath = getControllerMethodMappingPath(controllerRequestMappingPath, method);
+			} else {
+				requestMappingPath = FALLING_PATH_JOINNER.joinRootPath(controllerRequestMappingPath,
+						annotionConfigMappingPath);
 			}
 			if (StringUtils.isNotBlank(requestMappingPath)) {
 				String resourcePin = requestResourceAnnotaion.resourcePin();
@@ -121,11 +138,13 @@ public class RequestResourceRegister {
 					resourcePin = StringUtils.join(WordUtils.uncapitalize(controllerClass.getSimpleName()),
 							WordUtils.capitalize(method.getName()));
 				}
-				requestResourceMapping = new RequestResourceMapping(
+				requestResourceMapping = new RequestResourceMapping(true,
 						getDefaultRequestResource(requestResourceAnnotaion, resourcePin, requestMappingPath),
-						requestResourceAnnotaion);
+						requestResourceAnnotaion, null);
 			}
-
+		} else {
+			requestResourceMapping = new RequestResourceMapping(false, null, null,
+					getControllerMethodMappingPath(controllerRequestMappingPath, method));
 		}
 		return requestResourceMapping;
 	}
@@ -167,7 +186,8 @@ public class RequestResourceRegister {
 						: null);
 		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
 		requestResourceObject.setContentEscapeMethod(instance(requestResourceAnnotaion.contentEscapeMethodClass()));
-		requestResourceObject.setHttpCodeNameHandler(instance(requestResourceAnnotaion.httpCodeNameHandlerClass()));
+		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
+		requestResourceObject.setWrapResponseHandler(instance(requestResourceAnnotaion.wrapResponseHandlerClass()));
 		return requestResourceObject;
 	}
 
@@ -221,8 +241,10 @@ public class RequestResourceRegister {
 	@Setter
 	@AllArgsConstructor
 	public static class RequestResourceMapping {
+		private Boolean configed;
 		private DefaultRequestResource requestResourceObject;
 		private RequestResource requestResourceAnnotaion;
+		private String controllerMethodRequestMappingPath;
 
 	}
 

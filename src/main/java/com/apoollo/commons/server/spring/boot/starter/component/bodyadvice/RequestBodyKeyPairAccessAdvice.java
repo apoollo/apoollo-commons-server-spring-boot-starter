@@ -57,7 +57,8 @@ public class RequestBodyKeyPairAccessAdvice extends RequestBodyAdviceAdapter imp
 		RequestContext requestContext = RequestContext.get();
 		if (null != requestContext) {
 			RequestResource requestResource = requestContext.getRequestResource();
-			if (AccessStrategy.PRIVATE_BODY_KEY_PAIR == requestResource.getAccessStrategy()) {
+			if (null != requestResource
+					&& AccessStrategy.PRIVATE_BODY_KEY_PAIR == requestResource.getAccessStrategy()) {
 				if (body instanceof UserKeyPair) {
 					UserKeyPair userKeyPair = (UserKeyPair) body;
 					access.access(CompatibleUtils.compatibleStringSpace((userKeyPair.getAccessKey())),
@@ -73,7 +74,7 @@ public class RequestBodyKeyPairAccessAdvice extends RequestBodyAdviceAdapter imp
 
 	@Override
 	public int getOrder() {
-		return Constants.REQUEST_SECRET_KEY_TOKEN_ACCESS_BODY_ADVICE_ORDER;
+		return Constants.REQUEST_BODY_KEY_PAIR_ACCESS_ADVICE_ORDER;
 	}
 
 }

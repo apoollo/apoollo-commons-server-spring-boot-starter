@@ -12,8 +12,8 @@ public class ExceptionController {
 
 	@RequestMapping(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH)
 	public void forward(ServletRequest request) throws Throwable {
-		Throwable e = (Throwable) request.getAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION);
+		Throwable throwable = (Throwable) request.getAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION);
 		request.removeAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION);
-		throw e;
+		throw throwable;
 	}
 }

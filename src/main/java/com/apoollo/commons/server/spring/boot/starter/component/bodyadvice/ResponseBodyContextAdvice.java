@@ -3,6 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.component.bodyadvice;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.apoollo.commons.util.LangUtils;
-import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.RequestContext;
+import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.Response;
 
 /**
@@ -40,20 +42,23 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 		RequestContext requestContext = RequestContext.get();
 		Response<?> responseBody = null;
 		if (null != requestContext) {
-			HttpCodeNameHandler codeNameHandler = requestContext.getRequestResource().getHttpCodeNameHandler();
-			if (body instanceof Response) {
-				responseBody = (Response<?>) body;
-				if (null == responseBody.getSuccess()) {
-					responseBody.setSuccess(codeNameHandler.processIsExecuteSuccess(responseBody.getCode()));
-				}
-			} else {
-				responseBody = codeNameHandler.success(body);
-			}
+			RequestResource requestResource = requestContext.getRequestResource();
 			requestContext.setResponseTime(System.currentTimeMillis());
-			responseBody.setElapsedTime(requestContext.getElapsedTime());
-			responseBody.setRequestId(requestContext.getRequestId());
-			codeNameHandler.resetResponse(requestContext.getRequestBody(), responseBody);
-			requestContext.setResponse(responseBody);
+			if (null != requestResource &&BooleanUtils.isTrue(requestResource.getEnableResponseWrapper())) {
+				WrapResponseHandler wrapResponseHandler = requestResource.getWrapResponseHandler();
+				if (body instanceof Response) {
+					responseBody = (Response<?>) body;
+					if (null == responseBody.getSuccess()) {
+						responseBody.setSuccess(wrapResponseHandler.processIsExecuteSuccess(responseBody.getCode()));
+					}
+				} else {
+					responseBody = wrapResponseHandler.success(body);
+				}
+				responseBody.setElapsedTime(requestContext.getElapsedTime());
+				responseBody.setRequestId(requestContext.getRequestId());
+				wrapResponseHandler.resetResponse(requestContext.getRequestBody(), responseBody);
+				requestContext.setResponse(responseBody);
+			}
 		} else {
 			if (body instanceof Response) {
 				responseBody = (Response<?>) body;

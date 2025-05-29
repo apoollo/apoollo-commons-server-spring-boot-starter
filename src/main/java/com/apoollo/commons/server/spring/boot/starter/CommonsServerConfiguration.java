@@ -79,11 +79,11 @@ import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.EscapeMethod;
-import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
-import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -253,8 +253,8 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	HttpCodeNameHandler getHttpCodeNameHandler() {
-		return new DefaultHttpCodeNameHandler();
+	WrapResponseHandler getHttpCodeNameHandler() {
+		return new DefaultWrapResponseHandler();
 	}
 
 	@Bean

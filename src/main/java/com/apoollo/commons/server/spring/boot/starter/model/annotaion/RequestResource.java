@@ -11,10 +11,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import com.apoollo.commons.util.request.context.EscapeMethod;
-import com.apoollo.commons.util.request.context.HttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
-import com.apoollo.commons.util.request.context.def.DefaultHttpCodeNameHandler;
+import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
 
 /**
  * <p>
@@ -150,10 +150,16 @@ public @interface RequestResource {
 	public Class<? extends EscapeMethod> contentEscapeMethodClass() default DefaultEscapeXss.class;
 
 	/**
-	 * 自定义异常code与返回值样式，要么类有无参构造，要么实例注入到Spring环境中
+	 * 
+	 * @return 是否启用返回值包装器
+	 */
+	public boolean enableResponseWrapper() default true;
+
+	/**
+	 * 此字段当启用返回值包装器后生效，自定义异常code与返回值样式，要么类有无参构造，要么实例注入到Spring环境中
 	 * 
 	 * @return httpCodeNameHandlerClass
 	 */
-	public Class<? extends HttpCodeNameHandler> httpCodeNameHandlerClass() default DefaultHttpCodeNameHandler.class;
+	public Class<? extends WrapResponseHandler> wrapResponseHandlerClass() default DefaultWrapResponseHandler.class;
 
 }

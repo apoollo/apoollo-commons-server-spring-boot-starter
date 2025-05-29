@@ -47,8 +47,12 @@ public abstract class AbstractSecureFilter implements Filter {
 			try {
 				doSecureFilter(request, response, chain);
 			} catch (Throwable e) {
-				request.setAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION, e);
-				request.getRequestDispatcher(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH).forward(request, response);
+				if (!(e instanceof ServletException)) {
+					request.setAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION, e);
+					request.getRequestDispatcher(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH).forward(request, response);
+				} else {
+					throw e;
+				}
 			} finally {
 				cleanupMatches(request, response, chain);
 			}
@@ -92,7 +96,7 @@ public abstract class AbstractSecureFilter implements Filter {
 			if (matches(false, pathProperties.getExcludePathPatterns(), requestMappingPath)) {
 				result = false;
 			} else {
-				result = matches(true, pathProperties.getExcludePathPatterns(), requestMappingPath);
+				result = matches(true, pathProperties.getIncludePathPatterns(), requestMappingPath);
 			}
 		}
 		return result;
@@ -101,8 +105,8 @@ public abstract class AbstractSecureFilter implements Filter {
 	public boolean matches(boolean initail, List<String> pathPatterns, String requestMappingPath) {
 		boolean result = initail;
 		if (CollectionUtils.isNotEmpty(pathPatterns)) {
-			result = pathProperties.getExcludePathPatterns().stream()
-					.filter(pattern -> PATH_MATCHER.match(pattern, requestMappingPath)).findAny().isPresent();
+			result = pathPatterns.stream().filter(pattern -> PATH_MATCHER.match(pattern, requestMappingPath)).findAny()
+					.isPresent();
 		}
 		return result;
 	}
