@@ -159,22 +159,34 @@ public class RequestResourceRegister {
 		requestResourceObject.setLimtUserQps(requestResourceAnnotaion.limtUserQps());
 		requestResourceObject.setRoles(requestResourceAnnotaion.roles());
 		requestResourceObject.setEnableSync(requestResourceAnnotaion.enableSync());
+		requestResourceObject.setEnableNonce(requestResourceAnnotaion.enableNonce());
 		requestResourceObject.setEnableSignature(requestResourceAnnotaion.enableSignature());
-		requestResourceObject.setSignatureSecret(requestResourceAnnotaion.signatureSecret());
-		requestResourceObject
-				.setSignatureExcludeHeaderNames(null != requestResourceAnnotaion.signatureExcludeHeaderNames()
-						? Arrays.stream(requestResourceAnnotaion.signatureExcludeHeaderNames()).toList()
-						: null);
-		requestResourceObject
-				.setSignatureIncludeHeaderNames(null != requestResourceAnnotaion.signatureIncludeHeaderNames()
-						? Arrays.stream(requestResourceAnnotaion.signatureIncludeHeaderNames()).toList()
-						: null);
 		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
-		requestResourceObject
-				.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
 		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
-		requestResourceObject
-				.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandlerClass()));
+		if (requestResourceAnnotaion.enableSignature()) {
+			requestResourceObject.setSignatureSecret(requestResourceAnnotaion.signatureSecret());
+			requestResourceObject
+					.setSignatureExcludeHeaderNames(null != requestResourceAnnotaion.signatureExcludeHeaderNames()
+							? Arrays.stream(requestResourceAnnotaion.signatureExcludeHeaderNames()).toList()
+							: null);
+			requestResourceObject
+					.setSignatureIncludeHeaderNames(null != requestResourceAnnotaion.signatureIncludeHeaderNames()
+							? Arrays.stream(requestResourceAnnotaion.signatureIncludeHeaderNames()).toList()
+							: null);
+		}
+		if (requestResourceAnnotaion.enableNonce()) {
+			requestResourceObject.setNonceDuration(requestResourceAnnotaion.nonceDuration());
+			requestResourceObject
+					.setNonceValidator(instance.getInstance(requestResourceAnnotaion.nonceValidatorClass()));
+		}
+		if (requestResourceAnnotaion.enableContentEscape()) {
+			requestResourceObject
+					.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
+		}
+		if (requestResourceAnnotaion.enableResponseWrapper()) {
+			requestResourceObject
+					.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandlerClass()));
+		}
 		return requestResourceObject;
 	}
 

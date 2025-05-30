@@ -107,6 +107,8 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 		defaultRequestResource.setEnableResponseWrapper(serializableRequestResource.getEnableResponseWrapper());
 		defaultRequestResource.setEnableSignature(serializableRequestResource.getEnableSignature());
 		defaultRequestResource.setEnableSync(serializableRequestResource.getEnableSync());
+		defaultRequestResource.setEnableNonce(serializableRequestResource.getEnableNonce());
+		defaultRequestResource.setNonceDuration(serializableRequestResource.getNonceDuration());
 		defaultRequestResource.setLimtPlatformQps(serializableRequestResource.getLimtPlatformQps());
 		defaultRequestResource.setLimtUserQps(serializableRequestResource.getLimtUserQps());
 		defaultRequestResource.setName(serializableRequestResource.getName());
@@ -118,6 +120,10 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 		defaultRequestResource
 				.setSignatureIncludeHeaderNames(serializableRequestResource.getSignatureIncludeHeaderNames());
 		defaultRequestResource.setSignatureSecret(serializableRequestResource.getSignatureSecret());
+		if (null != serializableRequestResource.getNonceValidatorClass()) {
+			defaultRequestResource
+					.setNonceValidator(instance.getInstance(serializableRequestResource.getNonceValidatorClass()));
+		}
 		if (null != serializableRequestResource.contentEscapeMethodClass) {
 			defaultRequestResource
 					.setContentEscapeMethod(instance.getInstance(serializableRequestResource.contentEscapeMethodClass));
@@ -137,6 +143,8 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 		serializableRequestResource.setEnableResponseWrapper(requestResource.getEnableResponseWrapper());
 		serializableRequestResource.setEnableSignature(requestResource.getEnableSignature());
 		serializableRequestResource.setEnableSync(requestResource.getEnableSync());
+		serializableRequestResource.setEnableNonce(requestResource.getEnableNonce());
+		serializableRequestResource.setNonceDuration(requestResource.getNonceDuration());
 		serializableRequestResource.setLimtPlatformQps(requestResource.getLimtPlatformQps());
 		serializableRequestResource.setLimtUserQps(requestResource.getLimtUserQps());
 		serializableRequestResource.setName(requestResource.getName());
@@ -146,6 +154,10 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 		serializableRequestResource.setSignatureExcludeHeaderNames(requestResource.getSignatureExcludeHeaderNames());
 		serializableRequestResource.setSignatureIncludeHeaderNames(requestResource.getSignatureIncludeHeaderNames());
 		serializableRequestResource.setSignatureSecret(requestResource.getSignatureSecret());
+		if (null != requestResource.getNonceValidator()) {
+			serializableRequestResource
+					.setNonceValidatorClass(requestResource.getNonceValidator().getClass().toString());
+		}
 		if (null != requestResource.getContentEscapeMethod()) {
 			serializableRequestResource
 					.setContentEscapeMethodClass(requestResource.getContentEscapeMethod().getClass().toString());
@@ -170,6 +182,9 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 		private Long limtPlatformQps;
 		private String[] roles;
 		private Boolean enableSync;
+		private Boolean enableNonce;
+		private Long nonceDuration;
+		private String nonceValidatorClass;
 		private Boolean enableSignature;
 		private String signatureSecret;
 		private List<String> signatureExcludeHeaderNames;

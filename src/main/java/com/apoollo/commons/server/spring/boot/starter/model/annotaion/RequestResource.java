@@ -11,10 +11,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
+import com.apoollo.commons.util.request.context.def.StrictNonceValidaor;
 
 /**
  * <p>
@@ -110,15 +112,36 @@ public @interface RequestResource {
 	public boolean enableSync() default false;
 
 	/**
-	 * 启用 Body 签名，需要客户端将签名放入Header
+	 * 启用后，会验证 header 中的x-nonce、x-timestamp
 	 * 
-	 * @return 是否开始请求体摘要验证
+	 * @return 是否启用nonce 验证
+	 */
+	public boolean enableNonce() default false;
+
+	/**
+	 * 默认10000毫秒
+	 * 
+	 * @return nonce的有效时长
+	 */
+	public long nonceDuration() default 10000;
+
+	/**
+	 * 默认为严格的nonce验证器
+	 * 
+	 * @return nonce 验证器
+	 */
+	public Class<? extends NonceValidator> nonceValidatorClass() default StrictNonceValidaor.class;
+
+	/**
+	 * 启用后，会验证 header 中的x-signature
+	 * 
+	 * @return 是否请求签名验证
 	 */
 	public boolean enableSignature() default false;
 
 	/**
 	 * 
-	 * @return 客户端请求摘要签名加密的秘钥, 此属性可替换默认值
+	 * @return 请求摘要加密的秘钥, 摘要加密后就是签名， 此属性可替换默认值
 	 */
 	public String signatureSecret() default "";
 

@@ -16,7 +16,8 @@ public interface Constants {
 	// filters
 	public static final int REQUEST_CONTEXT_FILTER_ORDER = INITAIL;
 	public static final int REQUEST_RESOURCE_FILTER_ORDER = REQUEST_CONTEXT_FILTER_ORDER + INCREMENT;
-	public static final int REQUEST_SIGNATURE_VALIDATE_FILTER_ORDER = REQUEST_RESOURCE_FILTER_ORDER + INCREMENT;
+	public static final int REQUEST_NONCE_VALIDATE_FILTER_ORDER = REQUEST_RESOURCE_FILTER_ORDER + INCREMENT;
+	public static final int REQUEST_SIGNATURE_VALIDATE_FILTER_ORDER = REQUEST_NONCE_VALIDATE_FILTER_ORDER + INCREMENT;
 	public static final int REQUEST_CONTENT_ESCAPE_FILTER_ORDER = REQUEST_SIGNATURE_VALIDATE_FILTER_ORDER + INCREMENT;
 	public static final int REQUEST_HEADER_JWT_TOKEN_ACCESS_FILTER_ORDER = REQUEST_CONTENT_ESCAPE_FILTER_ORDER
 			+ INCREMENT;
@@ -26,8 +27,8 @@ public interface Constants {
 			+ INCREMENT;
 
 	// requestBodyAdvices
-
 	public static final int REQUEST_BODY_JWT_TOKEN_ACCESS_ADVICE_ORDER = INITAIL;
+
 	public static final int REQUEST_BODY_KEY_PAIR_ACCESS_ADVICE_ORDER = REQUEST_BODY_JWT_TOKEN_ACCESS_ADVICE_ORDER
 			+ INCREMENT;
 
@@ -36,6 +37,10 @@ public interface Constants {
 	public static final String REQUEST_ATTRIBUTE_EXCEPTION = "commons-server-exception";
 
 	public static final String REQUEST_HEADER_REQUEST_ID = "request-id";
+
+	public static final String REQUEST_TIMESTAMP_MS = "x-timestamp";
+
+	public static final String REQUEST_NONCE = "x-nonce";
 
 	public static final String REQUEST_SIGNATURE = "x-signature";
 

@@ -37,6 +37,7 @@ import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestCo
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderJwtTokenAccessFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderKeyPairAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestNonceValidateFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestParameterKeyPairAccessFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestResourceFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSignatureValidateFilter;
@@ -81,11 +82,13 @@ import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
+import com.apoollo.commons.util.request.context.def.StrictNonceValidaor;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -285,6 +288,12 @@ public class CommonsServerConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	NonceValidator getNonceValidator(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new StrictNonceValidaor(redisNameSpaceKey, redisTemplate);
+	}
+
+	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
 			RequestContextInitail requestContextInitail, CountLimiter countLimiter, LoggerWriter logWitter,
 			CommonsServerProperties commonsServerProperties) {
@@ -298,6 +307,14 @@ public class CommonsServerConfiguration {
 			CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(new RequestResourceFilter(commonsServerProperties.getPath(),
 				requestResourceManager, flowLimiter, syncService), Constants.REQUEST_RESOURCE_FILTER_ORDER);
+	}
+
+	@Bean
+	FilterRegistrationBean<RequestNonceValidateFilter> getRequestNonceValidateFilterRegistrationBean(
+			CommonsServerProperties commonsServerProperties, NonceValidator nonceValidator) {
+		return newFilterRegistrationBean(
+				new RequestNonceValidateFilter(commonsServerProperties.getPath(), nonceValidator),
+				Constants.REQUEST_NONCE_VALIDATE_FILTER_ORDER);
 	}
 
 	@Bean
