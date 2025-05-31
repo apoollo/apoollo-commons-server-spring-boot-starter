@@ -46,10 +46,10 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 
 		if (BooleanUtils.isTrue(requestResource.getEnableNonce())) {
 
-			String timestamp = request.getHeader(Constants.REQUEST_TIMESTAMP_MS);
+			String timestamp = request.getHeader(Constants.REQUEST_HEADER_TIMESTAMP);
 			if (StringUtils.isBlank(timestamp)) {
 				throw new AppIllegalArgumentException(
-						"header [" + Constants.REQUEST_TIMESTAMP_MS + "] must not be null");
+						"header [" + Constants.REQUEST_HEADER_TIMESTAMP + "] must not be null");
 			}
 			long timestampLong = requestResource.getNonceDuration();
 			try {
@@ -64,9 +64,9 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 				throw new AppIllegalArgumentException("timestamp [" + timestamp + "] already expire");
 			}
 
-			String nonce = request.getHeader(Constants.REQUEST_NONCE);
+			String nonce = request.getHeader(Constants.REQUEST_HEADER_NONCE);
 			if (StringUtils.isBlank(nonce)) {
-				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_NONCE + "] must not be null");
+				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_HEADER_NONCE + "] must not be null");
 			}
 
 			NonceValidator nonceValidator = requestResource.getNonceValidator();
@@ -74,7 +74,7 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 				nonceValidator = this.nonceValidator;
 			}
 			if (!nonceValidator.isValid(nonce, requestResource.getNonceDuration())) {
-				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_NONCE + "] invalid");
+				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_HEADER_NONCE + "] invalid");
 			}
 		}
 		chain.doFilter(request, response);
