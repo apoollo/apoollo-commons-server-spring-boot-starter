@@ -28,6 +28,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
+import com.apoollo.commons.server.spring.boot.starter.component.LimiterConfigurer;
 import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.RequestBodyJwtTokenAccessAdvice;
@@ -103,7 +104,7 @@ import jakarta.servlet.Filter;
 @Configuration(proxyBeanMethods = true)
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX, name = "enable", matchIfMissing = true)
-@Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
+@Import({ CommonsServerWebMvcConfigurer.class, LimiterConfigurer.class, ApplicationReady.class, WelcomeController.class,
 		ExceptionController.class, DynamicResourceController.class })
 public class CommonsServerConfiguration {
 
@@ -402,7 +403,7 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public RequestResourceAspect getRequestResourceAspect() {
+	RequestResourceAspect getRequestResourceAspect() {
 		return new RequestResourceAspect();
 	}
 }

@@ -10,19 +10,19 @@ import org.apache.commons.lang3.BooleanUtils;
 import com.apoollo.commons.server.spring.boot.starter.limiter.CorsLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.DailyCountLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.IpLimter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.IpLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.Limiters;
 import com.apoollo.commons.server.spring.boot.starter.limiter.NonceLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.RefererLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.SyncLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.CorsLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.DailyCountLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.FlowLimiterSupport;
-import com.apoollo.commons.server.spring.boot.starter.limiter.support.IpLimterSupport;
+import com.apoollo.commons.server.spring.boot.starter.limiter.support.IpLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.NonceLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.RefererLimiterSupport;
-import com.apoollo.commons.server.spring.boot.starter.limiter.support.SignatureLimterSupport;
+import com.apoollo.commons.server.spring.boot.starter.limiter.support.SignatureLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.limiter.support.SyncLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
 import com.apoollo.commons.util.request.context.RequestContext;
@@ -34,26 +34,26 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author liuyulong
  * @since 2025-06-05
  */
-public class DefaultLimters<T extends NonceLimiterSupport & SignatureLimterSupport & CorsLimiterSupport & IpLimterSupport & RefererLimiterSupport & SyncLimiterSupport & FlowLimiterSupport & DailyCountLimiterSupport>
+public class DefaultLimiters<T extends NonceLimiterSupport & SignatureLimiterSupport & CorsLimiterSupport & IpLimiterSupport & RefererLimiterSupport & SyncLimiterSupport & FlowLimiterSupport & DailyCountLimiterSupport>
 		implements Limiters<T> {
 
 	private NonceLimiter nonceLimiter;
-	private SignatureLimter signatureLimter;
+	private SignatureLimiter signatureLimter;
 	private CorsLimiter corsLimiter;
-	private IpLimter ipLimter;
+	private IpLimiter ipLimiter;
 	private RefererLimiter refererLimiter;
 	private SyncLimiter syncLimiter;
 	private FlowLimiter flowLimiter;
 	private DailyCountLimiter dailyCountLimiter;
 
-	public DefaultLimters(NonceLimiter nonceLimiter, SignatureLimter signatureLimter, CorsLimiter corsLimiter,
-			IpLimter ipLimter, RefererLimiter refererLimiter, SyncLimiter syncLimiter, FlowLimiter flowLimiter,
+	public DefaultLimiters(NonceLimiter nonceLimiter, SignatureLimiter signatureLimter, CorsLimiter corsLimiter,
+			IpLimiter ipLimiter, RefererLimiter refererLimiter, SyncLimiter syncLimiter, FlowLimiter flowLimiter,
 			DailyCountLimiter dailyCountLimiter) {
 		super();
 		this.nonceLimiter = nonceLimiter;
 		this.signatureLimter = signatureLimter;
 		this.corsLimiter = corsLimiter;
-		this.ipLimter = ipLimter;
+		this.ipLimiter = ipLimiter;
 		this.refererLimiter = refererLimiter;
 		this.syncLimiter = syncLimiter;
 		this.flowLimiter = flowLimiter;
@@ -74,7 +74,7 @@ public class DefaultLimters<T extends NonceLimiterSupport & SignatureLimterSuppo
 			corsLimiter.limit(request, response, support);
 		}
 		if (BooleanUtils.isTrue(support.getEnableIpLimiter())) {
-			ipLimter.limit(support, requestContext.getRequestIp());
+			ipLimiter.limit(support, requestContext.getRequestIp());
 		}
 		if (BooleanUtils.isTrue(support.getEnableRefererLimiter())) {
 			refererLimiter.limit(request, support);

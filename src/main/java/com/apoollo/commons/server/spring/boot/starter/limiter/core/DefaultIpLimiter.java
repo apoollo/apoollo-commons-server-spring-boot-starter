@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.IpLimter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.support.IpLimterSupport;
+import com.apoollo.commons.server.spring.boot.starter.limiter.IpLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.support.IpLimiterSupport;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.exception.detailed.IpLimterException;
 
@@ -16,9 +16,9 @@ import com.apoollo.commons.util.exception.detailed.IpLimterException;
  * @author liuyulong
  * @since 2025-06-05
  */
-public class DefaultIpLimiter implements IpLimter {
+public class DefaultIpLimiter implements IpLimiter {
 
-	public void limit(IpLimterSupport ipLimterSupport, String requestIp) {
+	public void limit(IpLimiterSupport ipLimterSupport, String requestIp) {
 
 		if (maches(ipLimterSupport.getIpLimiterExcludes(), requestIp)) {
 			throw new IpLimterException("request ip disabled by  black ip list : " + requestIp);

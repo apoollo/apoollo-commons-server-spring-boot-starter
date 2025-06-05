@@ -19,13 +19,13 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author liuyulong
  * @since 2025-06-05
  */
-public class DefaultNonceLimter implements NonceLimiter {
+public class DefaultNonceLimiter implements NonceLimiter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNonceLimter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNonceLimiter.class);
 
 	private NonceValidator nonceValidator;
 
-	public DefaultNonceLimter(NonceValidator nonceValidator) {
+	public DefaultNonceLimiter(NonceValidator nonceValidator) {
 		super();
 		this.nonceValidator = nonceValidator;
 	}

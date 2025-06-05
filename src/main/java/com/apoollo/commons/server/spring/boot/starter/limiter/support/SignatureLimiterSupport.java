@@ -9,7 +9,7 @@ import java.util.List;
  * @author liuyulong
  * @since 2025-06-05
  */
-public interface SignatureLimterSupport {
+public interface SignatureLimiterSupport {
 
 	Boolean getEnableSignatureLimiter();
 

@@ -15,8 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.support.SignatureLimterSupport;
+import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.support.SignatureLimiterSupport;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
 import com.apoollo.commons.util.HttpContentUtils;
@@ -30,14 +30,14 @@ import jakarta.servlet.http.HttpServletRequest;
  * @author liuyulong
  * @since 2025-06-05
  */
-public class DefaultSignatureLimter implements SignatureLimter {
+public class DefaultSignatureLimiter implements SignatureLimiter {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSignatureLimter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSignatureLimiter.class);
 
 	private static final MacHash HMAC_SHA256 = new HmacSHA256();
 
 	@Override
-	public void limit(HttpServletRequest request, SignatureLimterSupport signatureLimterSupport,
+	public void limit(HttpServletRequest request, SignatureLimiterSupport signatureLimterSupport,
 			Supplier<byte[]> body) {
 
 		String requestSignature = request.getHeader(Constants.REQUEST_HEADER_SIGNATURE);
