@@ -58,7 +58,8 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 		if (BooleanUtils.isTrue(requestResource.getEnableSignature())) {
 			String requestSignature = request.getHeader(Constants.REQUEST_HEADER_SIGNATURE);
 			if (StringUtils.isBlank(requestSignature)) {
-				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_HEADER_SIGNATURE + "] must not be null");
+				throw new AppIllegalArgumentException(
+						"header [" + Constants.REQUEST_HEADER_SIGNATURE + "] must not be null");
 			}
 
 			String targetSecret = LangUtils.defaultString(requestResource.getSignatureSecret(), this.secret);
@@ -72,7 +73,7 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 			TreeMap<String, String> headers = getHeaders(request, requestResource.getSignatureExcludeHeaderNames(),
 					requestResource.getSignatureIncludeHeaderNames());
 			Charset charset = ServletInputStreamHelper.getCharset(request);
-			byte[] body = ServletInputStreamHelper.getCachingBodyByteArray(request);
+			byte[] body = ServletInputStreamHelper.getCachingBodyByteArray(requestContext, request);
 
 			String httpContent = HttpContentUtils.getHttpContent(charset, requestMehtod, requestPath, queryString,
 					headers, body);

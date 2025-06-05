@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.service.impl;
+package com.apoollo.commons.server.spring.boot.starter.limiter.core;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.apoollo.commons.server.spring.boot.starter.service.ContentEscapeHandler;
+import com.apoollo.commons.server.spring.boot.starter.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;

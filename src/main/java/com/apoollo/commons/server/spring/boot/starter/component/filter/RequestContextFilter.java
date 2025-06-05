@@ -5,7 +5,6 @@ package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +16,6 @@ import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.util.IpUtils;
 import com.apoollo.commons.util.LangUtils;
-import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.User;
@@ -36,14 +34,12 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestContextFilter.class);
 
 	private RequestContextInitail requestContextInitail;
-	private CountLimiter countLimiter;
 	private LoggerWriter logWitter;
 
 	public RequestContextFilter(PathProperties pathProperties, RequestContextInitail requestContextInitail,
-			CountLimiter countLimiter, LoggerWriter logWitter) {
+			LoggerWriter logWitter) {
 		super(pathProperties);
 		this.requestContextInitail = requestContextInitail;
-		this.countLimiter = countLimiter;
 		this.logWitter = logWitter;
 	}
 
@@ -72,10 +68,6 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		User user = requestContext.getUser();
 		if (null != user) {
 			response.setHeader(Constants.RESPONSE_HEADER_NEED_RESET_PASSWORD, String.valueOf(user.needResetPassword()));
-		}
-		if (null != requestContext.getDailyMaximumUseTimesLimitKey()
-				&& BooleanUtils.isNotTrue(requestContext.getResponseIsChargeForUseTimesLimit())) {
-			countLimiter.decrement(requestContext.getDailyMaximumUseTimesLimitKey());
 		}
 		logWitter.write(requestContext, () -> {
 			LOGGER.info("请求结束标记");

@@ -4,6 +4,7 @@
 package com.apoollo.commons.server.spring.boot.starter.service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessIpProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.util.LangUtils;
@@ -112,10 +114,10 @@ public abstract class AbstractAccess<T> implements Access<T> {
 			RequestAccessParameter requestAccessParameter = requestContext
 					.getAuthorizedValue(RequestAccessParameter.class);
 			if (null != requestAccessParameter && null != requestAccessParameter.getRequestTimesPerSecond()) {
-				flowLimiter.tryAccess(accessKey, requestResource.getResourcePin(),
+				flowLimiter.limit(accessKey, requestResource.getResourcePin(),
 						requestAccessParameter.getRequestTimesPerSecond());
 			} else {
-				flowLimiter.tryAccess(accessKey, requestResource.getResourcePin(), requestResource.getLimtUserQps());
+				flowLimiter.limit(accessKey, requestResource.getResourcePin(), requestResource.getLimtUserQps());
 			}
 		}
 	}
@@ -130,12 +132,10 @@ public abstract class AbstractAccess<T> implements Access<T> {
 
 				String key = commonsServerRedisKey.getCommonsServerKey(accessKey,
 						requestContext.getRequestResource().getResourcePin());
-				Incremented incremented = countLimiter.incrementDate(key, 2,
+				Incremented incremented = countLimiter.incrementDate(key, System.currentTimeMillis(), 2, TimeUnit.DAYS,
 						requestAccessParameter.getRequestMaximumTimesToday());
 
-				if (BooleanUtils.isTrue(incremented.getAccessed())) {
-					requestContext.setDailyMaximumUseTimesLimitKey(incremented.getKey());
-				} else {
+				if (!BooleanUtils.isTrue(incremented.getAccessed())) {
 					throw new AppExceedingDailyMaximumUseTimesLimitException(
 							"dailyMaximumUseTimes: " + requestAccessParameter.getRequestMaximumTimesToday());
 				}

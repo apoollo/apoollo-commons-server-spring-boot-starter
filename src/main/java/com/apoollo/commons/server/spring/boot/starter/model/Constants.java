@@ -36,6 +36,8 @@ public interface Constants {
 
 	public static final String REQUEST_ATTRIBUTE_EXCEPTION = "commons-server-exception";
 
+	public static final String REQUEST_HEADER_REFERER = "referer";
+	
 	public static final String REQUEST_HEADER_REQUEST_ID = "request-id";
 
 	public static final String REQUEST_HEADER_TIMESTAMP = "x-timestamp";

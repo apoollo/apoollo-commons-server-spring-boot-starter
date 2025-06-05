@@ -1,30 +1,30 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.service.impl;
+package com.apoollo.commons.server.spring.boot.starter.limiter.core;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
 
 /**
  * @author liuyulong
  */
-public class SlidingWindowLimiterImpl implements FlowLimiter {
+public class DefaultFlowLimiter implements FlowLimiter {
 
 	private SlidingWindowLimiter slidingWindowLimiter;
 
-	public SlidingWindowLimiterImpl(SlidingWindowLimiter slidingWindowLimiter) {
+	public DefaultFlowLimiter(SlidingWindowLimiter slidingWindowLimiter) {
 		this.slidingWindowLimiter = slidingWindowLimiter;
 	}
 
 	@Override
-	public void tryAccess(String accessKey, String resourcePin, Long limitCount) {
+	public void limit(String accessKey, String resourcePin, Long limitCount) {
 		if (null != limitCount && limitCount > 0) {
 
 			if (limitCount % 2 != 0) {

@@ -10,8 +10,9 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import com.apoollo.commons.server.spring.boot.starter.service.ContentEscapeHandler;
+import com.apoollo.commons.server.spring.boot.starter.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.request.context.RequestContext;
 
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.Cookie;
@@ -82,10 +83,11 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 				.findAny()//
 				.isPresent()//
 		) {
-			return ServletInputStreamHelper.getCachingServletInputStream(super.getRequest(), content -> {
+			return ServletInputStreamHelper.getCachingServletInputStream(RequestContext.getRequired(),
+					super.getRequest(), content -> {
 
-				return contentEscapeHandler.escapeByContentType(getCharset(), contentType, content);
-			});
+						return contentEscapeHandler.escapeByContentType(getCharset(), contentType, content);
+					});
 		}
 		return super.getInputStream();
 	}

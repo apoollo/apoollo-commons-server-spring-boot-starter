@@ -6,6 +6,8 @@ package com.apoollo.commons.server.spring.boot.starter.model;
 import java.io.IOException;
 import java.util.function.Function;
 
+import com.apoollo.commons.util.request.context.RequestContext;
+
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -15,16 +17,14 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class RequestContextHttpServletRequestWrapper extends CommonsHttpServletRequestWrapper {
 
-
 	public RequestContextHttpServletRequestWrapper(HttpServletRequest request) {
 		super(request);
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
-		return ServletInputStreamHelper.getCachingServletInputStream(getRequest(), Function.identity());
+		return ServletInputStreamHelper.getCachingServletInputStream(RequestContext.getRequired(), getRequest(),
+				Function.identity());
 	}
-
-	
 
 }

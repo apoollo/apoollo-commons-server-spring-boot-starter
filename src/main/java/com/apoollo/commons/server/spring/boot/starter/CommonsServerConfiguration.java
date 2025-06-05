@@ -44,6 +44,12 @@ import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSi
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
+import com.apoollo.commons.server.spring.boot.starter.limiter.ContentEscapeHandler;
+import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.SyncLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultContentEscapeHandler;
+import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultFlowLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultSyncLimiter;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
@@ -52,26 +58,20 @@ import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
-import com.apoollo.commons.server.spring.boot.starter.service.ContentEscapeHandler;
-import com.apoollo.commons.server.spring.boot.starter.service.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
-import com.apoollo.commons.server.spring.boot.starter.service.SyncService;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultInstance;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestResourceManager;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultSyncService;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultUserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtAuthorizationRenewal;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtTokenAccess;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SecretKeyTokenAccess;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.SlidingWindowLimiterImpl;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
@@ -178,14 +178,14 @@ public class CommonsServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	FlowLimiter getFlowLimiter(SlidingWindowLimiter slidingWindowLimiter) {
-		return new SlidingWindowLimiterImpl(slidingWindowLimiter);
+		return new DefaultFlowLimiter(slidingWindowLimiter);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	SyncService getSyncService(RedisTemplate<String, String> redisTemplate,
+	SyncLimiter getSyncService(RedisTemplate<String, String> redisTemplate,
 			CommonsServerRedisKey commonsServerRedisKey) {
-		return new DefaultSyncService(redisTemplate, commonsServerRedisKey);
+		return new DefaultSyncLimiter(redisTemplate, commonsServerRedisKey);
 	}
 
 	@Bean
@@ -214,8 +214,8 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CountLimiter getCountLimiter(StringRedisTemplate stringRedisTemplate) {
-		return new CommonsCountLimiter(stringRedisTemplate);
+	CountLimiter getCountLimiter(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new CommonsCountLimiter(stringRedisTemplate, redisNameSpaceKey);
 	}
 
 	@Bean
@@ -295,15 +295,16 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
-			RequestContextInitail requestContextInitail, CountLimiter countLimiter, LoggerWriter logWitter,
+			RequestContextInitail requestContextInitail, LoggerWriter logWitter,
 			CommonsServerProperties commonsServerProperties) {
-		return newFilterRegistrationBean(new RequestContextFilter(commonsServerProperties.getPath(),
-				requestContextInitail, countLimiter, logWitter), Constants.REQUEST_CONTEXT_FILTER_ORDER);
+		return newFilterRegistrationBean(
+				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail, logWitter),
+				Constants.REQUEST_CONTEXT_FILTER_ORDER);
 	}
 
 	@Bean
 	FilterRegistrationBean<RequestResourceFilter> getRequestResourceFilterRegistrationBean(
-			RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncService syncService,
+			RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncLimiter syncService,
 			CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(new RequestResourceFilter(commonsServerProperties.getPath(),
 				requestResourceManager, flowLimiter, syncService), Constants.REQUEST_RESOURCE_FILTER_ORDER);
