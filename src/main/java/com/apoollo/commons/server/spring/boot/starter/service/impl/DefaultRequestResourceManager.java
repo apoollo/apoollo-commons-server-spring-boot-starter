@@ -13,9 +13,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.alibaba.fastjson2.JSON;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.core.DefaultRequestResource;
 import com.apoollo.commons.util.request.context.core.DefaultRequestResource.SerializableRequestResource;
@@ -32,16 +32,16 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 	// private CacheManagerService cacheManagerService;
 	private Instance instance;
 	private StringRedisTemplate redisTemplate;
-	private CommonsServerRedisKey commonsServerRedisKey;
+	private RedisNameSpaceKey redisNameSpaceKey;
 	private List<? extends RequestResource> requestResources;
 
 	public DefaultRequestResourceManager(Instance instance, StringRedisTemplate redisTemplate,
-			CommonsServerRedisKey commonsServerRedisKey, CommonsServerProperties commonsServerProperties) {
+			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
 		super();
 		// this.cacheManagerService = cacheManagerService;
 		this.instance = instance;
 		this.redisTemplate = redisTemplate;
-		this.commonsServerRedisKey = commonsServerRedisKey;
+		this.redisNameSpaceKey = redisNameSpaceKey;
 		this.requestResources = commonsServerProperties.getRbac().getRequestResources();
 	}
 
@@ -80,7 +80,7 @@ public class DefaultRequestResourceManager implements RequestResourceManager {
 	}
 
 	public String getRequestResourceRedisKey() {
-		return commonsServerRedisKey.getCommonResourceKey();
+		return redisNameSpaceKey.getKey(RedisNameSpaceKey.REQUEST_RESOURCE);
 	}
 
 	@Override

@@ -10,6 +10,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import org.springframework.web.cors.CorsConfiguration;
+
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
@@ -84,20 +86,6 @@ public @interface RequestResource {
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_HEADER_JWT_TOKEN;
 
 	/**
-	 * 请求资源用户维度QPS，默认不限制
-	 * 
-	 * @return 请求资源用户维度QPS
-	 */
-	public long limtUserQps() default -1;
-
-	/**
-	 * 请求资源平台维度QPS，默认关闭平台限流
-	 * 
-	 * @return 请求资源平台维度QPS
-	 */
-	public long limtPlatformQps() default -1;
-
-	/**
 	 * 如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色
 	 * 
 	 * @return 资源所属的角色列表
@@ -105,57 +93,124 @@ public @interface RequestResource {
 	public String[] roles() default { "User" };
 
 	/**
-	 * 设置true 该请求资源只允许序列请求，不允许并发请求
-	 * 
-	 * @return 是否开启同步模式
-	 */
-	public boolean enableSync() default false;
-
-	/**
 	 * 启用后，会验证 header 中的x-nonce、x-timestamp
 	 * 
 	 * @return 是否启用nonce 验证
 	 */
-	public boolean enableNonce() default false;
+	public boolean enableNonceLimiter() default false;
 
 	/**
 	 * 默认10000毫秒
 	 * 
 	 * @return nonce的有效时长
 	 */
-	public long nonceDuration() default 10000;
+	public long nonceLimiterDuration() default 10000;
 
 	/**
 	 * 默认为严格的nonce验证器
 	 * 
 	 * @return nonce 验证器
 	 */
-	public Class<? extends NonceValidator> nonceValidatorClass() default StrictNonceValidaor.class;
+	public Class<? extends NonceValidator> nonceLimiterValidator() default StrictNonceValidaor.class;
 
 	/**
 	 * 启用后，会验证 header 中的x-signature
 	 * 
 	 * @return 是否请求签名验证
 	 */
-	public boolean enableSignature() default false;
+	public boolean enableSignatureLimiter() default false;
 
 	/**
 	 * 
 	 * @return 请求摘要加密的秘钥, 摘要加密后就是签名， 此属性可替换默认值
 	 */
-	public String signatureSecret() default "";
+	public String signatureLimiterSecret() default "";
 
 	/**
 	 * 
 	 * @return 签名排除的header名称列表
 	 */
-	public String[] signatureExcludeHeaderNames() default {};
+	public String[] signatureLimiterExcludeHeaderNames() default {};
 
 	/**
 	 * 
 	 * @return 签名包含的header名称列表
 	 */
-	public String[] signatureIncludeHeaderNames() default {};
+	public String[] signatureLimiterIncludeHeaderNames() default {};
+
+	/**
+	 * 
+	 * @return 是否启用跨域配置
+	 */
+	public boolean enableCorsLimiter() default false;
+
+	/**
+	 * 
+	 * @return 跨域配置
+	 */
+	public Class<? extends CorsConfiguration> corsLimiterConfiguration() default CorsConfiguration.class;
+
+	/**
+	 * 
+	 * @return 是否启用IP限制
+	 */
+	public boolean enableIpLimiter() default false;
+
+	/**
+	 * 
+	 * @return IP 黑名单
+	 */
+	public String[] ipLimiterExcludes() default {};
+
+	/**
+	 * 
+	 * @return IP 白名单
+	 */
+	public String[] ipLimiterIncludes() default {};
+
+	/**
+	 * 
+	 * @return 是否启用限制referer
+	 */
+	public boolean enableRefererLimiter() default false;
+
+	/**
+	 * 
+	 * @return 限制Referer列表
+	 */
+	public String[] refererLimiterIncludeReferers() default {};
+
+	/**
+	 * 设置true 该请求资源只允许序列请求，不允许并发请求
+	 * 
+	 * @return 是否开启同步模式
+	 */
+	public boolean enableSyncLimiter() default false;
+
+	/**
+	 * 
+	 * @return 是否启用每秒限流
+	 */
+	public boolean enableFlowLimiter() default false;
+
+	/**
+	 * 
+	 * @return 每秒限流数量
+	 */
+	public long flowLimiterLimitCount() default -1;
+
+	/**
+	 * 
+	 * @return 是否启用限制每日调用次数
+	 */
+	public boolean enableDailyCountLimiter() default false;
+
+	/**
+	 * 限制每日调用次数
+	 * 
+	 * @return 默认-1
+	 */
+	public long dailyCountLimiterLimitCount() default -1;
 
 	/**
 	 * 启用后会过滤Xss字符
@@ -183,6 +238,6 @@ public @interface RequestResource {
 	 * 
 	 * @return httpCodeNameHandlerClass
 	 */
-	public Class<? extends WrapResponseHandler> wrapResponseHandlerClass() default DefaultWrapResponseHandler.class;
+	public Class<? extends WrapResponseHandler> wrapResponseHandler() default DefaultWrapResponseHandler.class;
 
 }

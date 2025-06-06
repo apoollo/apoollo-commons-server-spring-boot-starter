@@ -4,14 +4,12 @@
 package com.apoollo.commons.server.spring.boot.starter.service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.apoollo.commons.util.JwtUtils;
 import com.apoollo.commons.util.JwtUtils.Renewal;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.User;
-import com.apoollo.commons.util.request.context.core.DefaultUser;
 
 /**
  * @author liuyulong
@@ -28,14 +26,11 @@ public interface UserManager {
 	public default void renewal(String accessKey, Renewal renewal) {
 
 	}
-
-	public default String login(String id, String accessKey, String secretKey, String secretKeySaltValue,
-			Boolean allowRenewal, List<String> ipWhiteList, List<String> allowRequestAntPathPatterns,
-			List<String> roles, Object attachement, Date enableChangePasswordExpireDate, Long timeout, TimeUnit timeUnit) {
+	public default String login(User user, Long timeout, TimeUnit timeUnit) {
 		int keepSeconds = ((Long) timeUnit.toSeconds(timeout)).intValue();
-		String jwtToken = JwtUtils.generateJwtToken(accessKey, secretKey, secretKeySaltValue, new Date(), keepSeconds);
-		setUser(new DefaultUser(id, true, accessKey, secretKey, secretKeySaltValue, allowRenewal, ipWhiteList,
-				allowRequestAntPathPatterns, roles, attachement, enableChangePasswordExpireDate), timeout, timeUnit);
+		String jwtToken = JwtUtils.generateJwtToken(user.getAccessKey(), user.getSecretKey(),
+				user.getSecretKeySaltValue(), new Date(), keepSeconds);
+		setUser(user, timeout, timeUnit);
 		return JwtUtils.authorizationConcatJwtToken(jwtToken);
 	}
 

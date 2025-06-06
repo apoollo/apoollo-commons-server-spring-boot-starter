@@ -38,7 +38,6 @@ import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
-import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
@@ -128,12 +127,6 @@ public class CommonsServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CommonsServerRedisKey getCommonsServerRedisKey(RedisNameSpaceKey redisNameSpaceKey) {
-		return () -> redisNameSpaceKey;
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
 	CaptchaService getCaptchaService(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
 		return new RedisCaptchaService(redisTemplate, redisNameSpaceKey);
 	}
@@ -141,24 +134,23 @@ public class CommonsServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	RequestResourceManager getRequestResourceManager(Instance instance, StringRedisTemplate redisTemplate,
-			CommonsServerRedisKey commonsServerRedisKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultRequestResourceManager(instance, redisTemplate, commonsServerRedisKey,
-				commonsServerProperties);
+			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
+		return new DefaultRequestResourceManager(instance, redisTemplate, redisNameSpaceKey, commonsServerProperties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	UserManager getUserManager(StringRedisTemplate stringRedisTemplate, CommonsServerRedisKey commonsServerRedisKey,
-			CommonsServerProperties commonsServerProperties) {
-		return new DefaultUserManager(stringRedisTemplate, commonsServerRedisKey,
+	UserManager getUserManager(Instance instance, StringRedisTemplate stringRedisTemplate,
+			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
+		return new DefaultUserManager(instance, stringRedisTemplate, redisNameSpaceKey,
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getUsers()));
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	Authorization<?> getAuthorization(StringRedisTemplate stringRedisTemplate,
-			CommonsServerRedisKey commonsServerRedisKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultAuthorization(stringRedisTemplate, commonsServerRedisKey,
+	Authorization<?> getAuthorization(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey redisNameSpaceKey,
+			CommonsServerProperties commonsServerProperties) {
+		return new DefaultAuthorization(stringRedisTemplate, redisNameSpaceKey,
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getPermissions()));
 	}
 
@@ -171,18 +163,16 @@ public class CommonsServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean(name = "jwtTokenAccess")
 	Access<JwtToken> getJwtTokenAccess(UserManager userManager, Authorization<?> authorization,
-			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter FlowLimiter,
-			CommonsServerProperties commonsServerProperties) {
-		return new JwtTokenAccess(userManager, authorization, commonsServerRedisKey, countLimiter, FlowLimiter,
+			CountLimiter countLimiter, FlowLimiter FlowLimiter, CommonsServerProperties commonsServerProperties) {
+		return new JwtTokenAccess(userManager, authorization, countLimiter, FlowLimiter,
 				commonsServerProperties.getAccess());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(name = "secretKeyTokenAccess")
 	Access<String> getSecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization,
-			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter flowLimiter,
-			CommonsServerProperties commonsServerProperties) {
-		return new SecretKeyTokenAccess(userManager, authorization, commonsServerRedisKey, countLimiter, flowLimiter,
+			CountLimiter countLimiter, FlowLimiter flowLimiter, CommonsServerProperties commonsServerProperties) {
+		return new SecretKeyTokenAccess(userManager, authorization, countLimiter, flowLimiter,
 				commonsServerProperties.getAccess());
 	}
 

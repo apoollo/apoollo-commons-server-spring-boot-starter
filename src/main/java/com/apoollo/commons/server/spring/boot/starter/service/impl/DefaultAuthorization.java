@@ -14,8 +14,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.AntPathMatcher;
 
 import com.alibaba.fastjson2.JSON;
-import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.User;
@@ -32,19 +32,19 @@ public class DefaultAuthorization implements Authorization<Object> {
 
 	private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
 	private StringRedisTemplate redisTemplate;
-	private CommonsServerRedisKey commonsServerRedisKey;
+	private RedisNameSpaceKey redisNameSpaceKey;
 	private Map<String, Map<String, DefaultRequestAccessParameter>> permissions;
 
-	public DefaultAuthorization(StringRedisTemplate redisTemplate, CommonsServerRedisKey commonsServerRedisKey,
+	public DefaultAuthorization(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
 			Map<String, Map<String, DefaultRequestAccessParameter>> permissions) {
 		super();
 		this.redisTemplate = redisTemplate;
-		this.commonsServerRedisKey = commonsServerRedisKey;
+		this.redisNameSpaceKey = redisNameSpaceKey;
 		this.permissions = permissions;
 	}
 
 	public String getAuthorizedRedisKey(String accessKey) {
-		return commonsServerRedisKey.getCommonsAuthorizationKey(accessKey);
+		return redisNameSpaceKey.getKey(RedisNameSpaceKey.AUTHORIZATION, accessKey);
 	}
 
 	@Override

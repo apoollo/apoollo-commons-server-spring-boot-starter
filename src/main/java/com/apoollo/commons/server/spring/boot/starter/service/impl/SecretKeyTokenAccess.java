@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess;
-import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.util.exception.AppForbbidenException;
 import com.apoollo.commons.util.exception.detailed.TokenEmptyExcetion;
@@ -25,10 +24,9 @@ public class SecretKeyTokenAccess extends AbstractAccess<String> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SecretKeyTokenAccess.class);
 
-	public SecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization,
-			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter flowLimiter,
-			AccessProperties accessProperties) {
-		super(userManager, authorization, commonsServerRedisKey, countLimiter, flowLimiter, accessProperties);
+	public SecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization, CountLimiter countLimiter,
+			FlowLimiter flowLimiter, AccessProperties accessProperties) {
+		super(userManager, authorization, countLimiter, flowLimiter, accessProperties);
 	}
 
 	@Override

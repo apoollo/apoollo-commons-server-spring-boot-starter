@@ -40,17 +40,14 @@ public abstract class AbstractAccess<T> implements Access<T> {
 	protected UserManager userManager;
 	protected Authorization<?> authorization;
 	private AccessProperties accessProperties;
-	private CommonsServerRedisKey commonsServerRedisKey;
 	private CountLimiter countLimiter;
 	private FlowLimiter flowLimiter;
 
-	public AbstractAccess(UserManager userManager, Authorization<?> authorization,
-			CommonsServerRedisKey commonsServerRedisKey, CountLimiter countLimiter, FlowLimiter flowLimiter,
-			AccessProperties accessProperties) {
+	public AbstractAccess(UserManager userManager, Authorization<?> authorization, CountLimiter countLimiter,
+			FlowLimiter flowLimiter, AccessProperties accessProperties) {
 		super();
 		this.userManager = userManager;
 		this.authorization = authorization;
-		this.commonsServerRedisKey = commonsServerRedisKey;
 		this.countLimiter = countLimiter;
 		this.flowLimiter = flowLimiter;
 		this.accessProperties = accessProperties;
@@ -117,7 +114,8 @@ public abstract class AbstractAccess<T> implements Access<T> {
 				flowLimiter.limit(accessKey, requestResource.getResourcePin(),
 						requestAccessParameter.getRequestTimesPerSecond());
 			} else {
-				flowLimiter.limit(accessKey, requestResource.getResourcePin(), requestResource.getFlowLimiterLimitCount());
+				flowLimiter.limit(accessKey, requestResource.getResourcePin(),
+						requestResource.getFlowLimiterLimitCount());
 			}
 		}
 	}
@@ -129,10 +127,9 @@ public abstract class AbstractAccess<T> implements Access<T> {
 			RequestAccessParameter requestAccessParameter = requestContext
 					.getAuthorizedValue(RequestAccessParameter.class);
 			if (null != requestAccessParameter && null != requestAccessParameter.getRequestMaximumTimesToday()) {
-
-				String key = commonsServerRedisKey.getCommonsServerKey(accessKey,
-						requestContext.getRequestResource().getResourcePin());
-				Incremented incremented = countLimiter.incrementDate(key, System.currentTimeMillis(), 2, TimeUnit.DAYS,
+				Incremented incremented = countLimiter.incrementDate(
+						StringUtils.join(accessKey, ":", requestContext.getRequestResource().getResourcePin()),
+						System.currentTimeMillis(), 2, TimeUnit.DAYS,
 						requestAccessParameter.getRequestMaximumTimesToday());
 
 				if (!BooleanUtils.isTrue(incremented.getAccessed())) {
