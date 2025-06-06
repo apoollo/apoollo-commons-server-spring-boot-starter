@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import com.apoollo.commons.server.spring.boot.starter.limiter.ContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.limiter.CorsLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.DailyCountLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
@@ -17,6 +18,7 @@ import com.apoollo.commons.server.spring.boot.starter.limiter.NonceLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.RefererLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.SyncLimiter;
+import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultContentEscapeHandler;
 import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultCorsLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultDailyCountLimiter;
 import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultFlowLimiter;
@@ -29,7 +31,11 @@ import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedis
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
+import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
+import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
+import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
+import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.StrictNonceValidaor;
 
 /**
@@ -40,8 +46,33 @@ public class LimiterConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	NonceValidator getNonceValidator(RedisNameSpaceKey redisNameSpaceKey, StringRedisTemplate redisTemplate) {
-		return new StrictNonceValidaor(redisNameSpaceKey, redisTemplate);
+	EscapeMethod getEscapeXss() {
+		return new DefaultEscapeXss();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	ContentEscapeHandler getXssHandler(EscapeMethod escapeXss) {
+		return new DefaultContentEscapeHandler(escapeXss);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	SlidingWindowLimiter getSlidingWindowLimiter(RedisTemplate<String, String> redisTemplate,
+			RedisNameSpaceKey redisNameSpaceKey) {
+		return new CommonsSlidingWindowLimiter(redisTemplate, redisNameSpaceKey);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	CountLimiter getCountLimiter(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new CommonsCountLimiter(stringRedisTemplate, redisNameSpaceKey);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	NonceValidator getNonceValidator(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new StrictNonceValidaor(redisTemplate, redisNameSpaceKey);
 	}
 
 	@Bean
@@ -80,13 +111,13 @@ public class LimiterConfigurer {
 			CommonsServerRedisKey commonsServerRedisKey) {
 		return new DefaultSyncLimiter(redisTemplate, commonsServerRedisKey);
 	}
-	
+
 	@Bean
 	@ConditionalOnMissingBean
 	FlowLimiter getFlowLimiter(SlidingWindowLimiter slidingWindowLimiter) {
 		return new DefaultFlowLimiter(slidingWindowLimiter);
 	}
-	
+
 	@Bean
 	@ConditionalOnMissingBean
 	DailyCountLimiter getDailyCountLimiter(CountLimiter countLimiter) {
