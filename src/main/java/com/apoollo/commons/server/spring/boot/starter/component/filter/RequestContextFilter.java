@@ -14,9 +14,12 @@ import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.util.IpUtils;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.limiter.Limiters;
+import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.request.context.model.RequestConstants;
 import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
 
@@ -35,12 +38,16 @@ public class RequestContextFilter extends AbstractSecureFilter {
 
 	private RequestContextInitail requestContextInitail;
 	private LoggerWriter logWitter;
+	private Limiters<LimitersSupport> limiters;
+	private CapacitySupport capacitySupport;
 
 	public RequestContextFilter(PathProperties pathProperties, RequestContextInitail requestContextInitail,
-			LoggerWriter logWitter) {
+			LoggerWriter logWitter, Limiters<LimitersSupport> limiters, CapacitySupport capacitySupport) {
 		super(pathProperties);
 		this.requestContextInitail = requestContextInitail;
 		this.logWitter = logWitter;
+		this.limiters = limiters;
+		this.capacitySupport = capacitySupport;
 	}
 
 	@Override
@@ -63,15 +70,20 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		LOGGER.info("访问URI：" + reuqestUri);
 		LOGGER.info("访问IP：" + requestIp);
 		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
+		limiters.limit(request, response, requestContext, capacitySupport);
 		chain.doFilter(new RequestContextHttpServletRequestWrapper(request), response);
 		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		User user = requestContext.getUser();
 		if (null != user) {
-			response.setHeader(RequestConstants.RESPONSE_HEADER_NEED_RESET_PASSWORD, String.valueOf(user.needResetPassword()));
+			response.setHeader(RequestConstants.RESPONSE_HEADER_NEED_RESET_PASSWORD,
+					String.valueOf(user.needResetPassword()));
 		}
 		logWitter.write(requestContext, () -> {
 			LOGGER.info("请求结束标记");
 		});
+		limiters.unlimit(request, response, requestContext, capacitySupport);
+		limiters.unlimit(request, response, requestContext, requestContext.getRequestResource());
+		limiters.unlimit(request, response, requestContext, user);
 	}
 
 	@Override

@@ -1,1 +1,3 @@
 com.apoollo.commons.server.spring.boot.starter.CommonsServerConfiguration
+com.apoollo.commons.server.spring.boot.starter.LimiterConfigurer
+com.apoollo.commons.server.spring.boot.starter.ComponentConfigurer

@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -18,7 +19,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -26,8 +26,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
-import com.apoollo.commons.server.spring.boot.starter.component.ComponentConfigurer;
-import com.apoollo.commons.server.spring.boot.starter.component.LimiterConfigurer;
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
@@ -68,12 +66,12 @@ import com.github.benmanes.caffeine.cache.Caffeine;
  * @author liuyulong
  * @since 2023年8月22日
  */
+@AutoConfiguration
 @EnableCaching
-@Configuration(proxyBeanMethods = true)
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX, name = "enable", matchIfMissing = true)
-@Import({ CommonsServerWebMvcConfigurer.class, LimiterConfigurer.class, ComponentConfigurer.class,
-		ApplicationReady.class, WelcomeController.class, ExceptionController.class, DynamicResourceController.class })
+@Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
+		ExceptionController.class, DynamicResourceController.class })
 public class CommonsServerConfiguration {
 
 	@Bean

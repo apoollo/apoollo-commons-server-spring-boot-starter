@@ -1,14 +1,14 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.component;
+package com.apoollo.commons.server.spring.boot.starter;
 
 import java.util.List;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
@@ -32,22 +32,23 @@ import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceMan
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtAuthorizationRenewal;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
+import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
-import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
-import com.apoollo.commons.util.request.context.limiter.SyncLimiter;
+import com.apoollo.commons.util.request.context.limiter.Limiters;
+import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 
 import jakarta.servlet.Filter;
 
 /**
  * liuyulong
  */
-@Configuration
+@AutoConfiguration
 public class ComponentConfigurer {
-	
+
 	@Bean
 	@ConditionalOnMissingBean
 	WrapResponseHandler getHttpCodeNameHandler() {
@@ -62,19 +63,19 @@ public class ComponentConfigurer {
 
 	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
-			RequestContextInitail requestContextInitail, LoggerWriter logWitter,
-			CommonsServerProperties commonsServerProperties) {
-		return newFilterRegistrationBean(
-				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail, logWitter),
-				Constants.REQUEST_CONTEXT_FILTER_ORDER);
+			RequestContextInitail requestContextInitail, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
+			CapacitySupport capacitySupport, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(new RequestContextFilter(commonsServerProperties.getPath(),
+				requestContextInitail, logWitter, limiters, capacitySupport), Constants.REQUEST_CONTEXT_FILTER_ORDER);
 	}
 
 	@Bean
 	FilterRegistrationBean<RequestResourceFilter> getRequestResourceFilterRegistrationBean(
-			RequestResourceManager requestResourceManager, FlowLimiter flowLimiter, SyncLimiter syncService,
+			RequestResourceManager requestResourceManager, Limiters<LimitersSupport> limiters,
 			CommonsServerProperties commonsServerProperties) {
-		return newFilterRegistrationBean(new RequestResourceFilter(commonsServerProperties.getPath(),
-				requestResourceManager, flowLimiter, syncService), Constants.REQUEST_RESOURCE_FILTER_ORDER);
+		return newFilterRegistrationBean(
+				new RequestResourceFilter(commonsServerProperties.getPath(), requestResourceManager, limiters),
+				Constants.REQUEST_RESOURCE_FILTER_ORDER);
 	}
 
 	@Bean

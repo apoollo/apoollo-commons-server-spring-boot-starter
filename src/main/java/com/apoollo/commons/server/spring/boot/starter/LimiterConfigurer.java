@@ -1,11 +1,11 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.component;
+package com.apoollo.commons.server.spring.boot.starter;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
@@ -14,8 +14,10 @@ import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
+import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
+import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.core.StrictNonceValidaor;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
@@ -23,6 +25,7 @@ import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
 import com.apoollo.commons.util.request.context.limiter.DailyCountLimiter;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.request.context.limiter.IpLimiter;
+import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.NonceLimiter;
 import com.apoollo.commons.util.request.context.limiter.RefererLimiter;
 import com.apoollo.commons.util.request.context.limiter.SignatureLimiter;
@@ -32,15 +35,17 @@ import com.apoollo.commons.util.request.context.limiter.core.DefaultCorsLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultDailyCountLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultFlowLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultIpLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultLimiters;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultNonceLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultRefererLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultSignatureLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultSyncLimiter;
+import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 
 /**
  * liuyulong
  */
-@Configuration
+@AutoConfiguration
 public class LimiterConfigurer {
 
 	@Bean
@@ -120,5 +125,20 @@ public class LimiterConfigurer {
 	@ConditionalOnMissingBean
 	DailyCountLimiter getDailyCountLimiter(CountLimiter countLimiter) {
 		return new DefaultDailyCountLimiter(countLimiter);
+	}
+	
+	@Bean
+	@ConditionalOnMissingBean
+	CapacitySupport getCapacitySupport() {
+		return new DefaultCapacitySupport();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	Limiters<LimitersSupport> getLimiters(NonceLimiter nonceLimiter, SignatureLimiter signatureLimter,
+			CorsLimiter corsLimiter, IpLimiter ipLimiter, RefererLimiter refererLimiter, SyncLimiter syncLimiter,
+			FlowLimiter flowLimiter, DailyCountLimiter dailyCountLimiter) {
+		return new DefaultLimiters<>(nonceLimiter, signatureLimter, corsLimiter, ipLimiter, refererLimiter, syncLimiter,
+				flowLimiter, dailyCountLimiter);
 	}
 }
