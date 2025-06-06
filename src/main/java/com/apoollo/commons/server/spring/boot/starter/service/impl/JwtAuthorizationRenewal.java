@@ -32,7 +32,7 @@ public class JwtAuthorizationRenewal implements AuthorizationRenewal<JwtToken, R
     @Override
     public Renewal renewal(User user, JwtToken token, Consumer<Renewal> consumer) {
         Renewal target = null;
-        if (BooleanUtils.isTrue(user.getAllowRenewal())) {
+        if (BooleanUtils.isTrue(user.getEnableRenewal())) {
             Renewal renewal = new JwtUtils.Renewal(token, user.getSecretKey(), user.getSecretKeySaltValue()).renewal();
             if (BooleanUtils.isTrue(renewal.getRenewed())) {
                 userManager.renewal(user.getAccessKey(), renewal);

@@ -11,7 +11,7 @@ import com.apoollo.commons.util.JwtUtils;
 import com.apoollo.commons.util.JwtUtils.Renewal;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.User;
-import com.apoollo.commons.util.request.context.def.DefaultUser;
+import com.apoollo.commons.util.request.context.core.DefaultUser;
 
 /**
  * @author liuyulong

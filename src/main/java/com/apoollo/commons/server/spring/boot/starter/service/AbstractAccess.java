@@ -78,7 +78,7 @@ public abstract class AbstractAccess<T> implements Access<T> {
 
 		RequestContext requestContext = RequestContext.getRequired();
 		// check ip
-		limitIpAccess(user.getIpWhiteList(), requestContext.getRequestIp());
+		limitIpAccess(user.getIpLimiterIncludes(), requestContext.getRequestIp());
 
 		// check acessKey and secretKey
 		limitTokenAccess(user, token);
@@ -117,7 +117,7 @@ public abstract class AbstractAccess<T> implements Access<T> {
 				flowLimiter.limit(accessKey, requestResource.getResourcePin(),
 						requestAccessParameter.getRequestTimesPerSecond());
 			} else {
-				flowLimiter.limit(accessKey, requestResource.getResourcePin(), requestResource.getLimtUserQps());
+				flowLimiter.limit(accessKey, requestResource.getResourcePin(), requestResource.getFlowLimiterLimitCount());
 			}
 		}
 	}

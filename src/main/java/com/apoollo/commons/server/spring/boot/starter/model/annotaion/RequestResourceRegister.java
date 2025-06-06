@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
-import com.apoollo.commons.util.request.context.def.DefaultRequestResource;
+import com.apoollo.commons.util.request.context.core.DefaultRequestResource;
+import com.apoollo.commons.util.web.spring.Instance;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -82,10 +82,10 @@ public class RequestResourceRegister {
 						requestResources.add(requestResourceObject);
 						pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
 					} else {
-						if (null != requestResourceMapping.getControllerMethodRequestMappingPath()) {
-							pathProperties.getExcludePathPatterns()
-									.add(requestResourceMapping.getControllerMethodRequestMappingPath());
-						}
+						// if (null != requestResourceMapping.getControllerMethodRequestMappingPath()) {
+						// pathProperties.getExcludePathPatterns()
+						// .add(requestResourceMapping.getControllerMethodRequestMappingPath());
+						// }
 					}
 				});
 	}

@@ -18,7 +18,7 @@ import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedis
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.request.context.User;
-import com.apoollo.commons.util.request.context.def.DefaultUser;
+import com.apoollo.commons.util.request.context.core.DefaultUser;
 
 /**
  * @author liuyulong

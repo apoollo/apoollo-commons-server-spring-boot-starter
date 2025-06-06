@@ -5,7 +5,7 @@ package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
-import com.apoollo.commons.util.request.context.def.AccessStrategy;
+import com.apoollo.commons.util.request.context.core.AccessStrategy;
 
 import jakarta.servlet.http.HttpServletRequest;
 

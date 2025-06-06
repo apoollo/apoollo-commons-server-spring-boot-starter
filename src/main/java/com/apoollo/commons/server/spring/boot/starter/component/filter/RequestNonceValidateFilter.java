@@ -44,14 +44,14 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 		RequestContext requestContext = RequestContext.getRequired();
 		RequestResource requestResource = requestContext.getRequestResource();
 
-		if (BooleanUtils.isTrue(requestResource.getEnableNonce())) {
+		if (BooleanUtils.isTrue(requestResource.getEnableNonceLimiter())) {
 
 			String timestamp = request.getHeader(RequestConstants.REQUEST_HEADER_TIMESTAMP);
 			if (StringUtils.isBlank(timestamp)) {
 				throw new AppIllegalArgumentException(
 						"header [" + RequestConstants.REQUEST_HEADER_TIMESTAMP + "] must not be null");
 			}
-			long timestampLong = requestResource.getNonceDuration();
+			long timestampLong = requestResource.getNonceLimiterDuration();
 			try {
 				timestampLong += Long.valueOf(timestamp);
 			} catch (NumberFormatException e) {
@@ -69,11 +69,11 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 				throw new AppIllegalArgumentException("header [" + RequestConstants.REQUEST_HEADER_NONCE + "] must not be null");
 			}
 
-			NonceValidator nonceValidator = requestResource.getNonceValidator();
+			NonceValidator nonceValidator = requestResource.getNonceLimiterValidator();
 			if (null == nonceValidator) {
 				nonceValidator = this.nonceValidator;
 			}
-			if (!nonceValidator.isValid(nonce, requestResource.getNonceDuration())) {
+			if (!nonceValidator.isValid(nonce, requestResource.getNonceLimiterDuration())) {
 				throw new AppIllegalArgumentException("header [" + RequestConstants.REQUEST_HEADER_NONCE + "] invalid");
 			}
 		}

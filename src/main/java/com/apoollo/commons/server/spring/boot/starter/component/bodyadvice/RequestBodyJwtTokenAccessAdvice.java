@@ -23,7 +23,7 @@ import com.apoollo.commons.util.exception.AppException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.TokenGetter;
-import com.apoollo.commons.util.request.context.def.AccessStrategy;
+import com.apoollo.commons.util.request.context.core.AccessStrategy;
 
 /**
  * @author liuyulong

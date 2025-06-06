@@ -13,10 +13,10 @@ import java.lang.annotation.Target;
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
-import com.apoollo.commons.util.request.context.def.AccessStrategy;
-import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
-import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
-import com.apoollo.commons.util.request.context.def.StrictNonceValidaor;
+import com.apoollo.commons.util.request.context.core.AccessStrategy;
+import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
+import com.apoollo.commons.util.request.context.core.StrictNonceValidaor;
 
 /**
  * <p>

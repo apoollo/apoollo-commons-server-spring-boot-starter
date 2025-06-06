@@ -16,8 +16,8 @@ import org.springframework.context.ApplicationListener;
 import com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceRegister;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.AfterApplicationReady;
-import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.web.spring.Instance;
 
 /**
  * @author liuyulong

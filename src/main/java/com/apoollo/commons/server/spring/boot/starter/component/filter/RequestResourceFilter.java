@@ -60,17 +60,17 @@ public class RequestResourceFilter extends AbstractSecureFilter {
 		if (BooleanUtils.isNotTrue(requestResource.getEnable())) {
 			throw new AppForbbidenException("requestResource disabled - " + requestResource.getRequestMappingPath());
 		}
-		if (BooleanUtils.isTrue(requestResource.getEnableSync())) {
+		if (BooleanUtils.isTrue(requestResource.getEnableSyncLimiter())) {
 			syncService.limit(ASYNC_KEY, Duration.ofSeconds(30));
 		}
-		flowLimiter.limit(null, requestResource.getResourcePin(), requestResource.getLimtPlatformQps());
+		flowLimiter.limit(null, requestResource.getResourcePin(), requestResource.getFlowLimiterLimitCount());
 
 		LOGGER.info("request resource accessed");
 		//
 		chain.doFilter(request, response);
 
 		//
-		if (BooleanUtils.isTrue(requestResource.getEnableSync())) {
+		if (BooleanUtils.isTrue(requestResource.getEnableSyncLimiter())) {
 			syncService.unlimit(ASYNC_KEY);
 		}
 

@@ -16,7 +16,7 @@ import com.apoollo.commons.util.JwtUtils;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
-import com.apoollo.commons.util.request.context.def.AccessStrategy;
+import com.apoollo.commons.util.request.context.core.AccessStrategy;
 import com.apoollo.commons.util.request.context.model.RequestConstants;
 
 import jakarta.servlet.FilterChain;

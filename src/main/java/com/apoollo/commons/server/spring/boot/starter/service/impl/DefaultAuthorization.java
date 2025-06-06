@@ -5,11 +5,9 @@ package com.apoollo.commons.server.spring.boot.starter.service.impl;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -21,7 +19,7 @@ import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.User;
-import com.apoollo.commons.util.request.context.def.DefaultRequestAccessParameter;
+import com.apoollo.commons.util.request.context.core.DefaultRequestAccessParameter;
 import com.apoollo.commons.util.request.context.model.Authorized;
 
 /**
@@ -71,10 +69,10 @@ public class DefaultAuthorization implements Authorization<Object> {
 		}
 
 		// 通过角色判定授权
-		if (null == authorized && ArrayUtils.isNotEmpty(requestResource.getRoles())
+		if (null == authorized && CollectionUtils.isNotEmpty(requestResource.getRoles())
 				&& CollectionUtils.isNotEmpty(user.getRoles())) {
 
-			Optional<String> roleOptional = Stream.of(requestResource.getRoles())
+			Optional<String> roleOptional = requestResource.getRoles().stream()
 					.filter(role -> user.getRoles().contains(role)).findAny();
 			if (roleOptional.isPresent()) {
 				authorized = new Authorized<>(true, null);

@@ -35,7 +35,7 @@ import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
-import com.apoollo.commons.util.request.context.def.DefaultWrapResponseHandler;
+import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.request.context.limiter.SyncLimiter;

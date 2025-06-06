@@ -39,13 +39,11 @@ import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
-import com.apoollo.commons.server.spring.boot.starter.service.Instance;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultInstance;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestResourceManager;
@@ -63,6 +61,8 @@ import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
+import com.apoollo.commons.util.web.spring.DefaultInstance;
+import com.apoollo.commons.util.web.spring.Instance;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
