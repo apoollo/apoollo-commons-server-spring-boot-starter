@@ -31,7 +31,6 @@ import com.apoollo.commons.server.spring.boot.starter.component.LimiterConfigure
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
-import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
@@ -61,6 +60,7 @@ import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
+import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;

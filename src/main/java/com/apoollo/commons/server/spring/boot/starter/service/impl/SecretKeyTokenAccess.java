@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess;
 import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
@@ -17,6 +16,7 @@ import com.apoollo.commons.util.exception.detailed.TokenEmptyExcetion;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 
 /**
  * @author liuyulong

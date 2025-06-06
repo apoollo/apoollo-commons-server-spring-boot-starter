@@ -10,14 +10,14 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.SyncLimiter;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.util.exception.AppForbbidenException;
 import com.apoollo.commons.util.exception.AppNoRequestResourceException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
+import com.apoollo.commons.util.request.context.limiter.SyncLimiter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

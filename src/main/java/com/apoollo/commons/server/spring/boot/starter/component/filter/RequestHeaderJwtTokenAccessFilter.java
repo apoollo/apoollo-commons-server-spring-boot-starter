@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
@@ -18,6 +17,7 @@ import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.def.AccessStrategy;
+import com.apoollo.commons.util.request.context.model.RequestConstants;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -58,7 +58,7 @@ public class RequestHeaderJwtTokenAccessFilter extends AbstractSecureFilter {
 			access.access(jwtToken.getAccessKey(), jwtToken);
 
 			authorizationRenewal.renewal(RequestContext.getRequired().getUser(), jwtToken, (renewal) -> {
-				response.setHeader(Constants.RESPONSE_HEADER_RENEWAL_AUTHORIZATION,
+				response.setHeader(RequestConstants.RESPONSE_HEADER_RENEWAL_AUTHORIZATION,
 						renewal.getRenewalAuthorizationJwtToken());
 			});
 			LOGGER.info("header jwt token validate accessed");

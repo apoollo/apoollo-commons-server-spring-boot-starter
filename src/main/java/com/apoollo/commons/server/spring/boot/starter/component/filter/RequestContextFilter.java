@@ -8,9 +8,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
-import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
@@ -19,6 +17,8 @@ import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.model.RequestConstants;
+import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,7 +47,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	public void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		LOGGER.info("请求进入标记");
-		String clientRequestId = request.getHeader(Constants.REQUEST_HEADER_REQUEST_ID);
+		String clientRequestId = request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID);
 
 		String requestId = LangUtils.getUppercaseUUID();
 		String reuqestUri = request.getRequestURI();
@@ -64,10 +64,10 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		LOGGER.info("访问IP：" + requestIp);
 		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
 		chain.doFilter(new RequestContextHttpServletRequestWrapper(request), response);
-		response.setHeader(Constants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
+		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		User user = requestContext.getUser();
 		if (null != user) {
-			response.setHeader(Constants.RESPONSE_HEADER_NEED_RESET_PASSWORD, String.valueOf(user.needResetPassword()));
+			response.setHeader(RequestConstants.RESPONSE_HEADER_NEED_RESET_PASSWORD, String.valueOf(user.needResetPassword()));
 		}
 		logWitter.write(requestContext, () -> {
 			LOGGER.info("请求结束标记");

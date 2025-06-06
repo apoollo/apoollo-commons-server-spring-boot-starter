@@ -10,12 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.exception.AppIllegalArgumentException;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.model.RequestConstants;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -46,10 +46,10 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 
 		if (BooleanUtils.isTrue(requestResource.getEnableNonce())) {
 
-			String timestamp = request.getHeader(Constants.REQUEST_HEADER_TIMESTAMP);
+			String timestamp = request.getHeader(RequestConstants.REQUEST_HEADER_TIMESTAMP);
 			if (StringUtils.isBlank(timestamp)) {
 				throw new AppIllegalArgumentException(
-						"header [" + Constants.REQUEST_HEADER_TIMESTAMP + "] must not be null");
+						"header [" + RequestConstants.REQUEST_HEADER_TIMESTAMP + "] must not be null");
 			}
 			long timestampLong = requestResource.getNonceDuration();
 			try {
@@ -64,9 +64,9 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 				throw new AppIllegalArgumentException("timestamp [" + timestamp + "] already expire");
 			}
 
-			String nonce = request.getHeader(Constants.REQUEST_HEADER_NONCE);
+			String nonce = request.getHeader(RequestConstants.REQUEST_HEADER_NONCE);
 			if (StringUtils.isBlank(nonce)) {
-				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_HEADER_NONCE + "] must not be null");
+				throw new AppIllegalArgumentException("header [" + RequestConstants.REQUEST_HEADER_NONCE + "] must not be null");
 			}
 
 			NonceValidator nonceValidator = requestResource.getNonceValidator();
@@ -74,7 +74,7 @@ public class RequestNonceValidateFilter extends AbstractSecureFilter {
 				nonceValidator = this.nonceValidator;
 			}
 			if (!nonceValidator.isValid(nonce, requestResource.getNonceDuration())) {
-				throw new AppIllegalArgumentException("header [" + Constants.REQUEST_HEADER_NONCE + "] invalid");
+				throw new AppIllegalArgumentException("header [" + RequestConstants.REQUEST_HEADER_NONCE + "] invalid");
 			}
 		}
 		chain.doFilter(request, response);

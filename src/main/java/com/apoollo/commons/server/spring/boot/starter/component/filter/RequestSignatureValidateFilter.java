@@ -16,8 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.model.ServletInputStreamHelper;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.HttpContentUtils;
 import com.apoollo.commons.util.LangUtils;
@@ -26,6 +24,8 @@ import com.apoollo.commons.util.crypto.hash.MacHash;
 import com.apoollo.commons.util.exception.AppIllegalArgumentException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.model.RequestConstants;
+import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -56,10 +56,10 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 		RequestResource requestResource = requestContext.getRequestResource();
 
 		if (BooleanUtils.isTrue(requestResource.getEnableSignature())) {
-			String requestSignature = request.getHeader(Constants.REQUEST_HEADER_SIGNATURE);
+			String requestSignature = request.getHeader(RequestConstants.REQUEST_HEADER_SIGNATURE);
 			if (StringUtils.isBlank(requestSignature)) {
 				throw new AppIllegalArgumentException(
-						"header [" + Constants.REQUEST_HEADER_SIGNATURE + "] must not be null");
+						"header [" + RequestConstants.REQUEST_HEADER_SIGNATURE + "] must not be null");
 			}
 
 			String targetSecret = LangUtils.defaultString(requestResource.getSignatureSecret(), this.secret);
@@ -116,7 +116,7 @@ public class RequestSignatureValidateFilter extends AbstractSecureFilter {
 	public TreeMap<String, String> getHeaders(HttpServletRequest request, List<String> excludes,
 			List<String> includes) {
 		if (CollectionUtils.isEmpty(excludes)) {
-			excludes = List.of(Constants.REQUEST_HEADER_SIGNATURE);
+			excludes = List.of(RequestConstants.REQUEST_HEADER_SIGNATURE);
 		}
 		return getNameValues(headerName -> request.getHeader(headerName), request.getHeaderNames().asIterator(),
 				excludes, includes);

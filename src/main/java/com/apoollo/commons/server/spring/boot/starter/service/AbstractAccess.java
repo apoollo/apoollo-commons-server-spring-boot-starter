@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessIpProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.util.LangUtils;
@@ -28,6 +27,7 @@ import com.apoollo.commons.util.request.context.RequestAccessParameter;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.request.context.model.Authorized;
 
 /**

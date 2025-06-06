@@ -9,25 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import com.apoollo.commons.server.spring.boot.starter.limiter.ContentEscapeHandler;
-import com.apoollo.commons.server.spring.boot.starter.limiter.CorsLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.DailyCountLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.FlowLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.IpLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.NonceLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.RefererLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.SignatureLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.SyncLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultContentEscapeHandler;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultCorsLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultDailyCountLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultFlowLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultIpLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultNonceLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultRefererLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultSignatureLimiter;
-import com.apoollo.commons.server.spring.boot.starter.limiter.core.DefaultSyncLimiter;
-import com.apoollo.commons.server.spring.boot.starter.service.CommonsServerRedisKey;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
@@ -37,6 +18,24 @@ import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.def.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.def.StrictNonceValidaor;
+import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
+import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
+import com.apoollo.commons.util.request.context.limiter.DailyCountLimiter;
+import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
+import com.apoollo.commons.util.request.context.limiter.IpLimiter;
+import com.apoollo.commons.util.request.context.limiter.NonceLimiter;
+import com.apoollo.commons.util.request.context.limiter.RefererLimiter;
+import com.apoollo.commons.util.request.context.limiter.SignatureLimiter;
+import com.apoollo.commons.util.request.context.limiter.SyncLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultContentEscapeHandler;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultCorsLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultDailyCountLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultFlowLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultIpLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultNonceLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultRefererLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultSignatureLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultSyncLimiter;
 
 /**
  * liuyulong
@@ -107,9 +106,8 @@ public class LimiterConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	SyncLimiter getSyncLimiter(RedisTemplate<String, String> redisTemplate,
-			CommonsServerRedisKey commonsServerRedisKey) {
-		return new DefaultSyncLimiter(redisTemplate, commonsServerRedisKey);
+	SyncLimiter getSyncLimiter(RedisTemplate<String, String> redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new DefaultSyncLimiter(redisTemplate, redisNameSpaceKey);
 	}
 
 	@Bean
