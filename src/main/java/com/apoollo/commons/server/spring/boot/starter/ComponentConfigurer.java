@@ -17,24 +17,29 @@ import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.Reque
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderJwtTokenAccessFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestHeaderKeyPairAccessFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestNonceValidateFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestParameterKeyPairAccessFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestResourceFilter;
-import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestSignatureValidateFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestHeaderJwtTokenAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestHeaderKeyPairAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestNonceValidateFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestParameterKeyPairAccessFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestResourceFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated.RequestSignatureValidateFilter;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
+import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtAuthorizationRenewal;
+import com.apoollo.commons.server.spring.boot.starter.service.impl.SecureRequestResource;
+import com.apoollo.commons.server.spring.boot.starter.service.impl.SecureUser;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.NonceValidator;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
+import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.User;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
@@ -62,11 +67,26 @@ public class ComponentConfigurer {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	SecurePrincipal<RequestResource> getSecureRequestResource(RequestResourceManager requestResourceManager,
+			Limiters<LimitersSupport> limiters) {
+		return new SecureRequestResource(requestResourceManager, limiters);
+	}
+
+	@ConditionalOnMissingBean
+	SecurePrincipal<User> getSecureUser(UserManager userManager, Limiters<LimitersSupport> limiters) {
+		return new SecureUser(userManager, limiters);
+	}
+
+	@Bean
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
-			RequestContextInitail requestContextInitail, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
+			RequestContextInitail requestContextInitail, SecurePrincipal<RequestResource> secureRequestResource,
+			SecurePrincipal<User> secureUser, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
 			CapacitySupport capacitySupport, CommonsServerProperties commonsServerProperties) {
-		return newFilterRegistrationBean(new RequestContextFilter(commonsServerProperties.getPath(),
-				requestContextInitail, logWitter, limiters, capacitySupport), Constants.REQUEST_CONTEXT_FILTER_ORDER);
+		return newFilterRegistrationBean(
+				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail,
+						secureRequestResource, secureUser, logWitter, limiters, capacitySupport),
+				Constants.REQUEST_CONTEXT_FILTER_ORDER);
 	}
 
 	@Bean

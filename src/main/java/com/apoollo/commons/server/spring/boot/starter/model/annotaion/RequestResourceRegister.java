@@ -81,12 +81,12 @@ public class RequestResourceRegister {
 								.getRequestResourceObject();
 						requestResources.add(requestResourceObject);
 						pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
-					} else {
-						// if (null != requestResourceMapping.getControllerMethodRequestMappingPath()) {
-						// pathProperties.getExcludePathPatterns()
-						// .add(requestResourceMapping.getControllerMethodRequestMappingPath());
-						// }
-					}
+					} /*
+						 * else { if (null !=
+						 * requestResourceMapping.getControllerMethodRequestMappingPath()) {
+						 * pathProperties.getExcludePathPatterns()
+						 * .add(requestResourceMapping.getControllerMethodRequestMappingPath()); } }
+						 */
 				});
 	}
 
@@ -156,16 +156,19 @@ public class RequestResourceRegister {
 		requestResourceObject.setNonceLimiterDuration(requestResourceAnnotaion.nonceLimiterDuration());
 		requestResourceObject.setEnableSignatureLimiter(requestResourceAnnotaion.enableSignatureLimiter());
 		requestResourceObject.setSignatureLimiterSecret(requestResourceAnnotaion.signatureLimiterSecret());
-		requestResourceObject.setSignatureLimiterExcludeHeaderNames(toList(requestResourceAnnotaion.signatureLimiterExcludeHeaderNames()));
-		requestResourceObject.setSignatureLimiterIncludeHeaderNames(toList(requestResourceAnnotaion.signatureLimiterIncludeHeaderNames()));
+		requestResourceObject.setSignatureLimiterExcludeHeaderNames(
+				toList(requestResourceAnnotaion.signatureLimiterExcludeHeaderNames()));
+		requestResourceObject.setSignatureLimiterIncludeHeaderNames(
+				toList(requestResourceAnnotaion.signatureLimiterIncludeHeaderNames()));
 		requestResourceObject.setEnableCorsLimiter(requestResourceAnnotaion.enableCorsLimiter());
 		requestResourceObject.setEnableIpLimiter(requestResourceAnnotaion.enableIpLimiter());
 		requestResourceObject.setIpLimiterExcludes(toList(requestResourceAnnotaion.ipLimiterExcludes()));
 		requestResourceObject.setIpLimiterIncludes(toList(requestResourceAnnotaion.ipLimiterIncludes()));
-		
+
 		requestResourceObject.setEnableRefererLimiter(requestResourceAnnotaion.enableRefererLimiter());
-		requestResourceObject.setRefererLimiterIncludeReferers(toList(requestResourceAnnotaion.refererLimiterIncludeReferers()));
-		
+		requestResourceObject
+				.setRefererLimiterIncludeReferers(toList(requestResourceAnnotaion.refererLimiterIncludeReferers()));
+
 		requestResourceObject.setEnableSyncLimiter(requestResourceAnnotaion.enableSyncLimiter());
 		requestResourceObject.setEnableFlowLimiter(requestResourceAnnotaion.enableFlowLimiter());
 		requestResourceObject.setFlowLimiterLimitCount(requestResourceAnnotaion.flowLimiterLimitCount());
@@ -175,25 +178,28 @@ public class RequestResourceRegister {
 		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
 
 		if (requestResourceAnnotaion.enableContentEscape()) {
-			requestResourceObject.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
+			requestResourceObject
+					.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
 		}
 		if (requestResourceAnnotaion.enableCorsLimiter()) {
-			requestResourceObject.setCorsLimiterConfiguration(instance.getInstance(requestResourceAnnotaion.corsLimiterConfiguration()));
+			requestResourceObject.setCorsLimiterConfiguration(
+					instance.getInstance(requestResourceAnnotaion.corsLimiterConfiguration()));
 		}
 		if (requestResourceAnnotaion.enableNonceLimiter()) {
-			requestResourceObject.setNonceLimiterValidator(instance.getInstance(requestResourceAnnotaion.nonceLimiterValidator()));
+			requestResourceObject
+					.setNonceLimiterValidator(instance.getInstance(requestResourceAnnotaion.nonceLimiterValidator()));
 		}
 		if (requestResourceAnnotaion.enableResponseWrapper()) {
-			requestResourceObject.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandler()));
+			requestResourceObject
+					.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandler()));
 		}
-		
-		
+
 		requestResourceObject.setEnable(requestResourceAnnotaion.enable());
 		requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
 		requestResourceObject.setRequestMappingPath(requestMappingPath);
 		requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy());
 		requestResourceObject.setRoles(toList(requestResourceAnnotaion.roles()));
-		
+
 		return requestResourceObject;
 	}
 

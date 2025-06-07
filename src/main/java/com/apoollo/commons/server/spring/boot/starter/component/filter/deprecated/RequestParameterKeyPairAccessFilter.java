@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.component.filter;
+package com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated;
 
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;

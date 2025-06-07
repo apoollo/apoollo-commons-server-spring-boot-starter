@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.component.filter;
+package com.apoollo.commons.server.spring.boot.starter.component.filter.deprecated;
 
 import java.io.IOException;
 
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.apoollo.commons.server.spring.boot.starter.component.filter.AbstractSecureFilter;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.exception.AppIllegalArgumentException;
 import com.apoollo.commons.util.request.context.NonceValidator;

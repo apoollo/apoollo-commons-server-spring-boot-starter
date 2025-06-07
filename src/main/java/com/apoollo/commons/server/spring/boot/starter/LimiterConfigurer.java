@@ -130,7 +130,9 @@ public class LimiterConfigurer {
 	@Bean
 	@ConditionalOnMissingBean
 	CapacitySupport getCapacitySupport() {
-		return new DefaultCapacitySupport();
+		DefaultCapacitySupport capacitySupport= new DefaultCapacitySupport();
+		capacitySupport.setResourcePin("platform");
+		return capacitySupport;
 	}
 
 	@Bean
