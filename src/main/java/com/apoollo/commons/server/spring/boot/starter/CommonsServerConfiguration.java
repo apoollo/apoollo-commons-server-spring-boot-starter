@@ -36,11 +36,9 @@ import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
-import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtTokenAccess;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SecretKeyTokenAccess;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
@@ -51,10 +49,7 @@ import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
-import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.UserManager;
-import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
-import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
@@ -129,20 +124,7 @@ public class CommonsServerConfiguration {
 		return new RedisCaptchaService(redisTemplate, redisNameSpaceKey);
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	RequestResourceManager getRequestResourceManager(Instance instance, StringRedisTemplate redisTemplate,
-			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultRequestResourceManager(instance, redisTemplate, redisNameSpaceKey, commonsServerProperties);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	UserManager getUserManager(Instance instance, StringRedisTemplate stringRedisTemplate,
-			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultUserManager(instance, stringRedisTemplate, redisNameSpaceKey,
-				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getUsers()));
-	}
+	
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -152,12 +134,7 @@ public class CommonsServerConfiguration {
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getPermissions()));
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	AuthorizationJwtTokenDecoder getAuthorizationJwtTokenJwtTokenDecoder() {
-		return new DefaultAuthenticationJwtTokenDecoder();
-	}
-
+	
 	@Bean
 	@ConditionalOnMissingBean(name = "jwtTokenAccess")
 	Access<JwtToken> getJwtTokenAccess(UserManager userManager, Authorization<?> authorization,

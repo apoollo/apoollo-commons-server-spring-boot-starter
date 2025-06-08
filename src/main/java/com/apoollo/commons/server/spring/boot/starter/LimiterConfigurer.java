@@ -17,8 +17,10 @@ import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.NonceValidator;
+import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.core.StrictNonceValidaor;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
@@ -47,6 +49,13 @@ import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
  */
 @AutoConfiguration
 public class LimiterConfigurer {
+	
+	@Bean
+	@ConditionalOnMissingBean
+	WrapResponseHandler getHttpCodeNameHandler() {
+		return new DefaultWrapResponseHandler();
+	}
+	
 
 	@Bean
 	@ConditionalOnMissingBean
