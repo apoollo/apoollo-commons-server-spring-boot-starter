@@ -17,12 +17,12 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAd
 
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
-import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.exception.AppException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.TokenGetter;
+import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.core.AccessStrategy;
 
 /**
@@ -33,10 +33,10 @@ public class RequestBodyJwtTokenAccessAdvice extends RequestBodyAdviceAdapter im
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(RequestBodyJwtTokenAccessAdvice.class);
 
-	private AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder;
+	private AuthorizationJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder;
 	private Access<JwtToken> access;
 
-	public RequestBodyJwtTokenAccessAdvice(AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
+	public RequestBodyJwtTokenAccessAdvice(AuthorizationJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
 			Access<JwtToken> access) {
 		super();
 		this.access = access;

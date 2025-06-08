@@ -26,11 +26,9 @@ import com.apoollo.commons.server.spring.boot.starter.component.filter.deprecate
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.Access;
-import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationJwtTokenJwtTokenDecoder;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
-import com.apoollo.commons.server.spring.boot.starter.service.UserManager;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtAuthorizationRenewal;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SecureRequestResource;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.SecureUser;
@@ -41,6 +39,10 @@ import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.User;
 import com.apoollo.commons.util.request.context.WrapResponseHandler;
+import com.apoollo.commons.util.request.context.access.Authentication;
+import com.apoollo.commons.util.request.context.access.Authorization;
+import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
+import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
@@ -74,8 +76,9 @@ public class ComponentConfigurer {
 	}
 
 	@ConditionalOnMissingBean
-	SecurePrincipal<User> getSecureUser(UserManager userManager, Limiters<LimitersSupport> limiters) {
-		return new SecureUser(userManager, limiters);
+	SecurePrincipal<User> getSecureUser(List<Authentication<?>> authentications, Authorization authorization,
+			Limiters<LimitersSupport> limiters, JwtAuthorizationRenewal authorizationRenewal) {
+		return new SecureUser(authentications, authorization, limiters, authorizationRenewal);
 	}
 
 	@Bean
@@ -125,7 +128,7 @@ public class ComponentConfigurer {
 
 	@Bean
 	FilterRegistrationBean<RequestHeaderJwtTokenAccessFilter> getRequestHeaderJwtTokenAccessFilterRegistrationBean(
-			AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder, Access<JwtToken> access,
+			AuthorizationJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder, Access<JwtToken> access,
 			JwtAuthorizationRenewal authorizationRenewal, CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(
 				new RequestHeaderJwtTokenAccessFilter(commonsServerProperties.getPath(),
@@ -165,8 +168,7 @@ public class ComponentConfigurer {
 	@Bean
 	@ConditionalOnMissingBean
 	RequestBodyJwtTokenAccessAdvice getRequestBodyJwtTokenAccessAdvice(
-			AuthorizationJwtTokenJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder,
-			Access<JwtToken> jwtTokenAccess) {
+			AuthorizationJwtTokenDecoder authorizationJwtTokenJwtTokenDecoder, Access<JwtToken> jwtTokenAccess) {
 		return new RequestBodyJwtTokenAccessAdvice(authorizationJwtTokenJwtTokenDecoder, jwtTokenAccess);
 	}
 

@@ -27,6 +27,7 @@ import com.apoollo.commons.util.request.context.RequestAccessParameter;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.request.context.model.Authorized;
 
