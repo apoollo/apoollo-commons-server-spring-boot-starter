@@ -116,22 +116,22 @@ public class SecureConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	SecurePrincipal<RequestResource> getSecureRequestResource(RequestResourceManager requestResourceManager,
-			Limiters<LimitersSupport> limiters) {
-		return new SecureRequestResource(requestResourceManager, limiters);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
 	Authorization getAuthorization(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
 			CommonsServerProperties commonsServerProperties) {
 		return new DefaultAuthorization(redisTemplate, redisNameSpaceKey, LangUtils.getPropertyIfNotNull(
 				commonsServerProperties.getRbac(), RabcProperties::getAccessKeyAndRequestResourcePinsMapping));
 	}
 
-	@ConditionalOnMissingBean
+	@Bean
+	SecurePrincipal<RequestResource> getSecureRequestResource(RequestResourceManager requestResourceManager,
+			Limiters<LimitersSupport> limiters) {
+		return new SecureRequestResource(requestResourceManager, limiters);
+	}
+
+	@Bean
 	SecurePrincipal<User> getSecureUser(List<Authentication<?>> authentications, Authorization authorization,
 			Limiters<LimitersSupport> limiters, JwtAuthorizationRenewal authorizationRenewal) {
 		return new SecureUser(authentications, authorization, limiters, authorizationRenewal);
 	}
+
 }

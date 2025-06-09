@@ -39,13 +39,13 @@ public class SecureRequestResource implements SecurePrincipal<RequestResource> {
 		if (null == requestResource) {
 			throw new AppNoRequestResourceException("can't find requestResource - " + requestMappingPath);
 		}
+		requestContext.setRequestResource(requestResource);
 		if (BooleanUtils.isNotTrue(requestResource.getEnable())) {
 			throw new AppForbbidenException("requestResource disabled - " + requestMappingPath);
 		}
 		if (BooleanUtils.isNotFalse(requestResource.getEnableCapacity())) {
 			limiters.limit(request, response, requestContext, requestResource);
 		}
-		requestContext.setRequestResource(requestResource);
 		return requestResource;
 	}
 
