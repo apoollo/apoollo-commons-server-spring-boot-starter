@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -44,6 +44,7 @@ import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.Response;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
+import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 
 /**
  * @author liuyulong
@@ -53,6 +54,9 @@ import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 public class ExceptionControllerAdvice {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
+
+	@Autowired
+	private CapacitySupport capacitySupport;
 
 	@ResponseBody
 	@ExceptionHandler(NoHandlerFoundException.class)
@@ -194,7 +198,7 @@ public class ExceptionControllerAdvice {
 		RequestContext requestContext = RequestContext.get();
 		if (null != requestContext) {
 			RequestResource requestResource = requestContext.getRequestResource();
-			if (null != requestResource && BooleanUtils.isTrue(requestResource.getEnableResponseWrapper())) {
+			if (CapacitySupport.support(requestContext, capacitySupport, CapacitySupport::getEnableResponseWrapper)) {
 				WrapResponseHandler wrapResponseHandler = requestResource.getWrapResponseHandler();
 				HttpCodeName<String, String> codeMessage = httpCodeGetter.apply(wrapResponseHandler);
 				LOGGER.error(

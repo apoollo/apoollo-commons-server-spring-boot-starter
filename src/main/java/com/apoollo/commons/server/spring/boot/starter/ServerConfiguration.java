@@ -12,9 +12,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -26,26 +26,36 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
+import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.properties.AccessProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
+import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
+import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.access.User;
+import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
+import com.apoollo.commons.util.request.context.limiter.Limiters;
+import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
+import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.apoollo.commons.util.web.spring.DefaultInstance;
 import com.apoollo.commons.util.web.spring.Instance;
 import com.github.benmanes.caffeine.cache.Caffeine;
+
+import jakarta.servlet.Filter;
 
 /**
  * @author liuyulong
@@ -54,10 +64,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 @AutoConfiguration
 @EnableCaching
 @ConditionalOnWebApplication
-@ConditionalOnProperty(prefix = Constants.CONFIGURATION_PREFIX, name = "enable", matchIfMissing = true)
 @Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
 		ExceptionController.class, DynamicResourceController.class })
-public class CommonsServerConfiguration {
+public class ServerConfiguration {
 
 	@Bean
 	@ConfigurationProperties(Constants.CONFIGURATION_PREFIX)
@@ -70,10 +79,7 @@ public class CommonsServerConfiguration {
 		rabcProperties.setRequestResources(new ArrayList<>());
 
 		CommonsServerProperties commonsServerProperties = new CommonsServerProperties();
-		commonsServerProperties.setEnable(true);
 		commonsServerProperties.setPath(pathProperties);
-		commonsServerProperties.setAccess(new AccessProperties(null, null, true));
-
 		commonsServerProperties.setRbac(rabcProperties);
 		return commonsServerProperties;
 	}
@@ -99,7 +105,7 @@ public class CommonsServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	RedisNameSpaceKey getRedisNameSpaceKey() {
-		return () -> "unallocated-namespace";
+		return () -> "commons-namespace";
 	}
 
 	@Bean
@@ -113,39 +119,6 @@ public class CommonsServerConfiguration {
 	CaptchaService getCaptchaService(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
 		return new RedisCaptchaService(redisTemplate, redisNameSpaceKey);
 	}
-
-	
-
-	/*
-	 * @Bean
-	 * 
-	 * @ConditionalOnMissingBean Authorization<?>
-	 * getAuthorization(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey
-	 * redisNameSpaceKey, CommonsServerProperties commonsServerProperties) { return
-	 * new DefaultAuthorization(stringRedisTemplate, redisNameSpaceKey,
-	 * LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) ->
-	 * rbac.getPermissions())); }
-	 */
-	
-	/*
-	 * @Bean
-	 * 
-	 * @ConditionalOnMissingBean(name = "jwtTokenAccess") Access<JwtToken>
-	 * getJwtTokenAccess(UserManager userManager, Authorization<?> authorization,
-	 * CountLimiter countLimiter, FlowLimiter FlowLimiter, CommonsServerProperties
-	 * commonsServerProperties) { return new JwtTokenAccess(userManager,
-	 * authorization, countLimiter, FlowLimiter,
-	 * commonsServerProperties.getAccess()); }
-	 * 
-	 * @Bean
-	 * 
-	 * @ConditionalOnMissingBean(name = "secretKeyTokenAccess") Access<String>
-	 * getSecretKeyTokenAccess(UserManager userManager, Authorization<?>
-	 * authorization, CountLimiter countLimiter, FlowLimiter flowLimiter,
-	 * CommonsServerProperties commonsServerProperties) { return new
-	 * SecretKeyTokenAccess(userManager, authorization, countLimiter, flowLimiter,
-	 * commonsServerProperties.getAccess()); }
-	 */
 
 	@Bean(name = "threadPoolExecutorForTimeOut", destroyMethod = "shutdown")
 	@ConditionalOnMissingBean
@@ -168,4 +141,31 @@ public class CommonsServerConfiguration {
 		return cacheManager;
 	}
 
+	@Bean
+	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
+			RequestContextInitail requestContextInitail, SecurePrincipal<RequestResource> secureRequestResource,
+			SecurePrincipal<User> secureUser, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
+			CapacitySupport capacitySupport, CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(
+				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail,
+						secureRequestResource, secureUser, logWitter, limiters, capacitySupport),
+				Constants.REQUEST_CONTEXT_FILTER_ORDER);
+	}
+
+	@Bean
+	FilterRegistrationBean<RequestContentEscapeFilter> getRequestContentEscapeFilterRegistrationBean(
+			ContentEscapeHandler contentEscapeHandler, CapacitySupport capacitySupport,
+			CommonsServerProperties commonsServerProperties) {
+		return newFilterRegistrationBean(new RequestContentEscapeFilter(commonsServerProperties.getPath(),
+				contentEscapeHandler, capacitySupport), Constants.REQUEST_CONTENT_ESCAPE_FILTER_ORDER);
+	}
+
+	private <T extends Filter> FilterRegistrationBean<T> newFilterRegistrationBean(T filter, int order) {
+		FilterRegistrationBean<T> filterRegistrationBean = new FilterRegistrationBean<>();
+		filterRegistrationBean.setFilter(filter);
+		filterRegistrationBean.setOrder(order);
+		filterRegistrationBean.setEnabled(true);
+		filterRegistrationBean.setUrlPatterns(List.of("/*"));
+		return filterRegistrationBean;
+	}
 }

@@ -24,6 +24,6 @@ public class RabcProperties {
 	private List<DefaultRequestResource> requestResources;
 
 	// accessKey:requestSourcePins
-	private Map<String, List<String>> accessKeyRequestResourcePinsMapping;
+	private Map<String, List<String>> accessKeyAndRequestResourcePinsMapping;
 
 }

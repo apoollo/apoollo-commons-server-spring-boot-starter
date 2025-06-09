@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
 
 import jakarta.servlet.ServletInputStream;
@@ -20,8 +21,11 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
  */
 public class CommonsHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
-	public CommonsHttpServletRequestWrapper(HttpServletRequest request) {
+	protected RequestContext requestContext;
+
+	public CommonsHttpServletRequestWrapper(HttpServletRequest request, RequestContext requestContext) {
 		super(request);
+		this.requestContext = requestContext;
 	}
 
 	public Charset getCharset() {

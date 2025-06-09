@@ -12,8 +12,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CommonsServerProperties extends EnablePorperties {
-
+public class CommonsServerProperties {
+	
 	private PathProperties path;
 
 	private String signatureSecret;
@@ -25,8 +25,6 @@ public class CommonsServerProperties extends EnablePorperties {
 	private String jwtTokenProperty;
 
 	private RabcProperties rbac;
-
-	private AccessProperties access;
 
 	private LoggerProperties log;
 }

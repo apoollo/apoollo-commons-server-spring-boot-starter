@@ -3,7 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.component.bodyadvice;
 
-import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -12,11 +12,11 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.Response;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
+import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 
 /**
  * @author liuyulong
@@ -24,6 +24,9 @@ import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
  */
 @ControllerAdvice
 public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
+
+	@Autowired
+	private CapacitySupport capacitySupport;
 
 	public ResponseBodyContextAdvice() {
 		super();
@@ -44,7 +47,7 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 		if (null != requestContext) {
 			RequestResource requestResource = requestContext.getRequestResource();
 			requestContext.setResponseTime(System.currentTimeMillis());
-			if (null != requestResource &&BooleanUtils.isTrue(requestResource.getEnableResponseWrapper())) {
+			if (CapacitySupport.support(requestContext, capacitySupport, CapacitySupport::getEnableResponseWrapper)) {
 				WrapResponseHandler wrapResponseHandler = requestResource.getWrapResponseHandler();
 				if (body instanceof Response) {
 					responseBody = (Response<?>) body;
@@ -58,12 +61,6 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 				responseBody.setRequestId(requestContext.getRequestId());
 				wrapResponseHandler.resetResponse(requestContext.getRequestBody(), responseBody);
 				requestContext.setResponse(responseBody);
-			}
-		} else {
-			if (body instanceof Response) {
-				responseBody = (Response<?>) body;
-				responseBody.setElapsedTime(0L);
-				responseBody.setRequestId(LangUtils.getUppercaseUUID());
 			}
 		}
 

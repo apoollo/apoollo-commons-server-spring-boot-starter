@@ -89,12 +89,12 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		});
 		RequestResource requestResource = secureRequestResource.init(request, response, requestContext);
 		User user = secureUser.init(request, response, requestContext);
-		chain.doFilter(new RequestContextHttpServletRequestWrapper(request), response);
-		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
+		chain.doFilter(new RequestContextHttpServletRequestWrapper(request, requestContext), response);
 		if (null != user) {
-			response.setHeader(RequestConstants.RESPONSE_USER_PASSWORD_EXPIRED,
+			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
 					String.valueOf(user.passwordIsExpired()));
 		}
+		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		logWitter.write(requestContext, () -> {
 			LOGGER.info("请求结束标记");
 		});

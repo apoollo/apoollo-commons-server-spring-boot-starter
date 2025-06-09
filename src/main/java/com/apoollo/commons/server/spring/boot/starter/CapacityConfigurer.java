@@ -5,10 +5,14 @@ package com.apoollo.commons.server.spring.boot.starter;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
+import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
+import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
@@ -48,20 +52,8 @@ import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
  * liuyulong
  */
 @AutoConfiguration
-public class LimiterConfigurer {
-	
-	@Bean
-	@ConditionalOnMissingBean
-	WrapResponseHandler getHttpCodeNameHandler() {
-		return new DefaultWrapResponseHandler();
-	}
-	
-
-	@Bean
-	@ConditionalOnMissingBean
-	EscapeMethod getEscapeXss() {
-		return new DefaultEscapeXss();
-	}
+@ConditionalOnWebApplication
+public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -135,11 +127,11 @@ public class LimiterConfigurer {
 	DailyCountLimiter getDailyCountLimiter(CountLimiter countLimiter) {
 		return new DefaultDailyCountLimiter(countLimiter);
 	}
-	
+
 	@Bean
 	@ConditionalOnMissingBean
 	CapacitySupport getCapacitySupport() {
-		DefaultCapacitySupport capacitySupport= new DefaultCapacitySupport();
+		DefaultCapacitySupport capacitySupport = new DefaultCapacitySupport();
 		capacitySupport.setResourcePin("platform");
 		return capacitySupport;
 	}
@@ -151,5 +143,35 @@ public class LimiterConfigurer {
 			FlowLimiter flowLimiter, DailyCountLimiter dailyCountLimiter) {
 		return new DefaultLimiters<>(nonceLimiter, signatureLimter, corsLimiter, ipLimiter, refererLimiter, syncLimiter,
 				flowLimiter, dailyCountLimiter);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	WrapResponseHandler getHttpCodeNameHandler() {
+		return new DefaultWrapResponseHandler();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	EscapeMethod getEscapeXss() {
+		return new DefaultEscapeXss();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	ResponseBodyContextAdvice getResponseContextBodyAdvice() {
+		return new ResponseBodyContextAdvice();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	ExceptionControllerAdvice getExceptionControllerAdvice() {
+		return new ExceptionControllerAdvice();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	RequestResourceAspect getRequestResourceAspect() {
+		return new RequestResourceAspect();
 	}
 }

@@ -18,14 +18,13 @@ import jakarta.servlet.http.HttpServletRequest;
  */
 public class RequestContextHttpServletRequestWrapper extends CommonsHttpServletRequestWrapper {
 
-	public RequestContextHttpServletRequestWrapper(HttpServletRequest request) {
-		super(request);
+	public RequestContextHttpServletRequestWrapper(HttpServletRequest request, RequestContext requestContext) {
+		super(request, requestContext);
 	}
 
 	@Override
 	public ServletInputStream getInputStream() throws IOException {
-		return ServletInputStreamHelper.getCachingServletInputStream(RequestContext.getRequired(), getRequest(),
-				Function.identity());
+		return ServletInputStreamHelper.getCachingServletInputStream(requestContext, getRequest(), Function.identity());
 	}
 
 }

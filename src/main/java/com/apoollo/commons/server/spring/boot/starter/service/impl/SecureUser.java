@@ -44,25 +44,27 @@ public class SecureUser implements SecurePrincipal<User> {
 	@Override
 	public User init(HttpServletRequest request, HttpServletResponse response, RequestContext requestContext) {
 		RequestResource requestResource = requestContext.getRequestResource();
-
-		Authority<?> authority = authentications.stream()
-				.filter(authentication -> authentication.support(requestResource.getAccessStrategy())).findAny().get()
-				.authenticate(request, requestContext);
-		User user = authority.getUser();
-		authorization.authorize(user, requestResource);
-		Object token = authority.getToken();
-
-		if (token instanceof JwtToken jwtToken) {
-			authorizationRenewal.renewal(user, jwtToken, (renewal) -> {
-				response.setHeader(RequestConstants.RESPONSE_HEADER_RENEWAL_AUTHORIZATION,
-						renewal.getRenewalAuthorizationJwtToken());
-			});
-		}
-		if (BooleanUtils.isNotFalse(user.getEnableCapacity())) {
-			limiters.limit(request, response, requestContext, user);
-		}
-		requestContext.setUser(user);
-		return user;
+		return authentications.stream()
+				.filter(authentication -> authentication.support(requestResource.getAccessStrategy()))
+				.map(authentication -> {
+					Authority<?> authority = authentication.authenticate(request, requestContext);
+					User user = authority.getUser();
+					authorization.authorize(user, requestResource);
+					Object token = authority.getToken();
+					if (token instanceof JwtToken jwtToken) {
+						authorizationRenewal.renewal(user, jwtToken, (renewal) -> {
+							response.setHeader(RequestConstants.RESPONSE_HEADER_RENEWAL_AUTHORIZATION,
+									renewal.getRenewalAuthorizationJwtToken());
+						});
+					}
+					if (BooleanUtils.isNotFalse(user.getEnableCapacity())) {
+						limiters.limit(request, response, requestContext, user);
+					}
+					requestContext.setUser(user);
+					return user;
+				})//
+				.findAny()//
+				.orElse(null);
 	}
 
 }

@@ -30,9 +30,9 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 	 * @param request
 	 * @param contentEscapeHandler
 	 */
-	public ContentEscapeHttpServletRequestWrapper(HttpServletRequest request,
+	public ContentEscapeHttpServletRequestWrapper(HttpServletRequest request, RequestContext requestContext,
 			ContentEscapeHandler contentEscapeHandler) {
-		super(request);
+		super(request, requestContext);
 		this.contentEscapeHandler = contentEscapeHandler;
 	}
 
@@ -84,8 +84,8 @@ public class ContentEscapeHttpServletRequestWrapper extends CommonsHttpServletRe
 				.findAny()//
 				.isPresent()//
 		) {
-			return ServletInputStreamHelper.getCachingServletInputStream(RequestContext.getRequired(),
-					super.getRequest(), content -> {
+			return ServletInputStreamHelper.getCachingServletInputStream(requestContext, super.getRequest(),
+					content -> {
 
 						return contentEscapeHandler.escapeByContentType(getCharset(), contentType, content);
 					});
