@@ -34,23 +34,13 @@ import com.apoollo.commons.server.spring.boot.starter.properties.AccessPropertie
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.Access;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.JwtTokenAccess;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.SecretKeyTokenAccess;
-import com.apoollo.commons.util.JwtUtils.JwtToken;
-import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
-import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
-import com.apoollo.commons.util.request.context.Authorization;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
-import com.apoollo.commons.util.request.context.access.UserManager;
-import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.apoollo.commons.util.web.spring.DefaultInstance;
@@ -126,30 +116,36 @@ public class CommonsServerConfiguration {
 
 	
 
-	@Bean
-	@ConditionalOnMissingBean
-	Authorization<?> getAuthorization(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey redisNameSpaceKey,
-			CommonsServerProperties commonsServerProperties) {
-		return new DefaultAuthorization(stringRedisTemplate, redisNameSpaceKey,
-				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getPermissions()));
-	}
-
+	/*
+	 * @Bean
+	 * 
+	 * @ConditionalOnMissingBean Authorization<?>
+	 * getAuthorization(StringRedisTemplate stringRedisTemplate, RedisNameSpaceKey
+	 * redisNameSpaceKey, CommonsServerProperties commonsServerProperties) { return
+	 * new DefaultAuthorization(stringRedisTemplate, redisNameSpaceKey,
+	 * LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) ->
+	 * rbac.getPermissions())); }
+	 */
 	
-	@Bean
-	@ConditionalOnMissingBean(name = "jwtTokenAccess")
-	Access<JwtToken> getJwtTokenAccess(UserManager userManager, Authorization<?> authorization,
-			CountLimiter countLimiter, FlowLimiter FlowLimiter, CommonsServerProperties commonsServerProperties) {
-		return new JwtTokenAccess(userManager, authorization, countLimiter, FlowLimiter,
-				commonsServerProperties.getAccess());
-	}
-
-	@Bean
-	@ConditionalOnMissingBean(name = "secretKeyTokenAccess")
-	Access<String> getSecretKeyTokenAccess(UserManager userManager, Authorization<?> authorization,
-			CountLimiter countLimiter, FlowLimiter flowLimiter, CommonsServerProperties commonsServerProperties) {
-		return new SecretKeyTokenAccess(userManager, authorization, countLimiter, flowLimiter,
-				commonsServerProperties.getAccess());
-	}
+	/*
+	 * @Bean
+	 * 
+	 * @ConditionalOnMissingBean(name = "jwtTokenAccess") Access<JwtToken>
+	 * getJwtTokenAccess(UserManager userManager, Authorization<?> authorization,
+	 * CountLimiter countLimiter, FlowLimiter FlowLimiter, CommonsServerProperties
+	 * commonsServerProperties) { return new JwtTokenAccess(userManager,
+	 * authorization, countLimiter, FlowLimiter,
+	 * commonsServerProperties.getAccess()); }
+	 * 
+	 * @Bean
+	 * 
+	 * @ConditionalOnMissingBean(name = "secretKeyTokenAccess") Access<String>
+	 * getSecretKeyTokenAccess(UserManager userManager, Authorization<?>
+	 * authorization, CountLimiter countLimiter, FlowLimiter flowLimiter,
+	 * CommonsServerProperties commonsServerProperties) { return new
+	 * SecretKeyTokenAccess(userManager, authorization, countLimiter, flowLimiter,
+	 * commonsServerProperties.getAccess()); }
+	 */
 
 	@Bean(name = "threadPoolExecutorForTimeOut", destroyMethod = "shutdown")
 	@ConditionalOnMissingBean

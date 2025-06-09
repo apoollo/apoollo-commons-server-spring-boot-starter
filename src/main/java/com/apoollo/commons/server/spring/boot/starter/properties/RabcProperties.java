@@ -6,7 +6,6 @@ package com.apoollo.commons.server.spring.boot.starter.properties;
 import java.util.List;
 import java.util.Map;
 
-import com.apoollo.commons.util.request.context.core.DefaultRequestAccessParameter;
 import com.apoollo.commons.util.request.context.core.DefaultRequestResource;
 import com.apoollo.commons.util.request.context.core.DefaultUser;
 
@@ -24,7 +23,7 @@ public class RabcProperties {
 
 	private List<DefaultRequestResource> requestResources;
 
-	// accessKey:requestSourcePin:DefaultRequestAccessParameter
-	private Map<String, Map<String, DefaultRequestAccessParameter>> permissions;
+	// accessKey:requestSourcePins
+	private Map<String, List<String>> accessKeyRequestResourcePinsMapping;
 
 }

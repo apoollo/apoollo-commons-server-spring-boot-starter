@@ -18,6 +18,7 @@ import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestCo
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
@@ -37,6 +38,7 @@ import com.apoollo.commons.util.request.context.access.Authorization;
 import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
+import com.apoollo.commons.util.request.context.access.core.DefaultAuthorization;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
 import com.apoollo.commons.util.request.context.access.core.HeaderJwtAuthentication;
 import com.apoollo.commons.util.request.context.access.core.HeaderKeyPairAuthentication;
@@ -87,17 +89,19 @@ public class ComponentConfigurer {
 			AuthorizationJwtTokenDecoder authorizationJwtTokenDecoder) {
 		return new HeaderJwtAuthentication(userManager, authorizationJwtTokenDecoder);
 	}
-	
+
 	@Bean
 	@ConditionalOnMissingBean
-	Authentication<String> getHeaderKeyPairAuthentication(UserManager userManager, CommonsServerProperties commonsServerProperties) {
+	Authentication<String> getHeaderKeyPairAuthentication(UserManager userManager,
+			CommonsServerProperties commonsServerProperties) {
 		return new HeaderKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
 				commonsServerProperties.getKeyPairSecretKeyProperty());
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	Authentication<String> getParameterKeyPairAuthentication(UserManager userManager, CommonsServerProperties commonsServerProperties) {
+	Authentication<String> getParameterKeyPairAuthentication(UserManager userManager,
+			CommonsServerProperties commonsServerProperties) {
 		return new ParameterKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
 				commonsServerProperties.getKeyPairSecretKeyProperty());
 	}
@@ -107,6 +111,14 @@ public class ComponentConfigurer {
 	SecurePrincipal<RequestResource> getSecureRequestResource(RequestResourceManager requestResourceManager,
 			Limiters<LimitersSupport> limiters) {
 		return new SecureRequestResource(requestResourceManager, limiters);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	Authorization getAuthorization(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
+			CommonsServerProperties commonsServerProperties) {
+		return new DefaultAuthorization(redisTemplate, redisNameSpaceKey, LangUtils.getPropertyIfNotNull(
+				commonsServerProperties.getRbac(), RabcProperties::getAccessKeyRequestResourcePinsMapping));
 	}
 
 	@ConditionalOnMissingBean
