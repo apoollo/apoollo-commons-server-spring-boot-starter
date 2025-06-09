@@ -41,9 +41,9 @@ import com.apoollo.commons.util.exception.detailed.TimeoutIllegalArgumentExcepti
 import com.apoollo.commons.util.exception.detailed.TokenEmptyExcetion;
 import com.apoollo.commons.util.request.context.HttpCodeName;
 import com.apoollo.commons.util.request.context.RequestContext;
-import com.apoollo.commons.util.request.context.RequestResource;
 import com.apoollo.commons.util.request.context.Response;
-import com.apoollo.commons.util.request.context.WrapResponseHandler;
+import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 
 /**
  * @author liuyulong

@@ -13,12 +13,12 @@ import java.lang.annotation.Target;
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.apoollo.commons.util.request.context.EscapeMethod;
-import com.apoollo.commons.util.request.context.NonceValidator;
-import com.apoollo.commons.util.request.context.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.core.AccessStrategy;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
-import com.apoollo.commons.util.request.context.core.DefaultWrapResponseHandler;
-import com.apoollo.commons.util.request.context.core.StrictNonceValidaor;
+import com.apoollo.commons.util.request.context.limiter.NonceValidator;
+import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler;
+import com.apoollo.commons.util.request.context.limiter.core.StrictNonceValidaor;
 
 /**
  * <p>
@@ -84,6 +84,12 @@ public @interface RequestResource {
 	 */
 
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_HEADER_JWT_TOKEN;
+
+	/**
+	 * 
+	 * @return 是否开启能力
+	 */
+	public boolean enableCapacity() default true;
 
 	/**
 	 * 如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色

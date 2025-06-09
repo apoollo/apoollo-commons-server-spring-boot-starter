@@ -25,7 +25,7 @@ import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerPr
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
-import com.apoollo.commons.util.request.context.core.DefaultRequestResource;
+import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource;
 import com.apoollo.commons.util.web.spring.Instance;
 
 import lombok.AllArgsConstructor;
@@ -193,7 +193,7 @@ public class RequestResourceRegister {
 			requestResourceObject
 					.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandler()));
 		}
-
+		requestResourceObject.setEnableCapacity(requestResourceAnnotaion.enableCapacity());
 		requestResourceObject.setEnable(requestResourceAnnotaion.enable());
 		requestResourceObject.setName(LangUtils.defaultString(requestResourceAnnotaion.name(), resourcePin));
 		requestResourceObject.setRequestMappingPath(requestMappingPath);

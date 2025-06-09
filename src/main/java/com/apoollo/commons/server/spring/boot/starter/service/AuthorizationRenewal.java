@@ -5,7 +5,7 @@ package com.apoollo.commons.server.spring.boot.starter.service;
 
 import java.util.function.Consumer;
 
-import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.access.User;
 
 /**
  * @author liuyulong

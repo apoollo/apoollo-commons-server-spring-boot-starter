@@ -3,7 +3,7 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.service;
 
-import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.access.RequestResource;
 
 /**
  * @author liuyulong

@@ -21,6 +21,8 @@ public class CommonsServerProperties extends EnablePorperties {
 	private String keyPairAccessKeyProperty;
 
 	private String keyPairSecretKeyProperty;
+	
+	private String jwtTokenProperty;
 
 	private RabcProperties rbac;
 

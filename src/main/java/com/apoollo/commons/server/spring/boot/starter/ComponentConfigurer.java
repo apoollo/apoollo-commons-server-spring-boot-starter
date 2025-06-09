@@ -29,22 +29,24 @@ import com.apoollo.commons.server.spring.boot.starter.service.impl.SecureUser;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
-import com.apoollo.commons.util.request.context.CapacitySupport;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
-import com.apoollo.commons.util.request.context.RequestResource;
-import com.apoollo.commons.util.request.context.User;
 import com.apoollo.commons.util.request.context.access.Authentication;
 import com.apoollo.commons.util.request.context.access.Authorization;
 import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
+import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthorization;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
 import com.apoollo.commons.util.request.context.access.core.HeaderJwtAuthentication;
 import com.apoollo.commons.util.request.context.access.core.HeaderKeyPairAuthentication;
+import com.apoollo.commons.util.request.context.access.core.JSONBodyJwtAuthentication;
+import com.apoollo.commons.util.request.context.access.core.JSONBodyKeyPairAuthentication;
 import com.apoollo.commons.util.request.context.access.core.ParameterKeyPairAuthentication;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
+import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.web.spring.Instance;
 
@@ -92,6 +94,15 @@ public class ComponentConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
+	Authentication<JwtToken> getJSONBodyJwtAuthentication(UserManager userManager,
+			AuthorizationJwtTokenDecoder authorizationJwtTokenDecoder,
+			CommonsServerProperties commonsServerProperties) {
+		return new JSONBodyJwtAuthentication(userManager, authorizationJwtTokenDecoder,
+				commonsServerProperties.getJwtTokenProperty());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	Authentication<String> getHeaderKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
 		return new HeaderKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
@@ -103,6 +114,14 @@ public class ComponentConfigurer {
 	Authentication<String> getParameterKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
 		return new ParameterKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
+				commonsServerProperties.getKeyPairSecretKeyProperty());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	Authentication<String> getJSONBodyKeyPairAuthentication(UserManager userManager,
+			CommonsServerProperties commonsServerProperties) {
+		return new JSONBodyKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
 				commonsServerProperties.getKeyPairSecretKeyProperty());
 	}
 

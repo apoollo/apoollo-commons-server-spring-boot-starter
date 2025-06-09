@@ -10,7 +10,7 @@ import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.util.exception.AppForbbidenException;
 import com.apoollo.commons.util.exception.AppNoRequestResourceException;
 import com.apoollo.commons.util.request.context.RequestContext;
-import com.apoollo.commons.util.request.context.RequestResource;
+import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 

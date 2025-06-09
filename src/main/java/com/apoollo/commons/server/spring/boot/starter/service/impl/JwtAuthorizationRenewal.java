@@ -11,7 +11,7 @@ import com.apoollo.commons.server.spring.boot.starter.service.AuthorizationRenew
 import com.apoollo.commons.util.JwtUtils;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.JwtUtils.Renewal;
-import com.apoollo.commons.util.request.context.User;
+import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.UserManager;
 
 /**

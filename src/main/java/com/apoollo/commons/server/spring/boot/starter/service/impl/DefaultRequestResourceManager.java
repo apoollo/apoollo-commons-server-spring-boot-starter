@@ -16,9 +16,9 @@ import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerPr
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
-import com.apoollo.commons.util.request.context.RequestResource;
-import com.apoollo.commons.util.request.context.core.DefaultRequestResource;
-import com.apoollo.commons.util.request.context.core.DefaultRequestResource.SerializableRequestResource;
+import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource;
+import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource.SerializableRequestResource;
 import com.apoollo.commons.util.web.spring.Instance;
 
 /**
