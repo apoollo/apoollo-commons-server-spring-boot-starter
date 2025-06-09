@@ -42,7 +42,9 @@ public class SecureRequestResource implements SecurePrincipal<RequestResource> {
 		if (BooleanUtils.isNotTrue(requestResource.getEnable())) {
 			throw new AppForbbidenException("requestResource disabled - " + requestMappingPath);
 		}
-		limiters.limit(request, response, requestContext, requestResource);
+		if (BooleanUtils.isNotFalse(requestResource.getEnableCapacity())) {
+			limiters.limit(request, response, requestContext, requestResource);
+		}
 		requestContext.setRequestResource(requestResource);
 		return requestResource;
 	}

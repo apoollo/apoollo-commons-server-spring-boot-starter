@@ -5,6 +5,8 @@ package com.apoollo.commons.server.spring.boot.starter.service.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.request.context.RequestContext;
@@ -29,8 +31,7 @@ public class SecureUser implements SecurePrincipal<User> {
 	private Authorization authorization;
 	private Limiters<LimitersSupport> limiters;
 	private JwtAuthorizationRenewal authorizationRenewal;
-	
-	
+
 	public SecureUser(List<Authentication<?>> authentications, Authorization authorization,
 			Limiters<LimitersSupport> limiters, JwtAuthorizationRenewal authorizationRenewal) {
 		super();
@@ -39,8 +40,6 @@ public class SecureUser implements SecurePrincipal<User> {
 		this.limiters = limiters;
 		this.authorizationRenewal = authorizationRenewal;
 	}
-
-
 
 	@Override
 	public User init(HttpServletRequest request, HttpServletResponse response, RequestContext requestContext) {
@@ -59,7 +58,9 @@ public class SecureUser implements SecurePrincipal<User> {
 						renewal.getRenewalAuthorizationJwtToken());
 			});
 		}
-		limiters.limit(request, response, requestContext, user);
+		if (BooleanUtils.isTrue(user.getEnableCapacity())) {
+			limiters.limit(request, response, requestContext, user);
+		}
 		requestContext.setUser(user);
 		return user;
 	}
