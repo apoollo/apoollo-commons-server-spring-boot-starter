@@ -84,19 +84,19 @@ public @interface RequestResource {
 	 */
 
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_HEADER_JWT_TOKEN;
-
-	/**
-	 * 
-	 * @return 是否开启能力
-	 */
-	public boolean enableCapacity() default true;
-
+	
 	/**
 	 * 如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色
 	 * 
 	 * @return 资源所属的角色列表
 	 */
 	public String[] roles() default { "User" };
+
+	/**
+	 * 
+	 * @return 是否开启能力
+	 */
+	public boolean enableCapacity() default false;
 
 	/**
 	 * 启用后，会验证 header 中的x-nonce、x-timestamp
@@ -237,7 +237,7 @@ public @interface RequestResource {
 	 * 
 	 * @return 是否启用返回值包装器
 	 */
-	public boolean enableResponseWrapper() default true;
+	public boolean enableResponseWrapper() default false;
 
 	/**
 	 * 此字段当启用返回值包装器后生效，自定义异常code与返回值样式，要么类有无参构造，要么实例注入到Spring环境中

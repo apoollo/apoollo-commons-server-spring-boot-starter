@@ -130,8 +130,11 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CapacitySupport getCapacitySupport() {
+	CapacitySupport getCapacitySupport(WrapResponseHandler responseHandler) {
 		DefaultCapacitySupport capacitySupport = new DefaultCapacitySupport();
+		capacitySupport.setEnableCapacity(true);
+		capacitySupport.setEnableResponseWrapper(true);
+		capacitySupport.setWrapResponseHandler(responseHandler);
 		capacitySupport.setResourcePin("platform");
 		return capacitySupport;
 	}
@@ -159,14 +162,16 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ResponseBodyContextAdvice getResponseContextBodyAdvice() {
-		return new ResponseBodyContextAdvice();
+	ResponseBodyContextAdvice getResponseContextBodyAdvice(CapacitySupport capacitySupport,
+			WrapResponseHandler wrapResponseHandler) {
+		return new ResponseBodyContextAdvice(capacitySupport, wrapResponseHandler);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ExceptionControllerAdvice getExceptionControllerAdvice() {
-		return new ExceptionControllerAdvice();
+	ExceptionControllerAdvice getExceptionControllerAdvice(CapacitySupport capacitySupport,
+			WrapResponseHandler wrapResponseHandler) {
+		return new ExceptionControllerAdvice(capacitySupport, wrapResponseHandler);
 	}
 
 	@Bean

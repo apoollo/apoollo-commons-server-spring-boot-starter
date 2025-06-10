@@ -49,6 +49,7 @@ public class SecureUser implements SecurePrincipal<User> {
 				.map(authentication -> {
 					Authority<?> authority = authentication.authenticate(request, requestContext);
 					User user = authority.getUser();
+					requestContext.setUser(user);
 					authorization.authorize(user, requestResource);
 					Object token = authority.getToken();
 					if (token instanceof JwtToken jwtToken) {
@@ -60,7 +61,6 @@ public class SecureUser implements SecurePrincipal<User> {
 					if (BooleanUtils.isNotFalse(user.getEnableCapacity())) {
 						limiters.limit(request, response, requestContext, user);
 					}
-					requestContext.setUser(user);
 					return user;
 				})//
 				.findAny()//

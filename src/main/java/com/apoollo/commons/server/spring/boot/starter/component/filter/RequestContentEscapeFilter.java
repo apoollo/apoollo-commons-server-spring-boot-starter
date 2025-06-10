@@ -40,7 +40,7 @@ public class RequestContentEscapeFilter extends AbstractSecureFilter {
 	public void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		RequestContext requestContext = RequestContext.getRequired();
-		if (CapacitySupport.support(requestContext, capacitySupport, CapacitySupport::getEnableContentEscape)) {
+		if (CapacitySupport.supportAbility(requestContext, capacitySupport, CapacitySupport::getEnableContentEscape)) {
 			request = new ContentEscapeHttpServletRequestWrapper(request, requestContext, contentEscapeHandler);
 			LOGGER.info("content escape accessed");
 		}

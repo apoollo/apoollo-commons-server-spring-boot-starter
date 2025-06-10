@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -42,7 +41,6 @@ import com.apoollo.commons.util.exception.detailed.TokenEmptyExcetion;
 import com.apoollo.commons.util.request.context.HttpCodeName;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.Response;
-import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 
@@ -51,12 +49,13 @@ import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
  * @since 2023年7月31日
  */
 @ControllerAdvice
-public class ExceptionControllerAdvice {
+public class ExceptionControllerAdvice extends WrapResponseSupport {
+
+	public ExceptionControllerAdvice(CapacitySupport capacitySupport, WrapResponseHandler wrapResponseHandler) {
+		super(capacitySupport, wrapResponseHandler);
+	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvice.class);
-
-	@Autowired
-	private CapacitySupport capacitySupport;
 
 	@ResponseBody
 	@ExceptionHandler(NoHandlerFoundException.class)
@@ -197,9 +196,7 @@ public class ExceptionControllerAdvice {
 			Exception e, String appendMessage) throws Exception {
 		RequestContext requestContext = RequestContext.get();
 		if (null != requestContext) {
-			RequestResource requestResource = requestContext.getRequestResource();
-			if (CapacitySupport.support(requestContext, capacitySupport, CapacitySupport::getEnableResponseWrapper)) {
-				WrapResponseHandler wrapResponseHandler = requestResource.getWrapResponseHandler();
+			ResponseEntity<Response<T>> responseEntity = handle(requestContext, wrapResponseHandler -> {
 				HttpCodeName<String, String> codeMessage = httpCodeGetter.apply(wrapResponseHandler);
 				LOGGER.error(
 						WrapResponseHandler.getDefaultMessage(codeMessage.getName(), messageCompileArgs, appendMessage),
@@ -208,6 +205,9 @@ public class ExceptionControllerAdvice {
 				return new ResponseEntity<>(
 						wrapResponseHandler.getResponse(codeMessage, messageCompileArgs, appendMessage, data),
 						HttpStatusCode.valueOf(codeMessage.getHttpCode()));
+			});
+			if (null != responseEntity) {
+				return responseEntity;
 			}
 		}
 		throw e;

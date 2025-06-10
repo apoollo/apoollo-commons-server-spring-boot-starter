@@ -3,7 +3,6 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.component.bodyadvice;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -14,7 +13,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.Response;
-import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 
@@ -23,18 +21,34 @@ import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
  * @since 2023年8月29日
  */
 @ControllerAdvice
-public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
+public class ResponseBodyContextAdvice extends WrapResponseSupport implements ResponseBodyAdvice<Object> {
 
-	@Autowired
-	private CapacitySupport capacitySupport;
-
-	public ResponseBodyContextAdvice() {
-		super();
+	public ResponseBodyContextAdvice(CapacitySupport capacitySupport, WrapResponseHandler wrapResponseHandler) {
+		super(capacitySupport, wrapResponseHandler);
 	}
 
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
 		return true;
+	}
+
+	private Response<?> wrapResponseBody(RequestContext requestContext, Object body) {
+		return handle(requestContext, wrapResponseHandler -> {
+			Response<?> responseBody = null;
+			if (body instanceof Response) {
+				responseBody = (Response<?>) body;
+				if (null == responseBody.getSuccess()) {
+					responseBody.setSuccess(wrapResponseHandler.processIsExecuteSuccess(responseBody.getCode()));
+				}
+			} else {
+				responseBody = wrapResponseHandler.success(body);
+			}
+			responseBody.setElapsedTime(requestContext.getElapsedTime());
+			responseBody.setRequestId(requestContext.getRequestId());
+			wrapResponseHandler.resetResponse(requestContext.getRequestBody(), responseBody);
+			requestContext.setResponse(responseBody);
+			return responseBody;
+		});
 	}
 
 	@Override
@@ -45,25 +59,9 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 		RequestContext requestContext = RequestContext.get();
 		Response<?> responseBody = null;
 		if (null != requestContext) {
-			RequestResource requestResource = requestContext.getRequestResource();
 			requestContext.setResponseTime(System.currentTimeMillis());
-			if (CapacitySupport.support(requestContext, capacitySupport, CapacitySupport::getEnableResponseWrapper)) {
-				WrapResponseHandler wrapResponseHandler = requestResource.getWrapResponseHandler();
-				if (body instanceof Response) {
-					responseBody = (Response<?>) body;
-					if (null == responseBody.getSuccess()) {
-						responseBody.setSuccess(wrapResponseHandler.processIsExecuteSuccess(responseBody.getCode()));
-					}
-				} else {
-					responseBody = wrapResponseHandler.success(body);
-				}
-				responseBody.setElapsedTime(requestContext.getElapsedTime());
-				responseBody.setRequestId(requestContext.getRequestId());
-				wrapResponseHandler.resetResponse(requestContext.getRequestBody(), responseBody);
-				requestContext.setResponse(responseBody);
-			}
+			responseBody = wrapResponseBody(requestContext, body);
 		}
-
 		Object responseBodyTarget = null;
 		if (null == responseBody) {
 			responseBodyTarget = body;
