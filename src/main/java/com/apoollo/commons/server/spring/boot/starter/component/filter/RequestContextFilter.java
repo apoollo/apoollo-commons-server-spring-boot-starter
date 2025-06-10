@@ -4,8 +4,8 @@
 package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import java.io.IOException;
+import java.util.List;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,6 @@ import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
 import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.util.IpUtils;
 import com.apoollo.commons.util.LangUtils;
-import com.apoollo.commons.util.model.Processor;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.access.RequestResource;
@@ -84,7 +83,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		LOGGER.info("访问URI：" + reuqestUri);
 		LOGGER.info("访问IP：" + requestIp);
 		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
-		limiterDo(capacitySupport, () -> {
+		CapacitySupport.doSupport(List.of(capacitySupport), capacitySupport -> {
 			limiters.limit(request, response, requestContext, capacitySupport);
 		});
 		RequestResource requestResource = secureRequestResource.init(request, response, requestContext);
@@ -98,26 +97,10 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		logWitter.write(requestContext, () -> {
 			LOGGER.info("请求结束标记");
 		});
-		unlimit(request, response, requestContext, user, requestResource, user);
-	}
-
-	public void unlimit(HttpServletRequest request, HttpServletResponse response, RequestContext requestContext,
-			CapacitySupport capacitySupport, RequestResource requestResource, User user) {
-		limiterDo(user, () -> {
-			limiters.unlimit(request, response, requestContext, user);
-		});
-		limiterDo(requestResource, () -> {
-			limiters.unlimit(request, response, requestContext, requestResource);
-		});
-		limiterDo(capacitySupport, () -> {
-			limiters.unlimit(request, response, requestContext, capacitySupport);
-		});
-	}
-
-	private void limiterDo(CapacitySupport capacitySupport, Processor processor) {
-		if (null != capacitySupport && BooleanUtils.isNotFalse(capacitySupport.getEnableCapacity())) {
-			processor.process();
-		}
+		CapacitySupport.doSupport(LangUtils.getStream(capacitySupport, user, requestResource).toList(),
+				capacitySupport -> {
+					limiters.unlimit(request, response, requestContext, user);
+				});
 	}
 
 	@Override

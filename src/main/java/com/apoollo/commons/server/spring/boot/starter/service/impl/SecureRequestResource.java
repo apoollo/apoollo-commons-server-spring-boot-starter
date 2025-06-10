@@ -3,6 +3,8 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.service.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.BooleanUtils;
 
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
@@ -12,6 +14,7 @@ import com.apoollo.commons.util.exception.AppNoRequestResourceException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
+import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,9 +46,9 @@ public class SecureRequestResource implements SecurePrincipal<RequestResource> {
 		if (BooleanUtils.isNotTrue(requestResource.getEnable())) {
 			throw new AppForbbidenException("requestResource disabled - " + requestMappingPath);
 		}
-		if (BooleanUtils.isNotFalse(requestResource.getEnableCapacity())) {
+		CapacitySupport.doSupport(List.of(requestResource), capacitySupport -> {
 			limiters.limit(request, response, requestContext, requestResource);
-		}
+		});
 		return requestResource;
 	}
 

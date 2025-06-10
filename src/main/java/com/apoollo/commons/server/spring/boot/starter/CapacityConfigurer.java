@@ -23,7 +23,7 @@ import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
-import com.apoollo.commons.util.request.context.limiter.DailyCountLimiter;
+import com.apoollo.commons.util.request.context.limiter.TimeUnitPatternCountLimiter;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
 import com.apoollo.commons.util.request.context.limiter.IpLimiter;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
@@ -35,7 +35,7 @@ import com.apoollo.commons.util.request.context.limiter.SyncLimiter;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultCorsLimiter;
-import com.apoollo.commons.util.request.context.limiter.core.DefaultDailyCountLimiter;
+import com.apoollo.commons.util.request.context.limiter.core.DefaultTimeUnitPatternCountLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultFlowLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultIpLimiter;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultLimiters;
@@ -124,8 +124,8 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	DailyCountLimiter getDailyCountLimiter(CountLimiter countLimiter) {
-		return new DefaultDailyCountLimiter(countLimiter);
+	TimeUnitPatternCountLimiter getTimeUnitPatternCountLimiter(CountLimiter countLimiter) {
+		return new DefaultTimeUnitPatternCountLimiter(countLimiter);
 	}
 
 	@Bean
@@ -143,7 +143,7 @@ public class CapacityConfigurer {
 	@ConditionalOnMissingBean
 	Limiters<LimitersSupport> getLimiters(NonceLimiter nonceLimiter, SignatureLimiter signatureLimter,
 			CorsLimiter corsLimiter, IpLimiter ipLimiter, RefererLimiter refererLimiter, SyncLimiter syncLimiter,
-			FlowLimiter flowLimiter, DailyCountLimiter dailyCountLimiter) {
+			FlowLimiter flowLimiter, TimeUnitPatternCountLimiter dailyCountLimiter) {
 		return new DefaultLimiters<>(nonceLimiter, signatureLimter, corsLimiter, ipLimiter, refererLimiter, syncLimiter,
 				flowLimiter, dailyCountLimiter);
 	}

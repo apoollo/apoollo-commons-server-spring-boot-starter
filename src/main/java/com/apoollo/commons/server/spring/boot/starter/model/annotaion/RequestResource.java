@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.web.cors.CorsConfiguration;
 
+import com.apoollo.commons.util.redis.service.RedisNameSpaceKey.TimeUnitPattern;
 import com.apoollo.commons.util.request.context.EscapeMethod;
 import com.apoollo.commons.util.request.context.core.AccessStrategy;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
@@ -84,7 +85,7 @@ public @interface RequestResource {
 	 */
 
 	public AccessStrategy accessStrategy() default AccessStrategy.PRIVATE_HEADER_JWT_TOKEN;
-	
+
 	/**
 	 * 如果用户的角色与资源的角色匹配，才会有权限访问，默认资源角色为用户角色
 	 * 
@@ -207,16 +208,22 @@ public @interface RequestResource {
 
 	/**
 	 * 
-	 * @return 是否启用限制每日调用次数
+	 * @return 是否启用限制调用次数
 	 */
-	public boolean enableDailyCountLimiter() default false;
+	public boolean enableCountLimiter() default false;
 
 	/**
-	 * 限制每日调用次数
+	 * 
+	 * @return 时间单位模式，用于限制时间维度
+	 */
+	public TimeUnitPattern countLimiterTimeUnitPattern() default TimeUnitPattern.DAY;
+
+	/**
+	 * 限制调用次数
 	 * 
 	 * @return 默认-1
 	 */
-	public long dailyCountLimiterLimitCount() default -1;
+	public long countLimiterLimitCount() default -1;
 
 	/**
 	 * 启用后会过滤Xss字符

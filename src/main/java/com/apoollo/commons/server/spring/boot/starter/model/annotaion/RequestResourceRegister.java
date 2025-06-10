@@ -172,8 +172,9 @@ public class RequestResourceRegister {
 		requestResourceObject.setEnableSyncLimiter(requestResourceAnnotaion.enableSyncLimiter());
 		requestResourceObject.setEnableFlowLimiter(requestResourceAnnotaion.enableFlowLimiter());
 		requestResourceObject.setFlowLimiterLimitCount(requestResourceAnnotaion.flowLimiterLimitCount());
-		requestResourceObject.setEnableDailyCountLimiter(requestResourceAnnotaion.enableDailyCountLimiter());
-		requestResourceObject.setDailyCountLimiterLimitCount(requestResourceAnnotaion.dailyCountLimiterLimitCount());
+		requestResourceObject.setEnableCountLimiter(requestResourceAnnotaion.enableCountLimiter());
+		requestResourceObject.setCountLimiterTimeUnitPattern(requestResourceAnnotaion.countLimiterTimeUnitPattern());
+		requestResourceObject.setCountLimiterLimitCount(requestResourceAnnotaion.countLimiterLimitCount());
 		requestResourceObject.setEnableContentEscape(requestResourceAnnotaion.enableContentEscape());
 		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
 

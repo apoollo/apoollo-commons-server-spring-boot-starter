@@ -26,7 +26,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.apoollo.commons.util.LangUtils;
-import com.apoollo.commons.util.exception.AppExceedingDailyMaximumUseTimesLimitException;
+import com.apoollo.commons.util.exception.AppExceedingTimeUnitMaximumUseTimesLimitException;
 import com.apoollo.commons.util.exception.AppException;
 import com.apoollo.commons.util.exception.AppForbbidenException;
 import com.apoollo.commons.util.exception.AppHttpCodeMessageException;
@@ -124,8 +124,8 @@ public class ExceptionControllerAdvice extends WrapResponseSupport {
 	}
 
 	@ResponseBody
-	@ExceptionHandler(AppExceedingDailyMaximumUseTimesLimitException.class)
-	public <T> ResponseEntity<Response<T>> handleException(AppExceedingDailyMaximumUseTimesLimitException e)
+	@ExceptionHandler(AppExceedingTimeUnitMaximumUseTimesLimitException.class)
+	public <T> ResponseEntity<Response<T>> handleException(AppExceedingTimeUnitMaximumUseTimesLimitException e)
 			throws Exception {
 		return response(WrapResponseHandler::getExceedingDailyMaximumUseTimesLimit, null, e, e.getMessage());
 	}
