@@ -47,7 +47,7 @@ public class SecureRequestResource implements SecurePrincipal<RequestResource> {
 			throw new AppForbbidenException("requestResource disabled - " + requestMappingPath);
 		}
 		CapacitySupport.doSupport(List.of(requestResource), capacitySupport -> {
-			limiters.limit(request, response, requestContext, requestResource);
+			limiters.limit(request, response, requestContext, capacitySupport);
 		});
 		return requestResource;
 	}

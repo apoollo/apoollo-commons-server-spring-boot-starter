@@ -15,7 +15,6 @@ import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.core.AbstractAuthentication.Authority;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
-import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.request.context.model.RequestConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,11 +27,11 @@ public class SecureUser implements SecurePrincipal<User> {
 
 	private List<Authentication<?>> authentications;
 	private Authorization authorization;
-	private Limiters<LimitersSupport> limiters;
+	private Limiters<User> limiters;
 	private JwtAuthorizationRenewal authorizationRenewal;
 
-	public SecureUser(List<Authentication<?>> authentications, Authorization authorization,
-			Limiters<LimitersSupport> limiters, JwtAuthorizationRenewal authorizationRenewal) {
+	public SecureUser(List<Authentication<?>> authentications, Authorization authorization, Limiters<User> limiters,
+			JwtAuthorizationRenewal authorizationRenewal) {
 		super();
 		this.authentications = authentications;
 		this.authorization = authorization;
@@ -58,7 +57,7 @@ public class SecureUser implements SecurePrincipal<User> {
 						});
 					}
 					CapacitySupport.doSupport(List.of(user), capacitySupport -> {
-						limiters.limit(request, response, requestContext, user);
+						limiters.limit(request, response, requestContext, capacitySupport);
 					});
 					return user;
 				})//

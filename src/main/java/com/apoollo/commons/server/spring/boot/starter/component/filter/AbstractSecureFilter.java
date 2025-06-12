@@ -28,6 +28,9 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractSecureFilter implements Filter {
 
+	// private static final Logger LOGGER =
+	// LoggerFactory.getLogger(AbstractSecureFilter.class);
+
 	private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
 	private static final String ONCE_MATCHES_REQUEST_ATTRIBUTE = AbstractSecureFilter.class + "onceMatchesRequest";
 
@@ -47,6 +50,7 @@ public abstract class AbstractSecureFilter implements Filter {
 			try {
 				doSecureFilter(request, response, chain);
 			} catch (Throwable e) {
+				// LOGGER.error("secure filter error :", e);
 				if (!(e instanceof ServletException)) {
 					request.setAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION, e);
 					request.getRequestDispatcher(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH).forward(request, response);

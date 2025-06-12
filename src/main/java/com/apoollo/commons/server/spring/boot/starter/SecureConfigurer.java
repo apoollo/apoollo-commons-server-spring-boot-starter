@@ -28,9 +28,11 @@ import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDeco
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.UserManager;
+import com.apoollo.commons.util.request.context.access.UserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthorization;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
+import com.apoollo.commons.util.request.context.access.core.DefaultUserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.access.core.HeaderJwtAuthentication;
 import com.apoollo.commons.util.request.context.access.core.HeaderKeyPairAuthentication;
 import com.apoollo.commons.util.request.context.access.core.JSONBodyJwtAuthentication;
@@ -75,14 +77,12 @@ public class SecureConfigurer {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	Authentication<JwtToken> getHeaderJwtTokenAuthentication(UserManager userManager,
 			AuthorizationJwtTokenDecoder authorizationJwtTokenDecoder) {
 		return new HeaderJwtAuthentication(userManager, authorizationJwtTokenDecoder);
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	Authentication<JwtToken> getJSONBodyJwtAuthentication(UserManager userManager,
 			AuthorizationJwtTokenDecoder authorizationJwtTokenDecoder,
 			CommonsServerProperties commonsServerProperties) {
@@ -91,7 +91,6 @@ public class SecureConfigurer {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	Authentication<String> getHeaderKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
 		return new HeaderKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
@@ -99,7 +98,6 @@ public class SecureConfigurer {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	Authentication<String> getParameterKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
 		return new ParameterKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
@@ -107,7 +105,6 @@ public class SecureConfigurer {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	Authentication<String> getJSONBodyKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
 		return new JSONBodyKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
@@ -116,10 +113,17 @@ public class SecureConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
+	UserRequestResourceMatcher getUserRequestResourceMatcher() {
+		return new DefaultUserRequestResourceMatcher();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	Authorization getAuthorization(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
-			CommonsServerProperties commonsServerProperties) {
-		return new DefaultAuthorization(redisTemplate, redisNameSpaceKey, LangUtils.getPropertyIfNotNull(
-				commonsServerProperties.getRbac(), RabcProperties::getAccessKeyAndRequestResourcePinsMapping));
+			UserRequestResourceMatcher requestResourceMatcher, CommonsServerProperties commonsServerProperties) {
+		return new DefaultAuthorization(redisTemplate, redisNameSpaceKey, requestResourceMatcher,
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getAccessKeyAndRequestResourcePinsMapping));
 	}
 
 	@Bean
@@ -130,7 +134,7 @@ public class SecureConfigurer {
 
 	@Bean
 	SecurePrincipal<User> getSecureUser(List<Authentication<?>> authentications, Authorization authorization,
-			Limiters<LimitersSupport> limiters, JwtAuthorizationRenewal authorizationRenewal) {
+			Limiters<User> limiters, JwtAuthorizationRenewal authorizationRenewal) {
 		return new SecureUser(authentications, authorization, limiters, authorizationRenewal);
 	}
 
