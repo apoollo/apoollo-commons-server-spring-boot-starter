@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
@@ -28,8 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractSecureFilter implements Filter {
 
-	// private static final Logger LOGGER =
-	// LoggerFactory.getLogger(AbstractSecureFilter.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSecureFilter.class);
 
 	private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
 	private static final String ONCE_MATCHES_REQUEST_ATTRIBUTE = AbstractSecureFilter.class + "onceMatchesRequest";
@@ -48,15 +49,23 @@ public abstract class AbstractSecureFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 		if (matches(request)) {
 			try {
-				doSecureFilter(request, response, chain);
+				doPreSecureFilter(request, response);
+				chain.doFilter(request, response);
 			} catch (Throwable e) {
-				// LOGGER.error("secure filter error :", e);
-				if (!(e instanceof ServletException)) {
+				if (!response.isCommitted() && !(e instanceof ServletException)) {
+					// 处理统一异常返回值
 					request.setAttribute(Constants.REQUEST_ATTRIBUTE_EXCEPTION, e);
 					request.getRequestDispatcher(Constants.EXCEPTION_FORWARD_CONTROLLE_PATH).forward(request, response);
 				} else {
+					// 
 					throw e;
 				}
+			}
+			try {
+				// 如果after 发生异常，会被吞掉异常
+				doAfterSecureFilter(request, response);
+			} catch (Throwable e) {
+				LOGGER.error("System Error :", e);
 			} finally {
 				cleanupMatches(request, response, chain);
 			}
@@ -69,7 +78,10 @@ public abstract class AbstractSecureFilter implements Filter {
 		}
 	}
 
-	public abstract void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+	public abstract void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException;
+
+	public abstract void doAfterSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException;
 
 	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {

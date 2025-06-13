@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
@@ -64,7 +63,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	}
 
 	@Override
-	public void doSecureFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+	public void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		LOGGER.info("请求进入标记");
 		String clientRequestId = request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID);
@@ -86,26 +85,31 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		CapacitySupport.doSupport(List.of(capacitySupport), capacitySupport -> {
 			limiters.limit(request, response, requestContext, capacitySupport);
 		});
-		RequestResource requestResource = secureRequestResource.init(request, response, requestContext);
-		User user = secureUser.init(request, response, requestContext);
-		chain.doFilter(new RequestContextHttpServletRequestWrapper(request, requestContext), response);
-		try {
-			if (null != user) {
-				response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
-						String.valueOf(user.passwordIsExpired()));
-			}
-			response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
-			logWitter.write(requestContext, null);
-			CapacitySupport.doSupport(LangUtils.getStream(capacitySupport, user, requestResource).toList(),
-					capacitySupport -> {
-						limiters.unlimit(request, response, requestContext, capacitySupport);
-					});
-			LOGGER.info("请求结束标记");
-		} catch (Throwable e) {
-			// TODO 需要统一异常处理返回值
-			LOGGER.info("System Error:", e);
-		}
+		secureRequestResource.init(request, response, requestContext);
+		secureUser.init(request, response, requestContext);
+
 	}
+
+	@Override
+	public void doAfterSecureFilter(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+		RequestContext requestContext = RequestContext.getRequired();
+		RequestResource requestResource = requestContext.getRequestResource();
+		User user = requestContext.getUser();
+		if (null != user) {
+			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
+					String.valueOf(user.passwordIsExpired()));
+		}
+		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
+		logWitter.write(requestContext, null);
+		CapacitySupport.doSupport(LangUtils.getStream(capacitySupport, user, requestResource).toList(),
+				capacitySupport -> {
+					limiters.unlimit(request, response, requestContext, capacitySupport);
+				});
+		LOGGER.info("请求结束标记");
+
+	}
+
 
 	@Override
 	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
@@ -117,4 +121,5 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	public void cleanupNoMaches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 		super.cleanAttribute(request);
 	}
+
 }
