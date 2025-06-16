@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.apoollo.commons.server.spring.boot.starter.component.ApplicationReady;
 import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWebMvcConfigurer;
@@ -31,6 +32,7 @@ import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestCo
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
 import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
+import com.apoollo.commons.server.spring.boot.starter.model.CommonsHandlerExceptionResolver;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
@@ -65,7 +67,8 @@ import jakarta.servlet.Filter;
 @EnableCaching
 @ConditionalOnWebApplication
 @Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
-		ExceptionController.class, DynamicResourceController.class })
+		ExceptionController.class,
+		DynamicResourceController.class })
 public class ServerConfiguration {
 
 	@Bean
@@ -167,5 +170,10 @@ public class ServerConfiguration {
 		filterRegistrationBean.setEnabled(true);
 		filterRegistrationBean.setUrlPatterns(List.of("/*"));
 		return filterRegistrationBean;
+	}
+
+	@Bean
+	HandlerExceptionResolver getHandlerExceptionResolver() {
+		return new CommonsHandlerExceptionResolver(Constants.HANDLER_EXCEPTION_RESOVER);
 	}
 }
