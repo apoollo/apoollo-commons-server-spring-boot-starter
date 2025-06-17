@@ -4,12 +4,11 @@
 package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import java.io.IOException;
-import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
@@ -21,7 +20,6 @@ import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
-import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.request.context.model.RequestConstants;
 import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
@@ -45,27 +43,23 @@ public class RequestContextFilter extends AbstractSecureFilter {
 
 	private LoggerWriter logWitter;
 	private Limiters<LimitersSupport> limiters;
-	private CapacitySupport capacitySupport;
 
 	public RequestContextFilter(PathProperties pathProperties, RequestContextInitail requestContextInitail,
 			SecurePrincipal<RequestResource> secureRequestResource, SecurePrincipal<User> secureUser,
-			LoggerWriter logWitter, Limiters<LimitersSupport> limiters, CapacitySupport capacitySupport) {
-		super(pathProperties);
+			LoggerWriter logWitter, Limiters<LimitersSupport> limiters, RequestContextSupport requestContextSupport) {
+		super(pathProperties, requestContextSupport);
 		this.requestContextInitail = requestContextInitail;
 		this.secureRequestResource = secureRequestResource;
 		this.secureUser = secureUser;
 		this.logWitter = logWitter;
 		this.limiters = limiters;
-		this.capacitySupport = capacitySupport;
-		if (StringUtils.isBlank(this.capacitySupport.getResourcePin())) {
-			throw new RuntimeException("resourcePin must not be blank");
-		}
 	}
 
 	@Override
 	public void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		LOGGER.info("请求进入标记");
+		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		String clientRequestId = request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID);
 
 		String requestId = LangUtils.getUppercaseUUID();
@@ -82,39 +76,35 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		LOGGER.info("访问URI：" + reuqestUri);
 		LOGGER.info("访问IP：" + requestIp);
 		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
-		CapacitySupport.doSupport(List.of(capacitySupport), capacitySupport -> {
+		requestContextSupport.doSupport(capacitySupport -> {
 			limiters.limit(request, response, requestContext, capacitySupport);
 		});
 		secureRequestResource.init(request, response, requestContext);
-		secureUser.init(request, response, requestContext);
-
-	}
-
-	@Override
-	public void doAfterSecureFilter(HttpServletRequest request, HttpServletResponse response)
-			throws IOException, ServletException {
-		RequestContext requestContext = RequestContext.getRequired();
-		RequestResource requestResource = requestContext.getRequestResource();
-		User user = requestContext.getUser();
+		User user = secureUser.init(request, response, requestContext);
 		if (null != user) {
 			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
 					String.valueOf(user.passwordIsExpired()));
 		}
-		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
-		logWitter.write(requestContext, null);
-		CapacitySupport.doSupport(LangUtils.getStream(capacitySupport, user, requestResource).toList(),
-				capacitySupport -> {
-					limiters.unlimit(request, response, requestContext, capacitySupport);
-				});
-		LOGGER.info("请求结束标记");
-
 	}
-
 
 	@Override
 	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
-		super.cleanAttribute(request);
+		RequestContext requestContext = RequestContext.getRequired();
+		try {
+			requestContextSupport.doSupport(requestContext, capacitySupport -> {
+				limiters.unlimit(request, response, requestContext, capacitySupport);
+			});
+		} catch (Exception e) {
+			LOGGER.info("unlimit error", e);
+		}
+		try {
+			logWitter.write(requestContext, null);
+		} catch (Exception e) {
+			LOGGER.info("write log error", e);
+		}
 		RequestContext.release();
+		super.cleanAttribute(request);
+		LOGGER.info("请求结束标记");
 	}
 
 	@Override

@@ -9,8 +9,8 @@ import org.apache.commons.lang3.BooleanUtils;
 
 import com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager;
 import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
-import com.apoollo.commons.util.exception.refactor.AppRequestResourceDisabledException;
-import com.apoollo.commons.util.exception.refactor.AppRequestResourceNotExistsException;
+import com.apoollo.commons.util.exception.AppRequestResourceDisabledException;
+import com.apoollo.commons.util.exception.AppRequestResourceNotExistsException;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.limiter.Limiters;

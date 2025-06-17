@@ -11,8 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
-import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ExceptionControllerAdvice;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
@@ -50,6 +50,7 @@ import com.apoollo.commons.util.request.context.limiter.core.StrictNonceValidaor
 import com.apoollo.commons.util.request.context.limiter.core.UseLimiters;
 import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * liuyulong
@@ -159,9 +160,14 @@ public class CapacityConfigurer {
 	}
 
 	@Bean
+	RequestContextSupport getRequestContextSupport(CapacitySupport capacitySupport) {
+		return new RequestContextSupport(capacitySupport);
+	}
+
+	@Bean
 	@ConditionalOnMissingBean
-	WrapResponseHandler getHttpCodeNameHandler() {
-		return new DefaultWrapResponseHandler();
+	WrapResponseHandler getWrapResponseHandler(ObjectMapper objectMapper) {
+		return new DefaultWrapResponseHandler(objectMapper);
 	}
 
 	@Bean
@@ -172,16 +178,8 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ResponseBodyContextAdvice getResponseContextBodyAdvice(CapacitySupport capacitySupport,
-			WrapResponseHandler wrapResponseHandler) {
-		return new ResponseBodyContextAdvice(capacitySupport, wrapResponseHandler);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	ExceptionControllerAdvice getExceptionControllerAdvice(CapacitySupport capacitySupport,
-			WrapResponseHandler wrapResponseHandler) {
-		return new ExceptionControllerAdvice(capacitySupport, wrapResponseHandler);
+	ResponseBodyContextAdvice getResponseContextBodyAdvice(RequestContextSupport requestContextSupport) {
+		return new ResponseBodyContextAdvice(requestContextSupport);
 	}
 
 	@Bean

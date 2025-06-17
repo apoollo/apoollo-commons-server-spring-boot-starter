@@ -30,10 +30,10 @@ import com.apoollo.commons.server.spring.boot.starter.component.CommonsServerWeb
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContentEscapeFilter;
 import com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter;
 import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResourceController;
-import com.apoollo.commons.server.spring.boot.starter.controller.ExceptionController;
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.CommonsHandlerExceptionResolver;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
@@ -49,7 +49,6 @@ import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
-import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
@@ -67,7 +66,6 @@ import jakarta.servlet.Filter;
 @EnableCaching
 @ConditionalOnWebApplication
 @Import({ CommonsServerWebMvcConfigurer.class, ApplicationReady.class, WelcomeController.class,
-		ExceptionController.class,
 		DynamicResourceController.class })
 public class ServerConfiguration {
 
@@ -148,19 +146,19 @@ public class ServerConfiguration {
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
 			RequestContextInitail requestContextInitail, SecurePrincipal<RequestResource> secureRequestResource,
 			SecurePrincipal<User> secureUser, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
-			CapacitySupport capacitySupport, CommonsServerProperties commonsServerProperties) {
+			RequestContextSupport requestContextSupport, CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(
 				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail,
-						secureRequestResource, secureUser, logWitter, limiters, capacitySupport),
+						secureRequestResource, secureUser, logWitter, limiters, requestContextSupport),
 				Constants.REQUEST_CONTEXT_FILTER_ORDER);
 	}
 
 	@Bean
 	FilterRegistrationBean<RequestContentEscapeFilter> getRequestContentEscapeFilterRegistrationBean(
-			ContentEscapeHandler contentEscapeHandler, CapacitySupport capacitySupport,
+			ContentEscapeHandler contentEscapeHandler, RequestContextSupport requestContextSupport,
 			CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(new RequestContentEscapeFilter(commonsServerProperties.getPath(),
-				contentEscapeHandler, capacitySupport), Constants.REQUEST_CONTENT_ESCAPE_FILTER_ORDER);
+				contentEscapeHandler, requestContextSupport), Constants.REQUEST_CONTENT_ESCAPE_FILTER_ORDER);
 	}
 
 	private <T extends Filter> FilterRegistrationBean<T> newFilterRegistrationBean(T filter, int order) {
@@ -173,7 +171,7 @@ public class ServerConfiguration {
 	}
 
 	@Bean
-	HandlerExceptionResolver getHandlerExceptionResolver() {
-		return new CommonsHandlerExceptionResolver(Constants.HANDLER_EXCEPTION_RESOVER);
+	HandlerExceptionResolver getHandlerExceptionResolver(RequestContextSupport requestContextSupport) {
+		return new CommonsHandlerExceptionResolver(Constants.HANDLER_EXCEPTION_RESOVER, requestContextSupport);
 	}
 }
