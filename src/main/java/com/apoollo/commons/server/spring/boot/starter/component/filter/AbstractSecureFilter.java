@@ -49,8 +49,7 @@ public abstract class AbstractSecureFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 		if (matches(request)) {
 			try {
-				doPreSecureFilter(request, response);
-				chain.doFilter(request, response);
+				chain.doFilter(doPreSecureFilter(request, response), response);
 			} catch (Exception e) {
 				if (BooleanUtils.isTrue(
 						requestContextSupport.writeExceptionResponse(response, RequestContext.get(), e, () -> true))) {
@@ -70,10 +69,10 @@ public abstract class AbstractSecureFilter implements Filter {
 		}
 	}
 
-	public abstract void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
+	public abstract HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException;
 
-
+	
 	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 
 	}

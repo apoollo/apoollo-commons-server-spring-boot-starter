@@ -30,12 +30,13 @@ public class RequestContentEscapeFilter extends AbstractSecureFilter {
 	}
 
 	@Override
-	public void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
+	public HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		RequestContext requestContext = RequestContext.getRequired();
 		if (requestContextSupport.supportAbility(requestContext, CapacitySupport::getEnableContentEscape)) {
-			request = new ContentEscapeHttpServletRequestWrapper(request, requestContext, contentEscapeHandler);
+			return new ContentEscapeHttpServletRequestWrapper(request, requestContext, contentEscapeHandler);
 		}
+		return request;
 	}
 
 }

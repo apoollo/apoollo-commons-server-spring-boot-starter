@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
 import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
@@ -56,7 +57,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	}
 
 	@Override
-	public void doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
+	public HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		LOGGER.info("请求进入标记");
 		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
@@ -85,6 +86,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
 					String.valueOf(user.passwordIsExpired()));
 		}
+		return new RequestContextHttpServletRequestWrapper(request, requestContext);
 	}
 
 	@Override
@@ -102,8 +104,12 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		} catch (Exception e) {
 			LOGGER.info("write log error", e);
 		}
-		RequestContext.release();
-		super.cleanAttribute(request);
+		try {
+			RequestContext.release();
+			super.cleanAttribute(request);
+		} catch (Exception e) {
+			LOGGER.info("release requestContext error", e);
+		}
 		LOGGER.info("请求结束标记");
 	}
 
