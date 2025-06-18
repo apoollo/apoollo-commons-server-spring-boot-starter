@@ -19,9 +19,5 @@ public interface Constants {
 	// handlerExceptionResolver
 	public static final int HANDLER_EXCEPTION_RESOVER = -1;
 
-	public static final String EXCEPTION_FORWARD_CONTROLLE_PATH = "/exception/forward";
-
-	public static final String REQUEST_ATTRIBUTE_EXCEPTION = "commons-server-exception";
-
 	public static final String CONFIGURATION_PREFIX = "apoollo.commons.server";
 }
