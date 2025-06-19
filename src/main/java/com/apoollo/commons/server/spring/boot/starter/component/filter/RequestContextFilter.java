@@ -62,12 +62,12 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	@Override
 	public HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
-		LOGGER.info("请求进入标记");
 		String requestId = LangUtils.getUppercaseUUID();
 		String reuqestUri = request.getRequestURI();
 		String requestIp = IpUtils.tryGetRealIp(request);
 		RequestContext requestContext = RequestContext.reset(requestId, request.getContextPath(), reuqestUri,
 				requestContextInitail::newInstance);
+		LOGGER.info("请求进入标记");
 		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
 		String clientRequestId = StringUtils.trim(request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID));
 		if (null != clientRequestId && (clientRequestId.length() > 32 || clientRequestId.length() < 1)) {
@@ -77,7 +77,6 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		requestContext.setClientRequestId(clientRequestId);
 		requestContext.setRequestIp(requestIp);
 		requestContext.setRequestServerName(request.getServerName());
-
 		if (null != clientRequestId) {
 			LOGGER.info("客户端请求ID：" + clientRequestId);
 		}
@@ -109,21 +108,21 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		try {
 			logWitter.write(requestContext);
 			if (null != requestContext.getResponseTime()) {
-				LOGGER.info("request total elapsedTime：" + requestContext.getElapsedTime() + "ms");
+				LOGGER.info("total elapsedTime：" + requestContext.getElapsedTime() + "ms");
 			} else {
-				LOGGER.info("request total elapsedTime："
+				LOGGER.info("total elapsedTime："
 						+ (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
 			}
 		} catch (Exception e) {
 			LOGGER.info("write log error", e);
 		}
+		LOGGER.info("请求结束标记");
 		try {
 			RequestContext.release();
 			super.cleanAttribute(request);
 		} catch (Exception e) {
 			LOGGER.info("release requestContext error", e);
 		}
-		LOGGER.info("请求结束标记");
 	}
 
 	@Override
