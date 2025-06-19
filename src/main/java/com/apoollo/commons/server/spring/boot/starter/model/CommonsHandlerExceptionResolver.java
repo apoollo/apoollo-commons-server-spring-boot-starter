@@ -19,9 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CommonsHandlerExceptionResolver implements HandlerExceptionResolver, Ordered {
 
 	private int order;
-	private RequestContextSupport requestContextSupport;
+	private RequestContextCapacitySupport requestContextSupport;
 
-	public CommonsHandlerExceptionResolver(int order, RequestContextSupport requestContextSupport) {
+	public CommonsHandlerExceptionResolver(int order, RequestContextCapacitySupport requestContextSupport) {
 		super();
 		this.order=order;
 		this.requestContextSupport = requestContextSupport;

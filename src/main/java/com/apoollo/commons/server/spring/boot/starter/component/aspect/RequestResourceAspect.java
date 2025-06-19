@@ -49,12 +49,6 @@ public class RequestResourceAspect {
 		private long size;
 		private Double kb;
 
-		/**
-		 * @param name
-		 * @param originalFilename
-		 * @param contentType
-		 * @param size
-		 */
 		public MultipartFileLoggingObject(MultipartFile multipartFile) {
 			super();
 			this.name = multipartFile.getName();

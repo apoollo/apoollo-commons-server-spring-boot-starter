@@ -20,8 +20,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -33,20 +31,19 @@ import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResource
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.CommonsHandlerExceptionResolver;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
-import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultLoggerWriter;
-import com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
+import com.apoollo.commons.util.request.context.LoggerWriter;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.access.SecurePrincipal;
 import com.apoollo.commons.util.request.context.access.User;
+import com.apoollo.commons.util.request.context.core.AsyncLoggerWriter;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
@@ -92,15 +89,9 @@ public class ServerConfiguration {
 	}
 
 	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	RequestContextDataBus getDefaultRequesContextDataBus() {
-		return new DefaultRequestContextDataBus();
-	}
-
-	@Bean
 	@ConditionalOnMissingBean
 	LoggerWriter getLoggerWriter(List<RequestContextDataBus> requestContextDataBuses) {
-		return new DefaultLoggerWriter(requestContextDataBuses);
+		return new AsyncLoggerWriter(requestContextDataBuses);
 	}
 
 	@Bean
@@ -146,7 +137,7 @@ public class ServerConfiguration {
 	FilterRegistrationBean<RequestContextFilter> getRequestContextFilterRegistrationBean(
 			RequestContextInitail requestContextInitail, SecurePrincipal<RequestResource> secureRequestResource,
 			SecurePrincipal<User> secureUser, LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
-			RequestContextSupport requestContextSupport, CommonsServerProperties commonsServerProperties) {
+			RequestContextCapacitySupport requestContextSupport, CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(
 				new RequestContextFilter(commonsServerProperties.getPath(), requestContextInitail,
 						secureRequestResource, secureUser, logWitter, limiters, requestContextSupport),
@@ -155,7 +146,7 @@ public class ServerConfiguration {
 
 	@Bean
 	FilterRegistrationBean<RequestContentEscapeFilter> getRequestContentEscapeFilterRegistrationBean(
-			ContentEscapeHandler contentEscapeHandler, RequestContextSupport requestContextSupport,
+			ContentEscapeHandler contentEscapeHandler, RequestContextCapacitySupport requestContextSupport,
 			CommonsServerProperties commonsServerProperties) {
 		return newFilterRegistrationBean(new RequestContentEscapeFilter(commonsServerProperties.getPath(),
 				contentEscapeHandler, requestContextSupport), Constants.REQUEST_CONTENT_ESCAPE_FILTER_ORDER);
@@ -171,7 +162,7 @@ public class ServerConfiguration {
 	}
 
 	@Bean
-	HandlerExceptionResolver getHandlerExceptionResolver(RequestContextSupport requestContextSupport) {
+	HandlerExceptionResolver getHandlerExceptionResolver(RequestContextCapacitySupport requestContextSupport) {
 		return new CommonsHandlerExceptionResolver(Constants.HANDLER_EXCEPTION_RESOVER, requestContextSupport);
 	}
 }

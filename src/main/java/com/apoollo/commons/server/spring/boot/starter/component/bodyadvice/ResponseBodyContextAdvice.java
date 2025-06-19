@@ -11,7 +11,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.util.request.context.RequestContext;
 
 /**
@@ -21,9 +21,9 @@ import com.apoollo.commons.util.request.context.RequestContext;
 @ControllerAdvice
 public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 
-	private RequestContextSupport requestContextSupport;
+	private RequestContextCapacitySupport requestContextSupport;
 
-	public ResponseBodyContextAdvice(RequestContextSupport requestContextSupport) {
+	public ResponseBodyContextAdvice(RequestContextCapacitySupport requestContextSupport) {
 		super();
 		this.requestContextSupport = requestContextSupport;
 	}

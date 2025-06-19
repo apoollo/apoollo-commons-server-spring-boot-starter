@@ -11,7 +11,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.request.context.RequestContext;
 
@@ -34,9 +34,9 @@ public abstract class AbstractSecureFilter implements Filter {
 	private static final String ONCE_MATCHES_REQUEST_ATTRIBUTE = AbstractSecureFilter.class + "onceMatchesRequest";
 
 	protected PathProperties pathProperties;
-	protected RequestContextSupport requestContextSupport;
+	protected RequestContextCapacitySupport requestContextSupport;
 
-	public AbstractSecureFilter(PathProperties pathProperties, RequestContextSupport requestContextSupport) {
+	public AbstractSecureFilter(PathProperties pathProperties, RequestContextCapacitySupport requestContextSupport) {
 		super();
 		this.pathProperties = pathProperties;
 		this.requestContextSupport = requestContextSupport;

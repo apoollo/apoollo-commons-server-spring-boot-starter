@@ -5,6 +5,7 @@ package com.apoollo.commons.server.spring.boot.starter.model.annotaion;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +13,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.stereotype.Controller;
@@ -36,6 +39,8 @@ import lombok.Setter;
  * @author liuyulong
  */
 public class RequestResourceRegister {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(RequestResourceRegister.class);
 
 	private static final LeftFallingPathJoinner FALLING_PATH_JOINNER = new LeftFallingPathJoinner();
 
@@ -75,18 +80,28 @@ public class RequestResourceRegister {
 		LangUtils.getStream(controllerClass.getDeclaredMethods())
 				.map(method -> getRequestResourceMapping(controllerClass, controllerRequestMapping, method))
 				.filter(Objects::nonNull)//
+				.sorted(Comparator.comparing(RequestResourceMapping::getConfiged))//
 				.forEach(requestResourceMapping -> {
 					if (requestResourceMapping.configed) {
 						DefaultRequestResource requestResourceObject = requestResourceMapping
 								.getRequestResourceObject();
-						requestResources.add(requestResourceObject);
-						pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
-					} /*
-						 * else { if (null !=
-						 * requestResourceMapping.getControllerMethodRequestMappingPath()) {
-						 * pathProperties.getExcludePathPatterns()
-						 * .add(requestResourceMapping.getControllerMethodRequestMappingPath()); } }
-						 */
+						if (requestResources.stream()
+								.filter(requestResource -> requestResource.getResourcePin()
+										.equals(requestResourceObject.getResourcePin())
+										|| requestResource.getRequestMappingPath()
+												.equals(requestResourceObject.getRequestMappingPath()))
+								.findAny().isPresent()) {
+							throw new RuntimeException("have multiple request resourcePin or requestMappingPath:"
+									+ requestResourceObject.getResourcePin());
+						} else {
+							requestResources.add(requestResourceObject);
+							pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
+						}
+					}
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("requestResource  configed : {} - {}", requestResourceMapping.getConfiged(),
+								requestResourceMapping.getControllerMethodRequestMappingPath());
+					}
 				});
 	}
 
@@ -111,6 +126,8 @@ public class RequestResourceRegister {
 		}
 		if (null != methodPath) {
 			requestMappingPath = FALLING_PATH_JOINNER.joinRootPath(controllerRequestMappingPath, methodPath);
+		} else {
+			requestMappingPath = controllerRequestMappingPath;
 		}
 		return requestMappingPath;
 	}
@@ -138,7 +155,7 @@ public class RequestResourceRegister {
 				}
 				requestResourceMapping = new RequestResourceMapping(true,
 						getDefaultRequestResource(requestResourceAnnotaion, resourcePin, requestMappingPath),
-						requestResourceAnnotaion, null);
+						requestResourceAnnotaion, requestMappingPath);
 			}
 		} else {
 			requestResourceMapping = new RequestResourceMapping(false, null, null,
@@ -150,8 +167,6 @@ public class RequestResourceRegister {
 	public DefaultRequestResource getDefaultRequestResource(RequestResource requestResourceAnnotaion,
 			String resourcePin, String requestMappingPath) {
 		DefaultRequestResource requestResourceObject = new DefaultRequestResource();
-		requestResourceObject.setResourcePin(requestResourceAnnotaion.resourcePin());
-		requestResourceObject.setAccessKey(null);
 		requestResourceObject.setEnableNonceLimiter(requestResourceAnnotaion.enableNonceLimiter());
 		requestResourceObject.setNonceLimiterDuration(requestResourceAnnotaion.nonceLimiterDuration());
 		requestResourceObject.setEnableSignatureLimiter(requestResourceAnnotaion.enableSignatureLimiter());
@@ -200,6 +215,8 @@ public class RequestResourceRegister {
 		requestResourceObject.setRequestMappingPath(requestMappingPath);
 		requestResourceObject.setAccessStrategy(requestResourceAnnotaion.accessStrategy());
 		requestResourceObject.setRoles(toList(requestResourceAnnotaion.roles()));
+		requestResourceObject.setResourcePin(resourcePin);
+		requestResourceObject.setAccessKey(null);
 
 		return requestResourceObject;
 	}

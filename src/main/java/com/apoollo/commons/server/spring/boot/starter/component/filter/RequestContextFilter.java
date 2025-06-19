@@ -5,20 +5,22 @@ package com.apoollo.commons.server.spring.boot.starter.component.filter;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
-import com.apoollo.commons.server.spring.boot.starter.service.LoggerWriter;
-import com.apoollo.commons.server.spring.boot.starter.service.SecurePrincipal;
 import com.apoollo.commons.util.IpUtils;
 import com.apoollo.commons.util.LangUtils;
+import com.apoollo.commons.util.exception.AppClientRequestIdIllegalException;
+import com.apoollo.commons.util.request.context.LoggerWriter;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.access.RequestResource;
+import com.apoollo.commons.util.request.context.access.SecurePrincipal;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
@@ -47,7 +49,8 @@ public class RequestContextFilter extends AbstractSecureFilter {
 
 	public RequestContextFilter(PathProperties pathProperties, RequestContextInitail requestContextInitail,
 			SecurePrincipal<RequestResource> secureRequestResource, SecurePrincipal<User> secureUser,
-			LoggerWriter logWitter, Limiters<LimitersSupport> limiters, RequestContextSupport requestContextSupport) {
+			LoggerWriter logWitter, Limiters<LimitersSupport> limiters,
+			RequestContextCapacitySupport requestContextSupport) {
 		super(pathProperties, requestContextSupport);
 		this.requestContextInitail = requestContextInitail;
 		this.secureRequestResource = secureRequestResource;
@@ -60,19 +63,23 @@ public class RequestContextFilter extends AbstractSecureFilter {
 	public HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 		LOGGER.info("请求进入标记");
-		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
-		String clientRequestId = request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID);
-
 		String requestId = LangUtils.getUppercaseUUID();
 		String reuqestUri = request.getRequestURI();
 		String requestIp = IpUtils.tryGetRealIp(request);
 		RequestContext requestContext = RequestContext.reset(requestId, request.getContextPath(), reuqestUri,
 				requestContextInitail::newInstance);
+		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
+		String clientRequestId = StringUtils.trim(request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID));
+		if (null != clientRequestId && (clientRequestId.length() > 32 || clientRequestId.length() < 1)) {
+			throw new AppClientRequestIdIllegalException(
+					"client request id illegal , value length must great equal 1 and less equal 32");
+		}
 		requestContext.setClientRequestId(clientRequestId);
 		requestContext.setRequestIp(requestIp);
 		requestContext.setRequestServerName(request.getServerName());
+
 		if (null != clientRequestId) {
-			LOGGER.info("client-request-id：" + clientRequestId);
+			LOGGER.info("客户端请求ID：" + clientRequestId);
 		}
 		LOGGER.info("访问URI：" + reuqestUri);
 		LOGGER.info("访问IP：" + requestIp);
@@ -100,7 +107,13 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			LOGGER.info("unlimit error", e);
 		}
 		try {
-			logWitter.write(requestContext, null);
+			logWitter.write(requestContext);
+			if (null != requestContext.getResponseTime()) {
+				LOGGER.info("request total elapsedTime：" + requestContext.getElapsedTime() + "ms");
+			} else {
+				LOGGER.info("request total elapsedTime："
+						+ (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
+			}
 		} catch (Exception e) {
 			LOGGER.info("write log error", e);
 		}

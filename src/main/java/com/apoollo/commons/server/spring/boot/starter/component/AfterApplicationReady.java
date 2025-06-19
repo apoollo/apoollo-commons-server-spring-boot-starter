@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.apoollo.commons.server.spring.boot.starter.service;
+package com.apoollo.commons.server.spring.boot.starter.component;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.core.Ordered;

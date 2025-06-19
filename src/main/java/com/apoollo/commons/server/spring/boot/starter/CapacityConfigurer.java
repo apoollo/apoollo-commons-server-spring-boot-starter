@@ -12,7 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
@@ -160,8 +160,8 @@ public class CapacityConfigurer {
 	}
 
 	@Bean
-	RequestContextSupport getRequestContextSupport(CapacitySupport capacitySupport) {
-		return new RequestContextSupport(capacitySupport);
+	RequestContextCapacitySupport getRequestContextSupport(CapacitySupport capacitySupport) {
+		return new RequestContextCapacitySupport(capacitySupport);
 	}
 
 	@Bean
@@ -178,7 +178,7 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ResponseBodyContextAdvice getResponseContextBodyAdvice(RequestContextSupport requestContextSupport) {
+	ResponseBodyContextAdvice getResponseContextBodyAdvice(RequestContextCapacitySupport requestContextSupport) {
 		return new ResponseBodyContextAdvice(requestContextSupport);
 	}
 

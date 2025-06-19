@@ -22,11 +22,11 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author liuyulong
  * @since 2025-06-10
  */
-public class RequestContextSupport {
+public class RequestContextCapacitySupport {
 
 	private CapacitySupport capacitySupport;
 
-	public RequestContextSupport(CapacitySupport capacitySupport) {
+	public RequestContextCapacitySupport(CapacitySupport capacitySupport) {
 		super();
 		this.capacitySupport = capacitySupport;
 		if (BooleanUtils.isTrue(capacitySupport.getEnableCapacity())) {

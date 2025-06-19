@@ -6,7 +6,7 @@ package com.apoollo.commons.server.spring.boot.starter.component.filter;
 import java.io.IOException;
 
 import com.apoollo.commons.server.spring.boot.starter.model.ContentEscapeHttpServletRequestWrapper;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextSupport;
+import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
@@ -24,7 +24,7 @@ public class RequestContentEscapeFilter extends AbstractSecureFilter {
 	private ContentEscapeHandler contentEscapeHandler;
 
 	public RequestContentEscapeFilter(PathProperties pathProperties, ContentEscapeHandler contentEscapeHandler,
-			RequestContextSupport requestContextSupport) {
+			RequestContextCapacitySupport requestContextSupport) {
 		super(pathProperties, requestContextSupport);
 		this.contentEscapeHandler = contentEscapeHandler;
 	}
