@@ -18,10 +18,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RabcProperties {
+	
+	private String keyPairAccessKeyProperty;
 
-	private List<SerializableUser> users;
+	private String keyPairSecretKeyProperty;
+	
+	private String jwtTokenProperty;
 
 	private List<SerializableRequestResource> requestResources;
+	
+	private List<SerializableUser> users;
 
 	// accessKey:requestSourcePins
 	private Map<String, List<String>> accessKeyAndRequestResourcePinsMapping;

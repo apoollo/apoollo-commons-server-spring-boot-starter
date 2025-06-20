@@ -91,7 +91,7 @@ public @interface RequestResource {
 	 * 
 	 * @return 资源所属的角色列表
 	 */
-	public String[] roles() default { "User" };
+	public String[] roles() default { "Resource" };
 
 	/**
 	 * 

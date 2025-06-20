@@ -13,16 +13,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommonsServerProperties {
-	
+
 	private PathProperties path;
-
-	private String signatureSecret;
-
-	private String keyPairAccessKeyProperty;
-
-	private String keyPairSecretKeyProperty;
-	
-	private String jwtTokenProperty;
 
 	private RabcProperties rbac;
 

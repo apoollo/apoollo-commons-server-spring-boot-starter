@@ -99,28 +99,37 @@ public class SecureConfigurer {
 			AuthorizationJwtTokenDecoder authorizationJwtTokenDecoder,
 			CommonsServerProperties commonsServerProperties) {
 		return new JSONBodyJwtAuthentication(userManager, authorizationJwtTokenDecoder,
-				commonsServerProperties.getJwtTokenProperty());
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), RabcProperties::getJwtTokenProperty));
 	}
 
 	@Bean
 	Authentication<String> getHeaderKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
-		return new HeaderKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
-				commonsServerProperties.getKeyPairSecretKeyProperty());
+		return new HeaderKeyPairAuthentication(userManager,
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairAccessKeyProperty),
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairSecretKeyProperty));
 	}
 
 	@Bean
 	Authentication<String> getParameterKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
-		return new ParameterKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
-				commonsServerProperties.getKeyPairSecretKeyProperty());
+		return new ParameterKeyPairAuthentication(userManager,
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairAccessKeyProperty),
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairSecretKeyProperty));
 	}
 
 	@Bean
 	Authentication<String> getJSONBodyKeyPairAuthentication(UserManager userManager,
 			CommonsServerProperties commonsServerProperties) {
-		return new JSONBodyKeyPairAuthentication(userManager, commonsServerProperties.getKeyPairAccessKeyProperty(),
-				commonsServerProperties.getKeyPairSecretKeyProperty());
+		return new JSONBodyKeyPairAuthentication(userManager,
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairAccessKeyProperty),
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(),
+						RabcProperties::getKeyPairSecretKeyProperty));
 	}
 
 	@Bean

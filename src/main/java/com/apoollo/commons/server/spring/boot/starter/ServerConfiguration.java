@@ -97,7 +97,7 @@ public class ServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	RedisNameSpaceKey getRedisNameSpaceKey() {
-		return () -> "commons-namespace";
+		return () -> Constants.CONFIGURATION_PREFIX;
 	}
 
 	@Bean
