@@ -19,9 +19,11 @@ import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
 import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.Instances;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.UserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport;
+import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport.SerializebleCapacitySupport;
 import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
@@ -48,7 +50,6 @@ import com.apoollo.commons.util.request.context.limiter.core.DefaultTimeUnitPatt
 import com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.core.StrictNonceValidaor;
 import com.apoollo.commons.util.request.context.limiter.core.UseLimiters;
-import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -61,8 +62,8 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ContentEscapeHandler getXssHandler(EscapeMethod escapeXss) {
-		return new DefaultContentEscapeHandler(escapeXss);
+	ContentEscapeHandler getXssHandler(Instances instances) {
+		return new DefaultContentEscapeHandler(instances.getEscapeMethod(DefaultEscapeXss.class));
 	}
 
 	@Bean
@@ -80,14 +81,8 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	NonceValidator getNonceValidator(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
-		return new StrictNonceValidaor(redisTemplate, redisNameSpaceKey);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	NonceLimiter getNonceLimiter(NonceValidator nonceValidator) {
-		return new DefaultNonceLimiter(nonceValidator);
+	NonceLimiter getNonceLimiter(Instances instances) {
+		return new DefaultNonceLimiter(instances.getNonceValidator(StrictNonceValidaor.class));
 	}
 
 	@Bean
@@ -134,13 +129,25 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	CapacitySupport getCapacitySupport(WrapResponseHandler responseHandler) {
-		DefaultCapacitySupport capacitySupport = new DefaultCapacitySupport();
+	SerializebleCapacitySupport getSerializebleCapacitySupport() {
+		SerializebleCapacitySupport capacitySupport = new SerializebleCapacitySupport();
 		capacitySupport.setEnableCapacity(true);
 		capacitySupport.setEnableResponseWrapper(true);
-		capacitySupport.setWrapResponseHandler(responseHandler);
+		capacitySupport.setWrapResponseHandlerClass(WrapResponseHandler.class.getName());
 		capacitySupport.setResourcePin("platform");
 		return capacitySupport;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	ResponseBodyContextAdvice getResponseContextBodyAdvice(RequestContextCapacitySupport requestContextSupport) {
+		return new ResponseBodyContextAdvice(requestContextSupport);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	RequestResourceAspect getRequestResourceAspect() {
+		return new RequestResourceAspect();
 	}
 
 	@Bean
@@ -160,31 +167,27 @@ public class CapacityConfigurer {
 	}
 
 	@Bean
-	RequestContextCapacitySupport getRequestContextSupport(CapacitySupport capacitySupport) {
-		return new RequestContextCapacitySupport(capacitySupport);
+	RequestContextCapacitySupport getRequestContextSupport(Instances instance,
+			SerializebleCapacitySupport serializebleCapacitySupport) {
+		DefaultCapacitySupport capacitySupport = new DefaultCapacitySupport();
+		DefaultCapacitySupport.evlaute(instance, serializebleCapacitySupport, capacitySupport);
+		return new RequestContextCapacitySupport(instance.getWrapResponseHandler(DefaultWrapResponseHandler.class),
+				capacitySupport);
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
+	NonceValidator getNonceValidator(StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey) {
+		return new StrictNonceValidaor(redisTemplate, redisNameSpaceKey);
+	}
+
+	@Bean
 	WrapResponseHandler getWrapResponseHandler(ObjectMapper objectMapper) {
 		return new DefaultWrapResponseHandler(objectMapper);
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	EscapeMethod getEscapeXss() {
 		return new DefaultEscapeXss();
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	ResponseBodyContextAdvice getResponseContextBodyAdvice(RequestContextCapacitySupport requestContextSupport) {
-		return new ResponseBodyContextAdvice(requestContextSupport);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	RequestResourceAspect getRequestResourceAspect() {
-		return new RequestResourceAspect();
-	}
 }

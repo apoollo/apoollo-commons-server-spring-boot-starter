@@ -24,29 +24,35 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class RequestContextCapacitySupport {
 
+	private WrapResponseHandler wrapResponseHandler;
 	private CapacitySupport capacitySupport;
 
-	public RequestContextCapacitySupport(CapacitySupport capacitySupport) {
+	public RequestContextCapacitySupport(WrapResponseHandler wrapResponseHandler, CapacitySupport capacitySupport) {
 		super();
+		this.wrapResponseHandler = wrapResponseHandler;
 		this.capacitySupport = capacitySupport;
 		if (BooleanUtils.isTrue(capacitySupport.getEnableCapacity())) {
 			if (StringUtils.isBlank(capacitySupport.getResourcePin())) {
 				throw new RuntimeException("platform capacitySupport resourcePin must not be blank");
 			}
-			if (BooleanUtils.isTrue(capacitySupport.getEnableResponseWrapper())
-					&& null == capacitySupport.getWrapResponseHandler()) {
-				throw new RuntimeException("platform capacitySupport wrapResponseHandler must not be null");
-			}
 		}
+	}
+
+	public WrapResponseHandler getWrapResponseHandler(RequestContext requestContext) {
+		WrapResponseHandler wrapResponseHandler = CapacitySupport.getAbility(requestContext, capacitySupport,
+				CapacitySupport::getWrapResponseHandler);
+		if (null == wrapResponseHandler) {
+			wrapResponseHandler = this.wrapResponseHandler;
+		}
+		return wrapResponseHandler;
 	}
 
 	public Object getNormallyResponse(RequestContext requestContext, Object object) {
 		Object result = null;
-		WrapResponseHandler wrapResponseHandler = null;
-		if (null != requestContext && null != (wrapResponseHandler = CapacitySupport.getAbility(requestContext,
-				capacitySupport, CapacitySupport::getWrapResponseHandler))) {
+		if (null != requestContext && CapacitySupport.supportAbility(requestContext, capacitySupport,
+				CapacitySupport::getEnableResponseWrapper)) {
 			requestContext.setResponseTime(System.currentTimeMillis());
-			result = wrapResponseHandler.getNormallyResponse(requestContext, object);
+			result = getWrapResponseHandler(requestContext).getNormallyResponse(requestContext, object);
 		}
 		return result;
 	}
@@ -54,11 +60,10 @@ public class RequestContextCapacitySupport {
 	public <T> T writeExceptionResponse(HttpServletResponse response, RequestContext requestContext, Exception ex,
 			Supplier<T> supplier) {
 		T result = null;
-		WrapResponseHandler wrapResponseHandler = null;
-		if (!response.isCommitted() && null != requestContext && null != (wrapResponseHandler = CapacitySupport
-				.getAbility(requestContext, capacitySupport, CapacitySupport::getWrapResponseHandler))) {
+		if (!response.isCommitted() && null != requestContext && CapacitySupport.supportAbility(requestContext,
+				capacitySupport, CapacitySupport::getEnableResponseWrapper)) {
 			requestContext.setResponseTime(System.currentTimeMillis());
-			wrapResponseHandler.writeExceptionResponse(response, requestContext, ex);
+			getWrapResponseHandler(requestContext).writeExceptionResponse(response, requestContext, ex);
 			result = supplier.get();
 		}
 		return result;

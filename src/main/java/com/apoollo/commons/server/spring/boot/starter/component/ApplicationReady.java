@@ -13,10 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 
+import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceRegister;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
+import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
-import com.apoollo.commons.util.web.spring.Instance;
+import com.apoollo.commons.util.request.context.Instances;
 
 /**
  * @author liuyulong
@@ -27,21 +29,21 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
 	private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationReady.class);
 
 	private List<AfterApplicationReady> afterApplicationReadys;
-	private Instance instance;
-	private CommonsServerProperties commonsServerProperties;
+	private Instances instances;
+	private PathProperties pathProperties;
 
-	public ApplicationReady(List<AfterApplicationReady> afterApplicationReadys, Instance instance,
+	public ApplicationReady(List<AfterApplicationReady> afterApplicationReadys, Instances instances,
 			CommonsServerProperties commonsServerProperties) {
 		super();
 		this.afterApplicationReadys = afterApplicationReadys;
-		this.instance = instance;
-		this.commonsServerProperties = commonsServerProperties;
+		this.instances = instances;
+		this.pathProperties = commonsServerProperties.getPath();
 	}
 
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent event) {
 		Security.addProvider(new BouncyCastleProvider());
-		new RequestResourceRegister(instance, commonsServerProperties).regist();
+		new RequestResourceRegister(instances, pathProperties, Constants.REQUEST_RESOURCES).regist();
 
 		LangUtils.getStream(afterApplicationReadys).sorted(Comparator.comparingInt(AfterApplicationReady::getOrder))
 				.forEach(afterApplicationReady -> afterApplicationReady.onApplicationEvent(event));

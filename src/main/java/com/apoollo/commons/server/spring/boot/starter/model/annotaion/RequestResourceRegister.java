@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
+import com.apoollo.commons.util.request.context.Instances;
 import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource;
-import com.apoollo.commons.util.web.spring.Instance;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,20 +43,21 @@ public class RequestResourceRegister {
 
 	private static final LeftFallingPathJoinner FALLING_PATH_JOINNER = new LeftFallingPathJoinner();
 
-	private Instance instance;
+	private Instances instances;
 
 	private PathProperties pathProperties;
-	private List<DefaultRequestResource> requestResources;
+	private List<com.apoollo.commons.util.request.context.access.RequestResource> requestResources;
 
-	public RequestResourceRegister(Instance instance, CommonsServerProperties commonsServerProperties) {
+	public RequestResourceRegister(Instances instances, PathProperties pathProperties,
+			List<com.apoollo.commons.util.request.context.access.RequestResource> requestResources) {
 		super();
-		this.instance = instance;
-		this.pathProperties = commonsServerProperties.getPath();
-		this.requestResources = commonsServerProperties.getRbac().getRequestResources();
+		this.instances = instances;
+		this.pathProperties = pathProperties;
+		this.requestResources = requestResources;
 	}
 
 	public void regist() {
-		Map<String, Object> controllers = instance.getApplicationContext().getBeansWithAnnotation(Controller.class);
+		Map<String, Object> controllers = instances.getApplicationContext().getBeansWithAnnotation(Controller.class);
 		regist(controllers);
 
 	}
@@ -194,20 +194,20 @@ public class RequestResourceRegister {
 		requestResourceObject.setEnableResponseWrapper(requestResourceAnnotaion.enableResponseWrapper());
 
 		if (requestResourceAnnotaion.enableContentEscape()) {
-			requestResourceObject
-					.setContentEscapeMethod(instance.getInstance(requestResourceAnnotaion.contentEscapeMethodClass()));
+			requestResourceObject.setContentEscapeMethod(
+					instances.getEscapeMethod(requestResourceAnnotaion.contentEscapeMethodClass()));
 		}
 		if (requestResourceAnnotaion.enableCorsLimiter()) {
 			requestResourceObject.setCorsLimiterConfiguration(
-					instance.getInstance(requestResourceAnnotaion.corsLimiterConfiguration()));
+					instances.getCorsConfiguration(requestResourceAnnotaion.corsLimiterConfiguration()));
 		}
 		if (requestResourceAnnotaion.enableNonceLimiter()) {
-			requestResourceObject
-					.setNonceLimiterValidator(instance.getInstance(requestResourceAnnotaion.nonceLimiterValidator()));
+			requestResourceObject.setNonceLimiterValidator(
+					instances.getNonceValidator(requestResourceAnnotaion.nonceLimiterValidator()));
 		}
 		if (requestResourceAnnotaion.enableResponseWrapper()) {
-			requestResourceObject
-					.setWrapResponseHandler(instance.getInstance(requestResourceAnnotaion.wrapResponseHandler()));
+			requestResourceObject.setWrapResponseHandler(
+					instances.getWrapResponseHandler(requestResourceAnnotaion.wrapResponseHandler()));
 		}
 		requestResourceObject.setEnableCapacity(requestResourceAnnotaion.enableCapacity());
 		requestResourceObject.setEnable(requestResourceAnnotaion.enable());

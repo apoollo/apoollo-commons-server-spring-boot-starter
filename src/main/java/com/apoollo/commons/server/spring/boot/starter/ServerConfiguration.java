@@ -37,6 +37,7 @@ import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.util.exception.AppServerOverloadedException;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
+import com.apoollo.commons.util.request.context.Instances;
 import com.apoollo.commons.util.request.context.LoggerWriter;
 import com.apoollo.commons.util.request.context.RequestContextDataBus;
 import com.apoollo.commons.util.request.context.RequestContextInitail;
@@ -44,13 +45,12 @@ import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.access.SecurePrincipal;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.core.AsyncLoggerWriter;
+import com.apoollo.commons.util.request.context.core.DefaultInstances;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
-import com.apoollo.commons.util.web.spring.DefaultInstance;
-import com.apoollo.commons.util.web.spring.Instance;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 import jakarta.servlet.Filter;
@@ -102,8 +102,8 @@ public class ServerConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	Instance getInstance() {
-		return new DefaultInstance();
+	Instances getInstances() {
+		return new DefaultInstances();
 	}
 
 	@Bean

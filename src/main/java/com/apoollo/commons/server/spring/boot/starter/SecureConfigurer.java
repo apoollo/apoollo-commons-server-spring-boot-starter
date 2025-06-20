@@ -11,11 +11,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
 import com.apoollo.commons.util.JwtUtils.JwtToken;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
+import com.apoollo.commons.util.request.context.Instances;
 import com.apoollo.commons.util.request.context.access.Authentication;
 import com.apoollo.commons.util.request.context.access.Authorization;
 import com.apoollo.commons.util.request.context.access.AuthorizationJwtTokenDecoder;
@@ -27,6 +29,7 @@ import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.access.UserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthorization;
+import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource;
 import com.apoollo.commons.util.request.context.access.core.DefaultRequestResourceManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserRequestResourceMatcher;
@@ -40,7 +43,6 @@ import com.apoollo.commons.util.request.context.access.core.SecureRequestResourc
 import com.apoollo.commons.util.request.context.access.core.SecureUser;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
-import com.apoollo.commons.util.web.spring.Instance;
 
 /**
  * liuyulong
@@ -51,17 +53,24 @@ public class SecureConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	RequestResourceManager getRequestResourceManager(Instance instance, StringRedisTemplate redisTemplate,
+	RequestResourceManager getRequestResourceManager(Instances instances, StringRedisTemplate redisTemplate,
 			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultRequestResourceManager(instance, redisTemplate, redisNameSpaceKey,
-				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), RabcProperties::getRequestResources));
+
+		LangUtils.getStream(
+				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), RabcProperties::getRequestResources))
+				.forEach(serializableRequestResource -> {
+					Constants.REQUEST_RESOURCES
+							.add(DefaultRequestResource.toRequestResource(instances, serializableRequestResource));
+				});
+		return new DefaultRequestResourceManager(instances, redisTemplate, redisNameSpaceKey,
+				Constants.REQUEST_RESOURCES);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	UserManager getUserManager(Instance instance, StringRedisTemplate stringRedisTemplate,
+	UserManager getUserManager(Instances instances, StringRedisTemplate stringRedisTemplate,
 			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultUserManager(instance, stringRedisTemplate, redisNameSpaceKey,
+		return new DefaultUserManager(instances, stringRedisTemplate, redisNameSpaceKey,
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getUsers()));
 	}
 
