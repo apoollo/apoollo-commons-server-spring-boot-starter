@@ -133,7 +133,7 @@ public class CapacityConfigurer {
 		SerializebleCapacitySupport capacitySupport = new SerializebleCapacitySupport();
 		capacitySupport.setEnableCapacity(true);
 		capacitySupport.setEnableResponseWrapper(true);
-		capacitySupport.setWrapResponseHandlerClass(WrapResponseHandler.class.getName());
+		capacitySupport.setWrapResponseHandlerClass(DefaultWrapResponseHandler.class);
 		capacitySupport.setResourcePin("platform");
 		return capacitySupport;
 	}
@@ -167,12 +167,10 @@ public class CapacityConfigurer {
 	}
 
 	@Bean
-	RequestContextCapacitySupport getRequestContextSupport(Instances instance,
+	RequestContextCapacitySupport getRequestContextSupport(Instances instances,
 			SerializebleCapacitySupport serializebleCapacitySupport) {
-		DefaultCapacitySupport capacitySupport = new DefaultCapacitySupport();
-		DefaultCapacitySupport.evlaute(instance, serializebleCapacitySupport, capacitySupport);
-		return new RequestContextCapacitySupport(instance.getWrapResponseHandler(DefaultWrapResponseHandler.class),
-				capacitySupport);
+		return new RequestContextCapacitySupport(instances.getWrapResponseHandler(DefaultWrapResponseHandler.class),
+				DefaultCapacitySupport.toCapacitySupport(instances, serializebleCapacitySupport));
 	}
 
 	@Bean

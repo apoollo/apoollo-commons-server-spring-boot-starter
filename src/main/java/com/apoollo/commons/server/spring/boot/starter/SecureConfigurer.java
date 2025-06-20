@@ -43,6 +43,7 @@ import com.apoollo.commons.util.request.context.access.core.SecureRequestResourc
 import com.apoollo.commons.util.request.context.access.core.SecureUser;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * liuyulong
@@ -53,8 +54,9 @@ public class SecureConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	RequestResourceManager getRequestResourceManager(Instances instances, StringRedisTemplate redisTemplate,
-			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
+	RequestResourceManager getRequestResourceManager(ObjectMapper objectMapper, Instances instances,
+			StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
+			CommonsServerProperties commonsServerProperties) {
 
 		LangUtils.getStream(
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), RabcProperties::getRequestResources))
@@ -62,15 +64,15 @@ public class SecureConfigurer {
 					Constants.REQUEST_RESOURCES
 							.add(DefaultRequestResource.toRequestResource(instances, serializableRequestResource));
 				});
-		return new DefaultRequestResourceManager(instances, redisTemplate, redisNameSpaceKey,
+		return new DefaultRequestResourceManager(objectMapper, instances, redisTemplate, redisNameSpaceKey,
 				Constants.REQUEST_RESOURCES);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	UserManager getUserManager(Instances instances, StringRedisTemplate stringRedisTemplate,
+	UserManager getUserManager(ObjectMapper objectMapper, Instances instances, StringRedisTemplate stringRedisTemplate,
 			RedisNameSpaceKey redisNameSpaceKey, CommonsServerProperties commonsServerProperties) {
-		return new DefaultUserManager(instances, stringRedisTemplate, redisNameSpaceKey,
+		return new DefaultUserManager(objectMapper, instances, stringRedisTemplate, redisNameSpaceKey,
 				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), (rbac) -> rbac.getUsers()));
 	}
 

@@ -97,7 +97,7 @@ public @interface RequestResource {
 	 * 
 	 * @return 是否开启能力
 	 */
-	public boolean enableCapacity() default false;
+	public boolean enableCapacity() default true;
 
 	/**
 	 * 启用后，会验证 header 中的x-nonce、x-timestamp
