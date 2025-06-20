@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.apoollo.commons.server.spring.boot.starter.model.RequestContextHttpServletRequestWrapper;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.model.Version;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.IpUtils;
@@ -25,6 +24,7 @@ import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
 import com.apoollo.commons.util.request.context.model.RequestConstants;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 import com.apoollo.commons.util.request.context.model.ServletInputStreamHelper;
 
 import jakarta.servlet.FilterChain;

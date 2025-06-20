@@ -6,11 +6,11 @@ package com.apoollo.commons.server.spring.boot.starter.component.filter;
 import java.io.IOException;
 
 import com.apoollo.commons.server.spring.boot.starter.model.ContentEscapeHttpServletRequestWrapper;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.request.context.RequestContext;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.support.CapacitySupport;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

@@ -12,7 +12,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect;
 import com.apoollo.commons.server.spring.boot.starter.component.bodyadvice.ResponseBodyContextAdvice;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.util.redis.service.CountLimiter;
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
@@ -51,6 +50,7 @@ import com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponse
 import com.apoollo.commons.util.request.context.limiter.core.StrictNonceValidaor;
 import com.apoollo.commons.util.request.context.limiter.core.UseLimiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -62,8 +62,8 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ContentEscapeHandler getXssHandler(Instances instances) {
-		return new DefaultContentEscapeHandler(instances.getEscapeMethod(DefaultEscapeXss.class));
+	ContentEscapeHandler getXssHandler(RequestContextCapacitySupport requestContextCapacitySupport) {
+		return new DefaultContentEscapeHandler(requestContextCapacitySupport);
 	}
 
 	@Bean
@@ -169,7 +169,8 @@ public class CapacityConfigurer {
 	@Bean
 	RequestContextCapacitySupport getRequestContextSupport(Instances instances,
 			SerializebleCapacitySupport serializebleCapacitySupport) {
-		return new RequestContextCapacitySupport(instances.getWrapResponseHandler(DefaultWrapResponseHandler.class),
+		return new RequestContextCapacitySupport(instances.getEscapeMethod(DefaultEscapeXss.class),
+				instances.getWrapResponseHandler(DefaultWrapResponseHandler.class),
 				DefaultCapacitySupport.toCapacitySupport(instances, serializebleCapacitySupport));
 	}
 

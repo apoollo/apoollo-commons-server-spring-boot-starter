@@ -114,7 +114,7 @@ public @interface RequestResource {
 	public long nonceLimiterDuration() default 10000;
 
 	/**
-	 * 默认为严格的nonce验证器
+	 * 默认为严格的nonce验证器, 需要实例注入到Spring环境中
 	 * 
 	 * @return nonce 验证器
 	 */
@@ -153,7 +153,7 @@ public @interface RequestResource {
 
 	/**
 	 * 
-	 * @return 跨域配置
+	 * @return 跨域配置, 需要实例注入到Spring环境中
 	 */
 	public Class<? extends CorsConfiguration> corsLimiterConfiguration() default CorsConfiguration.class;
 
@@ -233,7 +233,7 @@ public @interface RequestResource {
 	public boolean enableContentEscape() default false;
 
 	/**
-	 * 要么类有无参构造，要么实例注入到Spring环境中
+	 * , 需要实例注入到Spring环境中
 	 * 
 	 * @return 转义方式实现类的Class
 	 */
@@ -247,7 +247,7 @@ public @interface RequestResource {
 	public boolean enableResponseWrapper() default false;
 
 	/**
-	 * 此字段当启用返回值包装器后生效，自定义异常code与返回值样式，要么类有无参构造，要么实例注入到Spring环境中
+	 * 此字段当启用返回值包装器后生效，自定义异常code与返回值样式, 需要实例注入到Spring环境中
 	 * 
 	 * @return httpCodeNameHandlerClass
 	 */

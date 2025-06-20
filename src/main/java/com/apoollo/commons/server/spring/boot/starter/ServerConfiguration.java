@@ -31,7 +31,6 @@ import com.apoollo.commons.server.spring.boot.starter.controller.DynamicResource
 import com.apoollo.commons.server.spring.boot.starter.controller.WelcomeController;
 import com.apoollo.commons.server.spring.boot.starter.model.CommonsHandlerExceptionResolver;
 import com.apoollo.commons.server.spring.boot.starter.model.Constants;
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.CommonsServerProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.server.spring.boot.starter.properties.RabcProperties;
@@ -49,6 +48,7 @@ import com.apoollo.commons.util.request.context.core.DefaultInstances;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 import com.apoollo.commons.util.web.captcha.CaptchaService;
 import com.apoollo.commons.util.web.captcha.RedisCaptchaService;
 import com.github.benmanes.caffeine.cache.Caffeine;

@@ -8,6 +8,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.apoollo.commons.util.request.context.RequestContext;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

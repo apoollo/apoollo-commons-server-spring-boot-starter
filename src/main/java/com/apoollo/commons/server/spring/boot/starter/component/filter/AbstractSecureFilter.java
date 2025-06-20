@@ -11,9 +11,9 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import com.apoollo.commons.server.spring.boot.starter.model.RequestContextCapacitySupport;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.request.context.RequestContext;
+import com.apoollo.commons.util.request.context.model.RequestContextCapacitySupport;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
