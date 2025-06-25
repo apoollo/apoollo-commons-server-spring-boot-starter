@@ -12,23 +12,40 @@ Apoollo Commons Server Spring Boot Starter
 ![image](https://github.com/user-attachments/assets/32172c2c-2924-4710-b8d6-82c8269c8760)
 
 
-#### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插
+#### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插。同样可以实现框架内特性与非框架特性的混合模式。
 
+### 请求流程拔插
 阶段                               |说明 
 -----------------------------------|----------------------------------------
-Xss Filter                         |跨站脚本攻击过滤
-RequestResource                    |一个请求资源，可以理解成MVC函数
-Limit Async                        |限制请求为同步请求
-Limit PlatformFlow                 |限制平台流量的QPS
-User                               |当前请求的用户
-Limit IP                           |限制请求的IP白名单
-Validate Token                     |验证请求的Token是否合法，支持JWT、AppKey两种方式
-Authorized User Request Resource   |验证用户请求资源的合法性
-Limit UserFlow                     |限制用户流量的QPS
-LimitDailyTimes                    |限制用户每天的请求的次数
-Method Log                         |打印函数入参出参等日志信息
-Taget MVC Method                   |目标MVC函数
-Wrapper Return Value               |包装返回值
+PLATFORM_LIMIERS                   |平台级别的限制，可单独设置平台级别的CAPACITY_SUPPORT
+REOURCE_LIMIERS                    |资源级别的限制，可单独设置资源级别的CAPACITY_SUPPORT
+USER AUTHENTICATION                |用户身份认证，可以选择认证或者不认证，认证则是一个私有访问，不认证则是一个公有访问
+USER AUTHORIZATION                 |用户授权认证，可以选择用户对资源的授权范围 
+USER_LIMIERS                       |用户级别的限制，可单独设置用户级别的CAPACITY_SUPPORT
+TARGET_METHOD_PARAMETER_LOGGING    |目标函数的日志，可选入参与出参打印日志以及参数脱敏打印
+
+### 能力支持拔插（CAPACITY_SUPPORT）
+阶段                               |说明 
+-----------------------------------|----------------------------------------
+NONCE_LIMIER                       |nonce 验证，可以预防重放攻击，一般配合签名限制一起使用
+SIGNATURE_LIMITER                  |签名验证，可以预防请求被篡改
+CORS_LIMITER                       |跨域验证
+IP_LIMITER                         |IP 验证
+REFER_LIMITER                      |Referer 验证
+SYNC_LIMITER                       |同步请求验证
+FLOW_LIMITER                       |Qps 验证
+COUNT_LIMTER                       |一段时间内请求数量验证
+CONTENT_ESCAPE                     |请求内容转义，可以预防Xss
+RESPONSE_WRAPPER                   |响应内容包装成一个标准返回值
+
+### CAPACITY_SUPPORT 的请求模式
+![image](https://github.com/user-attachments/assets/a7c5384b-b2b4-4ee1-90ac-8e533f2c2ead)
+
+阶段                               |说明                                                                            
+-----------------------------------|--------------------------------------------------------------------------------
+平台级别                            |所有被框架接收到的请求全都会应用平台级别的限制                                      
+资源级别                            |该资源的请求会应用资源本身设置的限制 + 平台级别                                               
+用户级别                            |该用户的请求会应用用户本身设置的限制，用户能动态选择适用资源的范围 + 资源级别 + 平台级别                 
 
 Required
 ----
