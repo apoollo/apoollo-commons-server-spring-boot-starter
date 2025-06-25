@@ -3,13 +3,14 @@
 Apoollo Commons Server Spring Boot Starter
 ====
 `apoollo-commons-server` 是一个`SpringBoot Starter`，随 SpringBoot 启动自动加载生效，旨在帮助 Java 开发者快速构建 `Web Server` 服务。应用该 Starter 后，会快速获得管理接口的能力。
-比如： `用户维度的限流`、`平台维度的限流`、`请求同步`、`统一返回值`、`接口公有私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
+比如：`NONCE 限制`、`签名限制`、`跨域限制`、`IP限制`、`REFERER限制`、`同步请求限制`、`流量限制`、`请求数量限制`、`内容转义`、`统一返回值`、`用户身份认证`、`用户授权`、`公有与私有访问`、`统一入参出参日志打印`、`动态静态接口管理`。
 单独启动，可以作为一个`独立的网关`。嵌入SpringBoot项目中，可以节省一些开发时间，让开发者专注于业务逻辑实现。
 
 工作原理
 ----
 
-![image](https://github.com/user-attachments/assets/0a0c5adf-9da5-48e9-89da-f1aa3a10b7f4)
+![image](https://github.com/user-attachments/assets/32172c2c-2924-4710-b8d6-82c8269c8760)
+
 
 #### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插
 
