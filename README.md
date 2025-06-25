@@ -97,7 +97,7 @@ mvn clean install -Dmaven.test.skip=true & \
 </dependencies>
 ```
 
-依赖Redis环境配置，Redis配置方式以及版本跟SpringBoot版本一致
+依赖Redis环境配置，Redis配置方式以及版本跟SpringBoot版本一致，其中 apoollo 部分的配置为可选配置。所有被path匹配到的路径全会被框架拦截，会应用框架特性，不被拦截的路径不会应用框架特性。适用混合模式的应用场景
 ```Yaml
 spring:
   data:
@@ -113,11 +113,16 @@ spring:
           max-active: 8
           max-idle: 8
           time-between-eviction-runs: 60000
+# apoollo:
+#  commons:
+#    server:
+#      path:
+#        include-path-patterns:
+#        - /*
 ```
 注意
 ----
-1. @SpringBootApplication 所在的位置不能包含  com.apoollo.commons.server.spring.boot.starter ，也就是默认不能扫描到这个包以及子包
-2. 多个项目公用同一个Redis实例或者集群会发生Key冲突，此时应该给每个子项目设置自己的Prefix，具体配置如下
+1. 多个项目公用同一个Redis实例或者集群会发生Key冲突，此时应该给每个子项目设置自己的Prefix，具体配置如下
 ```Java
 @Bean
 RedisNameSpaceKey getRedisNameSpaceKey() {
