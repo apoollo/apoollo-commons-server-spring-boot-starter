@@ -14,7 +14,7 @@ Apoollo Commons Server Spring Boot Starter
 
 ##### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插。同样可以实现框架内特性与非框架特性的混合模式。
 
-请求流程拔插
+1、请求流程拔插
 ------
 阶段                               |说明 
 -----------------------------------|----------------------------------------
@@ -25,7 +25,7 @@ USER AUTHORIZATION                 |用户授权认证，可以选择用户对�
 USER_LIMIERS                       |用户级别的限制，可单独设置用户级别的CAPACITY_SUPPORT
 TARGET_METHOD_PARAMETER_LOGGING    |目标函数的日志，可选入参与出参打印日志以及参数脱敏打印
 
-能力支持拔插（CAPACITY_SUPPORT）
+2、能力支持拔插（CAPACITY_SUPPORT）
 ------
 
 阶段                               |说明 
@@ -41,7 +41,7 @@ COUNT_LIMTER                       |一段时间内请求数量验证
 CONTENT_ESCAPE                     |请求内容转义，可以预防Xss
 RESPONSE_WRAPPER                   |响应内容包装成一个标准返回值
 
-CAPACITY_SUPPORT 的请求模式
+3、CAPACITY_SUPPORT 的请求模式
 ------
 ![image](https://github.com/user-attachments/assets/a7c5384b-b2b4-4ee1-90ac-8e533f2c2ead)
 ##### 每一条线表示一种穿过CAPACITY_SUPPORT的模式，注意：资源级别、用户级别的能力是叠加的。
