@@ -175,7 +175,7 @@ private com.apoollo.commons.server.spring.boot.starter.service.UserManager userM
 
 //身份匹配条件
 UserMatchesRequestResourceCondition authenticationCondition = new UserMatchesRequestResourceCondition();
-//包含角色为User的资源都会被该用户访问到
+//包含角色为Resource的资源都会被该用户访问到
 authenticationCondition.setIncludeRoles(List.of("Resource"));
 
 SerializableUser user = new SerializableUser();
