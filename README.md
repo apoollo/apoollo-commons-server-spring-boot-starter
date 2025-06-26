@@ -12,9 +12,10 @@ Apoollo Commons Server Spring Boot Starter
 ![image](https://github.com/user-attachments/assets/32172c2c-2924-4710-b8d6-82c8269c8760)
 
 
-#### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插。同样可以实现框架内特性与非框架特性的混合模式。
+##### 将目标函数（Taget MVC Method）变成一个安全接口，要请求目标函数, 需要过一些列的安全检查，每一个阶段都可以动态拔插。同样可以实现框架内特性与非框架特性的混合模式。
 
-### 请求流程拔插
+请求流程拔插
+------
 阶段                               |说明 
 -----------------------------------|----------------------------------------
 PLATFORM_LIMIERS                   |平台级别的限制，可单独设置平台级别的CAPACITY_SUPPORT
@@ -24,7 +25,9 @@ USER AUTHORIZATION                 |用户授权认证，可以选择用户对�
 USER_LIMIERS                       |用户级别的限制，可单独设置用户级别的CAPACITY_SUPPORT
 TARGET_METHOD_PARAMETER_LOGGING    |目标函数的日志，可选入参与出参打印日志以及参数脱敏打印
 
-### 能力支持拔插（CAPACITY_SUPPORT）
+能力支持拔插（CAPACITY_SUPPORT）
+------
+
 阶段                               |说明 
 -----------------------------------|----------------------------------------
 NONCE_LIMIER                       |nonce 验证，可以预防重放攻击，一般配合签名限制一起使用
@@ -38,9 +41,10 @@ COUNT_LIMTER                       |一段时间内请求数量验证
 CONTENT_ESCAPE                     |请求内容转义，可以预防Xss
 RESPONSE_WRAPPER                   |响应内容包装成一个标准返回值
 
-### CAPACITY_SUPPORT 的请求模式
+CAPACITY_SUPPORT 的请求模式
+------
 ![image](https://github.com/user-attachments/assets/a7c5384b-b2b4-4ee1-90ac-8e533f2c2ead)
-#### 每一条线表示一种穿过CAPACITY_SUPPORT的模式，注意：资源级别、用户级别的能力是叠加的。
+##### 每一条线表示一种穿过CAPACITY_SUPPORT的模式，注意：资源级别、用户级别的能力是叠加的。
 模式                               |说明                                                                            
 -----------------------------------|--------------------------------------------------------------------------------
 平台级别                            |所有被框架接收到的请求全都会应用平台级别的限制                                      
@@ -282,7 +286,9 @@ roles                        |Resource 默认资源角色为资源角色        
 enableCapacity               |true 表示默认开启资源级别的限制能力                             |具体限制有单独开关，此属性为true是其他限制能力的前提条件
 
 
-### 访问策略 AccessStrategy
+访问策略 AccessStrategy
+------
+
 属性                         |说明
 -----------------------------|---------------------------------------------------------
 PUBLIC                       |PUBLIC: 公有访问， 无需鉴权Token，可直接访问
@@ -292,12 +298,14 @@ PRIVATE_PARAMETER_KEY_PAIR   |私有访问，需要在parameter中获取秘钥�
 PRIVATE_JSON_BODY_JWT_TOKEN  |私有访问，需要在Body 的JSON根节点中放入 Authorization 属性，值为Jwt Token，与PRIVATE_HEADER_JWT_TOKEN的区别是获取位置不一致
 PRIVATE_JSON_BODY_KEY_PAIR   |私有访问，需要在Body 的JSON根节点中放入密钥对属性，与PRIVATE_HEADER_KEY_PAIR的区别是获取位置不一致
 
-CAPACITY_SUPPORT 属性
+CAPACITY_SUPPORT 实例
 ----
 
-#### 三种实例都包含以下属性，平台实例、资源实例、用户实例，通过以下属性可控制每种资源的限制粒度，注意实例之间的向下叠加性
+#### 平台实例、资源实例、用户实例，通过公共属性可控制每种资源的限制粒度，注意实例之间的向下叠加性
 
-#### 自定义平台实例
+1、自定义平台实例
+------
+
 ```Java
 @Bean
 SerializebleCapacitySupport getSerializebleCapacitySupport() {
@@ -310,7 +318,9 @@ SerializebleCapacitySupport getSerializebleCapacitySupport() {
 	return capacitySupport;
 }
 ```
-#### 自定义资源实例
+2、自定义资源实例
+------
+
 1. 使用注解的方式
 
 ```Java
@@ -326,19 +336,32 @@ public String demo1() {
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager requestResourceManager;
 
-requestResourceManager.setRequestResource(
-    new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...) // 具体参数与@RequestResource大同小异
-); 
+SerializableRequestResource requestResource = new SerializableRequestResource();
+requestResource.setEnableCapacity(true);
+requestResource.setEnableResponseWrapper(true);
+requestResource.setWrapResponseHandlerClass(WrapResponseHandler.class);
+requestResource.setEnableContentEscape(true);
+//......其他属性设置
+requestResourceManager.setRequestResource(requestResource); 
 ```
-#### 自定义用户实例
+3、自定义用户实例
+------
+
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
 //按照User属性设置
 SerializableUser user = new SerializableUser();
+user.setEnableCapacity(true);
+user.setEnableResponseWrapper(true);
+user.setWrapResponseHandlerClass(WrapResponseHandler.class);
+user.setEnableContentEscape(true);
+//......其他属性设置
 userManager.setUser(user, 30L, TimeUnit.MINUTES);
 ```
+4、CAPACITY_SUPPORT 属性
+------
 
 属性                                              |说明
 --------------------------------------------------|---------------------------------------------------------
