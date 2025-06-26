@@ -204,9 +204,10 @@ Stirng token = userManager.login(//
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
-
+//按照User属性设置
+SerializableUser user = new SerializableUser();
 userManager.setUser(
-        new com.apoollo.commons.util.request.context.def.DefaultUser(...), 按照User参数设置
+         user, // 注册
 	null,// 服务端设置用户一般不设置超时时间
 	null // 服务端设置用户一般不设置超时时间
 );
@@ -291,9 +292,36 @@ PRIVATE_PARAMETER_KEY_PAIR   |私有访问，需要在parameter中获取秘钥�
 PRIVATE_JSON_BODY_JWT_TOKEN  |私有访问，需要在Body 的JSON根节点中放入 Authorization 属性，值为Jwt Token，与PRIVATE_HEADER_JWT_TOKEN的区别是获取位置不一致
 PRIVATE_JSON_BODY_KEY_PAIR   |私有访问，需要在Body 的JSON根节点中放入密钥对属性，与PRIVATE_HEADER_KEY_PAIR的区别是获取位置不一致
 
-动态注入资源                 
+CAPACITY_SUPPORT 属性
 ----
-执行以下函数，动态注入资源
+
+#### 三种实例都包含以下属性，平台实例、资源实例、用户实例，通过以下属性可控制每种资源的限制粒度，注意实例之间的向下叠加性
+
+#### 自定义平台实例
+```Java
+@Bean
+SerializebleCapacitySupport getSerializebleCapacitySupport() {
+	SerializebleCapacitySupport capacitySupport = new SerializebleCapacitySupport();
+	capacitySupport.setEnableCapacity(true);
+	capacitySupport.setEnableResponseWrapper(true);
+	capacitySupport.setResourcePin("platform");
+	capacitySupport.setWrapResponseHandlerClass(WrapResponseHandler.class);
+        capacitySupport.setEnableContentEscape(true);
+	return capacitySupport;
+}
+```
+#### 自定义资源实例
+1. 使用注解的方式
+
+```Java
+@GetMapping("/demo2")
+@RequestResource(name = "演示2", accessStrategy = AccessStrategy.PRIVATE_JSON_BODY_JWT_TOKEN,  enableContentEscape = false, enableNonceLimiter = false)
+public String demo1() {
+	return "I'm OK";
+}
+```
+2. 使用注册的方式
+
 ```Java
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.RequestResourceManager requestResourceManager;
@@ -302,11 +330,15 @@ requestResourceManager.setRequestResource(
     new com.apoollo.commons.util.request.context.def.DefaultRequestResource(...) // 具体参数与@RequestResource大同小异
 ); 
 ```
+#### 自定义用户实例
+```Java
+@Autowired
+private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
-CAPACITY_SUPPORT 属性
-----
-
-#### 三种实例都包含以下属性，平台实例、资源实例、用户实例，通过以下属性可控制每种资源的限制粒度，注意实例之间的向下叠加性
+//按照User属性设置
+SerializableUser user = new SerializableUser();
+userManager.setUser(user, 30L, TimeUnit.MINUTES);
+```
 
 属性                                              |说明
 --------------------------------------------------|---------------------------------------------------------
