@@ -338,7 +338,7 @@ wrapResponseHandler                               |此字段当启用返回值�
 
 包装返回值
 ----
-包装返回值中预定义了code、name、httpCode、success 四者之间的关系，默认实现为com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler，可以为每个资源或者用户自定义自己的实现，完成不同资源、不同用户可以有不同的返回值。
+包装返回值中预定义了code、name、httpCode、success 四者之间的关系，默认实现为com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler，可以为每个资源或者用户自定义自己的实现，完成不同资源、不同用户可以有不同的返回值。41000-41999 之间是SpringBoot编码、42000-42999 之间是框架编码、43000-49999 之间是给应用预留的业务编码
 
 code       |name                                               |success          |httpCode       |说明 
 -----------|---------------------------------------------------|-----------------|---------------|----------------
@@ -361,9 +361,9 @@ code       |name                                               |success         
 42000      |ClientRequestIdIllegal                             |false            |200            |客户端请求id非法
 42001      |RequestResourceNotExists                           |false            |200            |资源不存在
 42002      |ResourceDisabled                                   |false            |200            |资源被禁用
-42010      |NonceLimiterNonceIllegal                           |false            |200            |Nonce非法
+42010      |NonceLimiterRefused                                |false            |200            |Nonce验证拒绝
 42011      |NonceLimiterTimestampIllegal                       |false            |200            |Nonce时间戳非法
-42020      |LimiterSignatureIllegal                            |false            |200            |签名非法
+42020      |SignatureLimiterSignatureRefused                   |false            |200            |签名限制拒绝
 42030      |CorsLimiterRefused                                 |false            |200            |跨域限制拒绝
 42040      |IpLimiterExcludeListRefused                        |false            |200            |IP黑名单限制拒绝
 42041      |IpLimiterIncludeListRefused                        |false            |200            |IP白名单限制拒绝
