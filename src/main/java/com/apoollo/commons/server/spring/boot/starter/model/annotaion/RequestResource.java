@@ -23,16 +23,8 @@ import com.apoollo.commons.util.request.context.limiter.core.StrictNonceValidaor
 
 /**
  * <p>
- * 使用此注解可获得的能力
  * <ol>
- * <li>用户维度限流：默认关闭</li>
- * <li>平台维度限流：默认关闭</li>
- * <li>同步执行：默认关闭</li>
- * <li>统一返回值：默认统一返回样式</li>
- * <li>统一异常：默认异常体系</li>
- * <li>统一权限管理：默认私有访问需要授权，可以通过URL匹配授权，也可以通过角色授权</li>
- * <li>全局MDC以及入参出参日志管理：默认开启打印入参出参日志，可单独关闭。配合 {@code @Logable }
- * 使用，可对指定字段脱敏打印</li>
+ * <li>详细解释详见：https://github.com/apoollo/apoollo-commons-server-spring-boot-starter</li>
  * <li>会得到 {@code RequestContext.getRequired();}</li>
  * <li>支持通过 {@code RequestResourceManager} 支持动态注入资源</li>
  * <li>支持通过 {@code UserManager} 动态授权</li>
@@ -233,7 +225,7 @@ public @interface RequestResource {
 	public boolean enableContentEscape() default false;
 
 	/**
-	 * , 需要实例注入到Spring环境中
+	 *  需要实例注入到Spring环境中
 	 * 
 	 * @return 转义方式实现类的Class
 	 */
