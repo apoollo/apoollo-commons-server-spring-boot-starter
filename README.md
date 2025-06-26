@@ -268,7 +268,7 @@ maskProperies      | {}  空对象，显示所有字段                         
 静态注入资源 @RequestResource
 ----
 全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，此注解表示一个静态资源实体，仅对Controller 中的@RequestMapping、@GetMapping、@PostMapping、@PutMapping、@DeleteMapping生效
-注入该注解会接管接口请求的前置条件以及后置条件，这里的字段属性并不完整，其他关于限制能力的部分后续会详细介绍
+注入该注解会接管接口请求的前置条件以及后置条件，这里的字段属性并不完整，其他关于限制能力的部分，可以参见：CAPACITY_SUPPORT 属性
 
 属性                         |默认值                                                       |说明
 -----------------------------|-------------------------------------------------------------|---------------------------------------------------------
@@ -303,6 +303,38 @@ requestResourceManager.setRequestResource(
 ); 
 ```
 
+CAPACITY_SUPPORT 属性
+----
+
+#### 三种实例都包含以下属性，平台实例、资源实例、用户实例，通过以下属性可控制每种资源的限制粒度，注意实例之间的向下叠加性
+
+属性                                              |说明
+--------------------------------------------------|---------------------------------------------------------
+enableCapacity                                    |CAPACITY 的总开关，此字段设置为false，将会禁止所有的CAPACITY
+enableNonceLimiter                                |启用后，会验证 header 中的x-nonce、x-timestamp
+nonceLimiterDuration                              |nonce的有效时长
+nonceLimiterValidator                             |nonce的验证方式
+enableSignatureLimiter                            |是否启用签名限制，启用后，会验证 header 中的x-signature
+signatureLimiterSecret                            |请求摘要加密的秘钥, 摘要加密后就是签名
+signatureLimiterExcludeHeaderNames                |签名排除的header名称列表
+signatureLimiterIncludeHeaderNames                |签名包含的header名称列表
+enableCorsLimiter                                 |是否启用跨域配置
+corsLimiterConfiguration                          |跨域配置, 需要实例注入到Spring环境中
+enableIpLimiter                                   |是否启用IP限制
+ipLimiterExcludes                                 |IP 黑名单
+ipLimiterIncludes                                 |IP 白名单
+enableRefererLimiter                              |是否启用限制referer
+refererLimiterIncludeReferers                     |允许referer的列表
+enableSyncLimiter                                 |是否开启同步模式，启用后，该请求资源只允许序列请求，不允许并发请求
+enableFlowLimiter                                 |是否启用每秒限流
+flowLimiterLimitCount                             |每秒限流数量
+enableCountLimiter                                |是否启用限制调用次数
+countLimiterTimeUnitPattern                       |限制次数时间单位模式，用于限制时间维度
+countLimiterLimitCount                            |限制调用次数的数量
+enableContentEscape                               |是否启用请求内容转义
+contentEscapeMethodClass                          |转义方式实现类的Class，需要实例注入到Spring环境中
+enableResponseWrapper                             |是否启用返回值包装器
+wrapResponseHandler                               |此字段当启用返回值包装器后生效，自定义异常code与返回值样式, 需要实例注入到Spring环境中
 
 
 
