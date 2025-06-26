@@ -176,7 +176,7 @@ private com.apoollo.commons.server.spring.boot.starter.service.UserManager userM
 //身份匹配条件
 UserMatchesRequestResourceCondition authenticationCondition = new UserMatchesRequestResourceCondition();
 //包含角色为User的资源都会被该用户访问到
-authenticationCondition.setIncludeRoles(List.of("User"));
+authenticationCondition.setIncludeRoles(List.of("Resource"));
 
 SerializableUser user = new SerializableUser();
 user.setId("id");// 用户id
@@ -232,32 +232,31 @@ curl --location 'http://127.0.0.1:8080/demo1' \
 ```
 ```JSON
 {
-    "requestId": "1446E45F531B4493BB54EEEEA3467024",
+    "code": 20000,
+    "data": "I'm OK",
     "success": true,
-    "code": "Ok",
-    "message": "通过",
-    "elapsedTime": 197,
-    "data": "I'm OK"
+    "requestId": "45710E55F64D42DAA06331B134E8A637",
+    "name": "Ok",
+    "message": "success",
+    "elapsedTime": 129
 }
 ```
-code 为 OK ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
+code 为 20000 ，name 为 Ok ，表示后端验证通过，请求成功，并且data字段返回了函数的返回值I'm OK，这样就完成一次请求私有函数的验证
 
 日志
 ----
 单次请求的业务日志，包含了 MDC 标记、请求标记、访问URI、请求IP、入参内容、出参内容、请求耗时、结束标记
 ```Java
-2025-05-14T09:47:17.208+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:64) :  C783FB19DFC34F488D8B344D03CFDC7D 请求进入标记
-2025-05-14T09:47:17.208+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:65) :  C783FB19DFC34F488D8B344D03CFDC7D 访问URI：/demo1
-2025-05-14T09:47:17.209+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.preHandle(RequestContextInterceptor.java:66) :  C783FB19DFC34F488D8B344D03CFDC7D 访问IP：127.0.0.1
-2025-05-14T09:47:17.213+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultUserManager.getUser(DefaultUserManager.java:77) :  C783FB19DFC34F488D8B344D03CFDC7D getUser elapsedTime：1ms
-2025-05-14T09:47:17.213+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization.getAuthorized(DefaultAuthorization.java:94) :  C783FB19DFC34F488D8B344D03CFDC7D authorized by allowRequestAntPathPattern: /demo1
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultAuthorization.getAuthorized(DefaultAuthorization.java:111) :  C783FB19DFC34F488D8B344D03CFDC7D authorized elapsedTime：1ms
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.service.AbstractAccess.access(AbstractAccess.java:94) :  C783FB19DFC34F488D8B344D03CFDC7D accesskey：[accessKey1] accessed
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:76) :  C783FB19DFC34F488D8B344D03CFDC7D [演示1入参]: 无
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:90) :  C783FB19DFC34F488D8B344D03CFDC7D [演示1出参]: I'm OK
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResourceAspect.advice(RequestResourceAspect.java:96) :  C783FB19DFC34F488D8B344D03CFDC7D [演示1耗时]: 0(ms)
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.service.impl.DefaultRequestContextDataBus.transport(DefaultRequestContextDataBus.java:23) :  C783FB19DFC34F488D8B344D03CFDC7D request elapsedTime：6ms
-2025-05-14T09:47:17.214+08:00  INFO --- [http-nio-8080-exec-2] com.apoollo.commons.server.spring.boot.starter.component.interceptor.RequestContextInterceptor.lambda$2(RequestContextInterceptor.java:90) :  C783FB19DFC34F488D8B344D03CFDC7D 请求结束标记
+2025-06-26T10:23:27.555+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter.doPreSecureFilter(RequestContextFilter.java:70) :  B0939A3EE9524BE085BFB4D1D1049610 请求进入标记
+2025-06-26T10:23:27.555+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter.doPreSecureFilter(RequestContextFilter.java:83) :  B0939A3EE9524BE085BFB4D1D1049610 访问URI：/demo1
+2025-06-26T10:23:27.555+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter.doPreSecureFilter(RequestContextFilter.java:84) :  B0939A3EE9524BE085BFB4D1D1049610 访问IP：127.0.0.1
+2025-06-26T10:23:27.555+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.util.request.context.access.core.DefaultRequestResourceManager.getRequestResource(DefaultRequestResourceManager.java:59) :  B0939A3EE9524BE085BFB4D1D1049610 getRequestResource elapsedTime：0ms
+2025-06-26T10:23:27.557+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.util.request.context.access.core.DefaultUserManager.getUser(DefaultUserManager.java:83) :  B0939A3EE9524BE085BFB4D1D1049610 getUser elapsedTime：1ms
+2025-06-26T10:23:27.557+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.util.request.context.access.core.DefaultAuthorization.authorize(DefaultAuthorization.java:76) :  B0939A3EE9524BE085BFB4D1D1049610 authorized elapsedTime：0ms
+2025-06-26T10:23:27.558+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect.print(RequestResourceAspect.java:99) :  B0939A3EE9524BE085BFB4D1D1049610 "演示1" - 出参: I'm OK
+2025-06-26T10:23:27.558+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.aspect.RequestResourceAspect.advice(RequestResourceAspect.java:158) :  B0939A3EE9524BE085BFB4D1D1049610 "演示1" - 耗时: 0(ms)
+2025-06-26T10:23:27.559+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter.cleanupMatches(RequestContextFilter.java:112) :  B0939A3EE9524BE085BFB4D1D1049610 total elapsedTime：3ms
+2025-06-26T10:23:27.559+08:00  INFO --- [http-nio-8080-exec-3] com.apoollo.commons.server.spring.boot.starter.component.filter.RequestContextFilter.cleanupMatches(RequestContextFilter.java:120) :  B0939A3EE9524BE085BFB4D1D1049610 请求结束标记
 ```
 
 正常情况下，被@RequestResource注解的请求资源会自动打印出入参日志。特殊情况下可能不想打印，或者特殊属性需要脱敏显示。这个情况可以由@Logable 调整。全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.Logable，设置在函数上是针对返回值的内容，设置在参数上针对参数
