@@ -88,9 +88,10 @@ public class RequestContextFilter extends AbstractSecureFilter {
 		});
 		secureRequestResource.init(request, response, requestContext);
 		User user = secureUser.init(request, response, requestContext);
-		if (null != user) {
+		if (null != user && null != user.getPasswordLastUpdateTimestamp() && null != user.getPasswordValidMillis()) {
 			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
-					String.valueOf(user.passwordIsExpired()));
+					String.valueOf(user.getPasswordLastUpdateTimestamp() + user.getPasswordValidMillis() < System
+							.currentTimeMillis()));
 		}
 		return new RequestContextHttpServletRequestWrapper(request, requestContext);
 	}
@@ -110,8 +111,8 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			if (null != requestContext.getResponseTime()) {
 				LOGGER.info("total elapsedTime：" + requestContext.getElapsedTime() + "ms");
 			} else {
-				LOGGER.info("total elapsedTime："
-						+ (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
+				LOGGER.info(
+						"total elapsedTime：" + (System.currentTimeMillis() - requestContext.getRequestTime()) + "ms");
 			}
 		} catch (Exception e) {
 			LOGGER.info("write log error", e);

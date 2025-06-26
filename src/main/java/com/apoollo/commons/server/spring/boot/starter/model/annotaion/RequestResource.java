@@ -183,7 +183,7 @@ public @interface RequestResource {
 
 	/**
 	 * 
-	 * @return 限制Referer列表
+	 * @return 允许referer的列表
 	 */
 	public String[] refererLimiterIncludeReferers() default {};
 
