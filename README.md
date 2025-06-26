@@ -339,7 +339,7 @@ wrapResponseHandler                               |此字段当启用返回值�
 包装返回值
 ----
 包装返回值中预定义了code、name、httpCode、success 四者之间的关系，默认实现为com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler，可以为每个资源或者用户自定义自己的实现，完成不同资源、不同用户可以有不同的返回值。
-1. 40000-49999 之间是请求报文编排到的异常，需要与服务器核对接口定义
+1. 40000-49999 之间是请求报文编排异常，需要与服务器核对接口定义
 2. 41000-41999 之间是SpringBoot级别预定义编码
 3. 42000-42999 之间是本框架预定义编码
 4. 43000-49999 之间是给应用预留的业务编码
