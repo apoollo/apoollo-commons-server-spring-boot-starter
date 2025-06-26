@@ -40,8 +40,8 @@ RESPONSE_WRAPPER                   |响应内容包装成一个标准返回值
 
 ### CAPACITY_SUPPORT 的请求模式
 ![image](https://github.com/user-attachments/assets/a7c5384b-b2b4-4ee1-90ac-8e533f2c2ead)
-
-阶段                               |说明                                                                            
+#### 每一条线表示一种穿过CAPACITY_SUPPORT的模式，注意：资源级别、用户级别的能力是叠加的。
+模式                               |说明                                                                            
 -----------------------------------|--------------------------------------------------------------------------------
 平台级别                            |所有被框架接收到的请求全都会应用平台级别的限制                                      
 资源级别                            |该资源的请求会应用资源本身设置的限制 + 平台级别                                               
@@ -153,15 +153,16 @@ curl --location 'http://127.0.0.1:8080/demo1'
 
 ```JSON
 {
-    "requestId": "0F0BD9D421764E4D9EBC0336575C8EF7",
+    "code": 42100,
+    "data": null,
     "success": false,
-    "code": "Forbidden",
-    "message": "访问无权限:authorizationJwtToken must not be blank",
-    "elapsedTime": 7,
-    "data": null
+    "requestId": "E0FF78F752BE4F34A570BA2950E5F15B",
+    "name": "AuthenticationJwtTokenIllegal",
+    "message": "authorizationJwtToken must not be blank",
+    "elapsedTime": 1
 }
 ```
-code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
+code 属性值为 `42100`，name 属性值为 `AuthenticationJwtTokenIllegal` ，这说明该函数默认被 `@RequestResource` 注解后，`默认置为私有访问了，得通过授权的token才能访问，同时将返回值变成一个JSON`
 
 
 以登录方式获取Token
@@ -172,17 +173,26 @@ code 属性为 `Forbidden`，这说明该函数默认被 `@RequestResource` 注�
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
+//身份匹配条件
+UserMatchesRequestResourceCondition authenticationCondition = new UserMatchesRequestResourceCondition();
+//包含角色为User的资源都会被该用户访问到
+authenticationCondition.setIncludeRoles(List.of("User"));
+
+SerializableUser user = new SerializableUser();
+user.setId("id");// 用户id
+user.setEnable(true);// 表示用户状态有效
+user.setAccessKey("accessKey");// 用户身份标识
+user.setSecretKey("secretKey");// 用户秘钥
+user.setAuthorizationCondition(authenticationCondition);// 设置身份匹配信息
+
+user.setSecretKeySsoSalt(LangUtils.getUppercaseUUID());//每次登录设置一个随机值，会支持单点登录
+
+// 同时设置以下两个字段不为null，response header "x-user-password-expired" 字段会标记 true 或者 false 提示用户修改密码
+user.setPasswordLastUpdateTimestamp(System.currentTimeMillis());// 设置上次密码修改的时间戳，
+user.setPasswordValidMillis(1000L * 60 * 60 * 24 * 30);// 设置密码有效毫秒时长
+
 Stirng token = userManager.login(//
-	"id", // 用户id
-	"accessKey", //用户名称
-	"secretKey", //用户密码
-	"secretKeySaltValue", //密码盐值，设置后可以实现单点登录，通常设置为一个随机数或者UUID
-	true, //是否支持续期，设置为true后，response header 中会在过期时长超过3/2的时候返回 x-renewal-authorization 字段，来替换旧的Token，前端可以替换使用
-	null, // Ip 白名单列表，配置apoollo.commons.server.access.limit-ip.enable=true 后才生效
-	List.of("/demo1"), // 该用户被允许请求的列表，支持AntPathMatcher表达式 /**,/abc/* 等
-	null, // 该用户的角色列表，如果用户角色跟资源角色匹配的话，也可以允许被访问，资源角色指的是 @RequestResource roles 属性
-	null, // 用户其他属性附件，可用于业务处理； 通过 RequestContext.getRequired(); 来获取上下文信息
-	null, // 提醒用户更换密码的最后时间
+	user,//身份信息
 	30L, // token 过期时长
 	TimeUnit.MINUTES //token 过期时长的单位时间
 	);
