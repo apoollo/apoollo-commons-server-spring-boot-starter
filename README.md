@@ -336,5 +336,58 @@ contentEscapeMethodClass                          |转义方式实现类的Class
 enableResponseWrapper                             |是否启用返回值包装器
 wrapResponseHandler                               |此字段当启用返回值包装器后生效，自定义异常code与返回值样式, 需要实例注入到Spring环境中
 
+包装返回值
+----
+包装返回值中预定义了code、name、httpCode、success 四者之间的关系，默认实现为com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler，可以为每个资源或者用户自定义自己的实现，完成不同资源、不同用户可以有不同的返回值。
+
+code       |name                                               |success          |httpCode       |说明 
+-----------|---------------------------------------------------|-----------------|---------------|----------------
+20000      |Ok                                                 |true             |200            |请求成功
+41000      |HttpRequestMethodNotSupported                      |false            |200            |请求方式不支持
+41001      |HttpMediaTypeNotSupported                          |false            |200            |请求媒体类型不支持
+41002      |HttpMediaTypeNotAcceptable                         |false            |200            |请求媒体类型不被接受
+41003      |MissingPathVariable                                |false            |200            |丢失路径变量
+41004      |MissingServletRequestParameter                     |false            |200            |请求参数丢失
+41005      |MissingServletRequestPart                          |false            |200            |请求文件参数丢失
+41006      |ServletRequestBinding                              |false            |200            |请求绑定异常
+41007      |MethodArgumentNotValid                             |false            |200            |请求参数不合法
+41008      |HandlerMethodValidation                            |false            |200            |参数验证失败
+41009      |NoHandlerFound                                     |false            |200            |没有找到处理器
+41010      |NoResourceFound                                    |false            |200            |没有找到资源
+41011      |AsyncRequestTimeout                                |false            |200            |异步请求超时
+41012      |TypeMismatch                                       |false            |200            |类型不匹配
+41013      |HttpMessageNotReadable                             |false            |200            |请求消息不可读
+41014      |BindError                                          |false            |200            |绑定异常
+42000      |ClientRequestIdIllegal                             |false            |200            |客户端请求id非法
+42001      |RequestResourceNotExists                           |false            |200            |资源不存在
+42002      |ResourceDisabled                                   |false            |200            |资源被禁用
+42010      |NonceLimiterNonceIllegal                           |false            |200            |Nonce非法
+42011      |NonceLimiterTimestampIllegal                       |false            |200            |Nonce时间戳非法
+42020      |LimiterSignatureIllegal                            |false            |200            |签名非法
+42030      |CorsLimiterRefused                                 |false            |200            |跨域限制拒绝
+42040      |IpLimiterExcludeListRefused                        |false            |200            |IP黑名单限制拒绝
+42041      |IpLimiterIncludeListRefused                        |false            |200            |IP白名单限制拒绝
+42050      |RefererLimiterRefused                              |false            |200            |Referer限制拒绝
+42060      |SyncLimiterRefused                                 |false            |200            |同步限制拒绝
+42070      |FlowLimiterRefused                                 |false            |200            |流量限制拒绝
+42080      |CountLimiterRefused                                |false            |200            |数量限制拒绝
+42090      |AuthenticationAccessKeyIllegal                     |false            |200            |身份认证身份标识非法
+42091      |AuthenticationTokenIllegal                         |false            |200            |身份认证token非法
+42092      |AuthenticationUserDisabled                         |false            |200            |身份认真用户被禁止
+42100      |AuthenticationJwtTokenIllegal                      |false            |200            |身份认证Token非法
+42101      |AuthenticationJwtTokenExpired                      |false            |200            |身份认证Token过期
+42110      |AuthenticationKeyPairTokenIllegal                  |false            |200            |身份认证密钥对非法
+42111      |AuthenticationKeyPairSecretKeyForbidden            |false            |200            |身份认证秘钥被拒绝
+42120      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
+42130      |ServerOverloaded                                   |false            |200            |服务器负载过高
+42998      |ParameterIllegal                                   |false            |200            |参数不合法
+42999      |BadRequest                                         |false            |200            |错误请求
+50000      |SystemError                                        |false            |200            |系统异常
+50001      |ConversionNotSupported                             |false            |200            |转化器不支持
+50002      |HttpMessageNotWritable                             |false            |200            |消息不能写入
+50003      |MethodValidation                                   |false            |200            |方法验证异常
+50004      |AsyncRequestNotUsable                              |false            |200            |异步请求不可用
+
+
 
 
