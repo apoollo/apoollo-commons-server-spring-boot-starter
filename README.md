@@ -235,7 +235,7 @@ curl --location 'http://127.0.0.1:8080/demo1' \
     "code": 20000,
     "data": "I'm OK",
     "success": true,
-    "requestId": "45710E55F64D42DAA06331B134E8A637",
+    "requestId": "B0939A3EE9524BE085BFB4D1D1049610",
     "name": "Ok",
     "message": "success",
     "elapsedTime": 129
@@ -268,7 +268,7 @@ maskProperies      | {}  空对象，显示所有字段                         
 静态注入资源 @RequestResource
 ----
 全路径：com.apoollo.commons.server.spring.boot.starter.model.annotaion.RequestResource，此注解表示一个静态资源实体，仅对Controller 中的@RequestMapping、@GetMapping、@PostMapping、@PutMapping、@DeleteMapping生效
-注入该注解会接管接口请求的输入输出格式、权限访问、日志打印，QPS 等能力，除了静态标注以外，还支持动态注入
+注入该注解会接管接口请求的前置条件以及后置条件，这里的字段属性并不完整，其他关于限制能力的部分后续会详细介绍
 
 属性                         |默认值                                                       |说明
 -----------------------------|-------------------------------------------------------------|---------------------------------------------------------
@@ -276,14 +276,22 @@ enable                       |true                                              
 resourcePin                  |Controller名称(首字母小写) +  Method 名换                      |唯一标识符
 name                         |resourcePin 属性的值                                          |名称，用于日志打印时显示
 requestMappingPath           |跟@RequestMapping注解的值一致                                  |请求资源路径，用于路径匹配，RequestMapping不建议使用多个URL
-accessStrategy               |PRIVATE_REQUEST 私有访问                                      |请求资源访问策略 1. PRIVATE_REQUEST ：私有访问，需要在Header中放入 Authorization 的Jwt Token完成鉴权 2. PUBLIC_REQUEST：公有访问， 无需鉴权Token，可直接访问 3. CUSTOMIZE: 自定义访问策略，需要设置customizeAccessStrategyClass字段来设置访问策略
-customizeAccessStrategyClass | PrivateRequestResourceAccessStrategy.class                  |  仅当 accessStrategy 的值为CUSTOMIZE时，此字段必填，默认值是无效的。需要实现RequestResourceAccessStrategy，设置实现类的Class
-limtUserQps                  |-1 表示不限流                                                 |请求资源用户维度QPS
-limtPlatformQps              |-1 表示不限流                                                 |请求资源平台维度QPS
-roles                        |User 默认资源角色为用户角色                                    |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
-enableSync                   |false 表示允许并发请求                                        |设置true 该请求资源只允许序列请求，不允许并发请求
+accessStrategy               |PRIVATE_HEADER_JWT_TOKEN 私有访问                             |详细见：访问策略 AccessStrategy
+roles                        |Resource 默认资源角色为资源角色                                |如果用户的角色与资源的角色匹配能够匹配，也会完成私有访问的权限验证，访问可以通过
+enableCapacity               |true 表示默认开启资源级别的限制能力                             |具体限制有单独开关，此属性为true是其他限制能力的前提条件
 
-动态注入资源
+
+### 访问策略 AccessStrategy
+属性                         |说明
+-----------------------------|---------------------------------------------------------
+PUBLIC                       |PUBLIC: 公有访问， 无需鉴权Token，可直接访问
+PRIVATE_HEADER_JWT_TOKEN     |私有访问，需要在Header中放入 Authorization 的Jwt Token完成鉴权
+PRIVATE_HEADER_KEY_PAIR      |私有访问，需要在Header中放入秘钥对，header密钥对的key可以通过配置文件配置，默认值为:accessKey、secretKey
+PRIVATE_PARAMETER_KEY_PAIR   |私有访问，需要在parameter中获取秘钥对，跟PRIVATE_HEADER_KEY_PAIR 区别是获取位置不一致
+PRIVATE_JSON_BODY_JWT_TOKEN  |私有访问，需要在Body 的JSON根节点中放入 Authorization 属性，值为Jwt Token，与PRIVATE_HEADER_JWT_TOKEN的区别是获取位置不一致
+PRIVATE_JSON_BODY_KEY_PAIR   |私有访问，需要在Body 的JSON根节点中放入密钥对属性，与PRIVATE_HEADER_KEY_PAIR的区别是获取位置不一致
+
+动态注入资源                 
 ----
 执行以下函数，动态注入资源
 ```Java
