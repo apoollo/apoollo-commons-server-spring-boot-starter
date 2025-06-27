@@ -291,7 +291,7 @@ enableCapacity               |true 表示默认开启资源级别的限制能力
 
 属性                         |说明
 -----------------------------|---------------------------------------------------------
-PUBLIC                       |PUBLIC: 公有访问， 无需鉴权Token，可直接访问
+PUBLIC                       |公有访问， 无需鉴权Token，可直接访问
 PRIVATE_HEADER_JWT_TOKEN     |私有访问，需要在Header中放入 Authorization 的Jwt Token完成鉴权
 PRIVATE_HEADER_KEY_PAIR      |私有访问，需要在Header中放入秘钥对，header密钥对的key可以通过配置文件配置，默认值为:accessKey、secretKey
 PRIVATE_PARAMETER_KEY_PAIR   |私有访问，需要在parameter中获取秘钥对，跟PRIVATE_HEADER_KEY_PAIR 区别是获取位置不一致
