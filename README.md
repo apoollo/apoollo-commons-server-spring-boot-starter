@@ -74,7 +74,7 @@ mvn clean install -Dmaven.test.skip=true & \
 cd .. & \
 git clone https://github.com/apoollo/apoollo-commons-server-spring-boot-starter & \
 cd apoollo-commons-server-spring-boot-starter & \
-mvn clean install -Dmaven.test.skip=true & \
+mvn clean install -Dmaven.test.skip=true
 ```
 
 引入单个Maven POM, 需要指定apoollo-commons-server-spring-boot-starter版本
