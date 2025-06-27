@@ -177,7 +177,7 @@ code 属性值为 `42100`，name 属性值为 `AuthenticationJwtTokenIllegal` �
 @Autowired
 private com.apoollo.commons.server.spring.boot.starter.service.UserManager userManager;
 
-//身份匹配条件
+//授权匹配条件
 UserMatchesRequestResourceCondition authenticationCondition = new UserMatchesRequestResourceCondition();
 //包含角色为Resource的资源都会被该用户访问到
 authenticationCondition.setIncludeRoles(List.of("Resource"));
@@ -187,7 +187,7 @@ user.setId("id");// 用户id
 user.setEnable(true);// 表示用户状态有效
 user.setAccessKey("accessKey");// 用户身份标识
 user.setSecretKey("secretKey");// 用户秘钥
-user.setAuthorizationCondition(authenticationCondition);// 设置身份匹配信息
+user.setAuthorizationCondition(authenticationCondition);// 设置授权匹配条件
 
 user.setSecretKeySsoSalt(LangUtils.getUppercaseUUID());//每次登录设置一个随机值，会支持单点登录
 
