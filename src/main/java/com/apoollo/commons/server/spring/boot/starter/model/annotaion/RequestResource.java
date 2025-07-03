@@ -13,9 +13,9 @@ import java.lang.annotation.Target;
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.apoollo.commons.util.redis.service.RedisNameSpaceKey.TimeUnitPattern;
-import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.ContentEscapeMethod;
 import com.apoollo.commons.util.request.context.core.AccessStrategy;
-import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.core.DefaultContentEscapeXss;
 import com.apoollo.commons.util.request.context.limiter.NonceValidator;
 import com.apoollo.commons.util.request.context.limiter.WrapResponseHandler;
 import com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler;
@@ -230,7 +230,7 @@ public @interface RequestResource {
 	 * @return 转义方式实现类的Class
 	 */
 
-	public Class<? extends EscapeMethod> contentEscapeMethodClass() default DefaultEscapeXss.class;
+	public Class<? extends ContentEscapeMethod> contentEscapeMethod() default DefaultContentEscapeXss.class;
 
 	/**
 	 * 

@@ -195,7 +195,7 @@ public class RequestResourceRegister {
 
 		if (requestResourceAnnotaion.enableContentEscape()) {
 			requestResourceObject.setContentEscapeMethod(
-					instances.getEscapeMethod(requestResourceAnnotaion.contentEscapeMethodClass()));
+					instances.getContentEscapeMethod(requestResourceAnnotaion.contentEscapeMethod()));
 		}
 		if (requestResourceAnnotaion.enableCorsLimiter()) {
 			requestResourceObject.setCorsLimiterConfiguration(

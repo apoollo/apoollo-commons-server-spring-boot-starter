@@ -17,13 +17,13 @@ import com.apoollo.commons.util.redis.service.RedisNameSpaceKey;
 import com.apoollo.commons.util.redis.service.SlidingWindowLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsCountLimiter;
 import com.apoollo.commons.util.redis.service.impl.CommonsSlidingWindowLimiter;
-import com.apoollo.commons.util.request.context.EscapeMethod;
+import com.apoollo.commons.util.request.context.ContentEscapeMethod;
 import com.apoollo.commons.util.request.context.Instances;
 import com.apoollo.commons.util.request.context.access.User;
 import com.apoollo.commons.util.request.context.access.UserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport;
 import com.apoollo.commons.util.request.context.core.DefaultCapacitySupport.SerializebleCapacitySupport;
-import com.apoollo.commons.util.request.context.core.DefaultEscapeXss;
+import com.apoollo.commons.util.request.context.core.DefaultContentEscapeXss;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.CorsLimiter;
 import com.apoollo.commons.util.request.context.limiter.FlowLimiter;
@@ -62,7 +62,7 @@ public class CapacityConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
-	ContentEscapeHandler getXssHandler(RequestContextCapacitySupport requestContextCapacitySupport) {
+	ContentEscapeHandler getContentEscapeHandler(RequestContextCapacitySupport requestContextCapacitySupport) {
 		return new DefaultContentEscapeHandler(requestContextCapacitySupport);
 	}
 
@@ -169,7 +169,7 @@ public class CapacityConfigurer {
 	@Bean
 	RequestContextCapacitySupport getRequestContextSupport(Instances instances,
 			SerializebleCapacitySupport serializebleCapacitySupport) {
-		return new RequestContextCapacitySupport(instances.getEscapeMethod(DefaultEscapeXss.class),
+		return new RequestContextCapacitySupport(instances.getContentEscapeMethod(DefaultContentEscapeXss.class),
 				instances.getWrapResponseHandler(DefaultWrapResponseHandler.class),
 				DefaultCapacitySupport.toCapacitySupport(instances, serializebleCapacitySupport));
 	}
@@ -185,8 +185,8 @@ public class CapacityConfigurer {
 	}
 
 	@Bean
-	EscapeMethod getEscapeXss() {
-		return new DefaultEscapeXss();
+	ContentEscapeMethod getContentEscapeMethod() {
+		return new DefaultContentEscapeXss();
 	}
 
 }
