@@ -29,7 +29,6 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractSecureFilter implements Filter {
 
-
 	private static final PathMatcher PATH_MATCHER = new AntPathMatcher();
 	private static final String ONCE_MATCHES_REQUEST_ATTRIBUTE = AbstractSecureFilter.class + "onceMatchesRequest";
 
@@ -72,7 +71,6 @@ public abstract class AbstractSecureFilter implements Filter {
 	public abstract HttpServletRequest doPreSecureFilter(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException;
 
-	
 	public void cleanupMatches(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 
 	}
@@ -96,12 +94,12 @@ public abstract class AbstractSecureFilter implements Filter {
 	}
 
 	public boolean matches(String requestMappingPath) {
-		boolean result = true;
+		boolean result = false;
 		if (null != pathProperties) {
 			if (matches(false, pathProperties.getExcludePathPatterns(), requestMappingPath)) {
 				result = false;
 			} else {
-				result = matches(true, pathProperties.getIncludePathPatterns(), requestMappingPath);
+				result = matches(false, pathProperties.getIncludePathPatterns(), requestMappingPath);
 			}
 		}
 		return result;
