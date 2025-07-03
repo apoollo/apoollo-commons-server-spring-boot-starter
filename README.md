@@ -117,6 +117,10 @@ spring:
           max-active: 8
           max-idle: 8
           time-between-eviction-runs: 60000
+        cluster:
+          refresh:
+            adaptive: true
+            period: 30000
 # apoollo:
 #  commons:
 #    server:
@@ -368,13 +372,13 @@ userManager.setUser(user, 30L, TimeUnit.MINUTES);
 enableCapacity                                    |CAPACITY 的总开关，此字段设置为false，将会禁止所有的CAPACITY
 enableNonceLimiter                                |启用后，会验证 header 中的x-nonce、x-timestamp
 nonceLimiterDuration                              |nonce的有效时长
-nonceLimiterValidator                             |nonce的验证方式
+nonceLimiterValidator                             |nonce的验证器实现类的Class, 自定义需要将实例注入到Spring环境中
 enableSignatureLimiter                            |是否启用签名限制，启用后，会验证 header 中的x-signature
 signatureLimiterSecret                            |请求摘要加密的秘钥, 摘要加密后就是签名
 signatureLimiterExcludeHeaderNames                |签名排除的header名称列表
 signatureLimiterIncludeHeaderNames                |签名包含的header名称列表
 enableCorsLimiter                                 |是否启用跨域配置
-corsLimiterConfiguration                          |跨域配置, 需要实例注入到Spring环境中
+corsLimiterConfiguration                          |跨域配置的Class，自定义需要将实例注入到Spring环境中
 enableIpLimiter                                   |是否启用IP限制
 ipLimiterExcludes                                 |IP 黑名单
 ipLimiterIncludes                                 |IP 白名单
@@ -387,9 +391,9 @@ enableCountLimiter                                |是否启用限制调用次�
 countLimiterTimeUnitPattern                       |限制次数时间单位模式，用于限制时间维度
 countLimiterLimitCount                            |限制调用次数的数量
 enableContentEscape                               |是否启用请求内容转义
-contentEscapeMethodClass                          |转义方式实现类的Class，需要实例注入到Spring环境中
+contentEscapeMethod                               |转义方式实现类的Class，自定义需要将实例注入到Spring环境中
 enableResponseWrapper                             |是否启用返回值包装器
-wrapResponseHandler                               |此字段当启用返回值包装器后生效，自定义异常code与返回值样式, 需要实例注入到Spring环境中
+wrapResponseHandler                               |包返回值实现类的Class，自定义需要实例注入到Spring环境中，此字段当启用返回值包装器后生效，自定义异常code与返回值样式
 
 包装返回值
 ----
