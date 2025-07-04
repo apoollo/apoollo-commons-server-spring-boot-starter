@@ -398,11 +398,10 @@ wrapResponseHandler                               |包返回值实现类的Class
 包装返回值
 ----
 包装返回值中预定义了code、name、httpCode、success 四者之间的关系，默认实现为com.apoollo.commons.util.request.context.limiter.core.DefaultWrapResponseHandler，可以为每个资源或者用户自定义自己的实现，完成不同资源、不同用户可以有不同的返回值。
-1. 40000-49999 之间是请求报文编排异常，需要与服务器核对接口定义
-2. 41000-41999 之间是SpringBoot级别预定义编码
-3. 42000-42999 之间是本框架预定义编码
-4. 43000-49999 之间是给应用预留的业务编码
-5. 50000-59999 之间是系统异常
+1. 41000-41999 之间是SpringBoot级别预定义编码，是请求报文编排异常，需要与服务器核对接口定义
+2. 42000-42999 之间是本框架预定义编码，是请求报文编排异常，需要与服务器核对接口定义
+3. 43000-49999 之间是给应用预留的业务编码，应用抛出异常可以从这些CODE里自定义编辑，通过com.apoollo.commons.util.exception.AppHttpCodeNameMessageException异常抛出，可以被系统捕获
+4. 50000-59999 之间是系统异常，属于系统BUG
 
 code       |name                                               |success          |httpCode       |说明 
 -----------|---------------------------------------------------|-----------------|---------------|----------------
@@ -436,11 +435,11 @@ code       |name                                               |success         
 42070      |FlowLimiterRefused                                 |false            |200            |流量限制拒绝
 42080      |CountLimiterRefused                                |false            |200            |数量限制拒绝
 42090      |AuthenticationAccessKeyIllegal                     |false            |200            |身份认证身份标识非法
-42091      |AuthenticationTokenIllegal                         |false            |200            |身份认证token非法
+42091      |AuthenticationTokenIllegal                         |false            |200            |身份认证Token非法
 42092      |AuthenticationUserDisabled                         |false            |200            |身份认证用户被禁止
-42100      |AuthenticationJwtTokenIllegal                      |false            |200            |身份认证Token非法
-42101      |AuthenticationJwtTokenExpired                      |false            |200            |身份认证Token过期
-42102      |AuthenticationJwtTokenForbidden                    |false            |200            |身份认证Token验证未通过
+42100      |AuthenticationJwtTokenIllegal                      |false            |200            |身份认证JWT Token非法
+42101      |AuthenticationJwtTokenExpired                      |false            |200            |身份认证JWT Token过期
+42102      |AuthenticationJwtTokenForbidden                    |false            |200            |身份认证JWT Token验证未通过
 42110      |AuthenticationKeyPairTokenIllegal                  |false            |200            |身份认证密钥对非法
 42111      |AuthenticationKeyPairSecretKeyForbidden            |false            |200            |身份认证秘钥验证未通过
 42120      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
