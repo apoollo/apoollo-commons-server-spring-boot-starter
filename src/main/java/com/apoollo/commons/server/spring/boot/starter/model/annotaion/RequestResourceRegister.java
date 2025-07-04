@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.apoollo.commons.server.spring.boot.starter.model.Constants;
 import com.apoollo.commons.server.spring.boot.starter.properties.PathProperties;
 import com.apoollo.commons.util.LangUtils;
 import com.apoollo.commons.util.path.LeftFallingPathJoinner;
@@ -46,10 +47,10 @@ public class RequestResourceRegister {
 	private Instances instances;
 
 	private PathProperties pathProperties;
-	private List<com.apoollo.commons.util.request.context.access.RequestResource> requestResources;
+	private Map<String, com.apoollo.commons.util.request.context.access.RequestResource> requestResources;
 
 	public RequestResourceRegister(Instances instances, PathProperties pathProperties,
-			List<com.apoollo.commons.util.request.context.access.RequestResource> requestResources) {
+			Map<String, com.apoollo.commons.util.request.context.access.RequestResource> requestResources) {
 		super();
 		this.instances = instances;
 		this.pathProperties = pathProperties;
@@ -85,18 +86,9 @@ public class RequestResourceRegister {
 					if (requestResourceMapping.configed) {
 						DefaultRequestResource requestResourceObject = requestResourceMapping
 								.getRequestResourceObject();
-						if (requestResources.stream()
-								.filter(requestResource -> requestResource.getResourcePin()
-										.equals(requestResourceObject.getResourcePin())
-										|| requestResource.getRequestMappingPath()
-												.equals(requestResourceObject.getRequestMappingPath()))
-								.findAny().isPresent()) {
-							throw new RuntimeException("have multiple request resourcePin or requestMappingPath:"
-									+ requestResourceObject.getResourcePin());
-						} else {
-							requestResources.add(requestResourceObject);
-							pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
-						}
+						Constants.checkRequestResources(requestResources, requestResourceObject);
+						requestResources.put(requestResourceObject.getRequestMappingPath(), requestResourceObject);
+						pathProperties.getIncludePathPatterns().add(requestResourceObject.getRequestMappingPath());
 					}
 					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("requestResource  configed : {} - {}", requestResourceMapping.getConfiged(),

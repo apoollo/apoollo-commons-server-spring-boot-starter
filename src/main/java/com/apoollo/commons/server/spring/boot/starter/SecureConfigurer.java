@@ -29,7 +29,6 @@ import com.apoollo.commons.util.request.context.access.UserManager;
 import com.apoollo.commons.util.request.context.access.UserRequestResourceMatcher;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthenticationJwtTokenDecoder;
 import com.apoollo.commons.util.request.context.access.core.DefaultAuthorization;
-import com.apoollo.commons.util.request.context.access.core.DefaultRequestResource;
 import com.apoollo.commons.util.request.context.access.core.DefaultRequestResourceManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserManager;
 import com.apoollo.commons.util.request.context.access.core.DefaultUserRequestResourceMatcher;
@@ -57,13 +56,6 @@ public class SecureConfigurer {
 	RequestResourceManager getRequestResourceManager(ObjectMapper objectMapper, Instances instances,
 			StringRedisTemplate redisTemplate, RedisNameSpaceKey redisNameSpaceKey,
 			CommonsServerProperties commonsServerProperties) {
-
-		LangUtils.getStream(
-				LangUtils.getPropertyIfNotNull(commonsServerProperties.getRbac(), RabcProperties::getRequestResources))
-				.forEach(serializableRequestResource -> {
-					Constants.REQUEST_RESOURCES
-							.add(DefaultRequestResource.toRequestResource(instances, serializableRequestResource));
-				});
 		return new DefaultRequestResourceManager(objectMapper, instances, redisTemplate, redisNameSpaceKey,
 				Constants.REQUEST_RESOURCES);
 	}

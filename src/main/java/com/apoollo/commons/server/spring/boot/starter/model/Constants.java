@@ -3,8 +3,8 @@
  */
 package com.apoollo.commons.server.spring.boot.starter.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.apoollo.commons.util.request.context.access.RequestResource;
 
@@ -26,5 +26,19 @@ public interface Constants {
 
 	public static final String CONFIGURATION_PREFIX = "apoollo.commons.server";
 
-	public static final List<RequestResource> REQUEST_RESOURCES = new ArrayList<>();
+	public static final Map<String, RequestResource> REQUEST_RESOURCES = new HashMap<>();
+
+	public static void checkRequestResources(Map<String, RequestResource> requestResources,
+			RequestResource requestResourceObject) {
+		if (requestResources.containsKey(requestResourceObject.getRequestMappingPath())
+				|| requestResources.values().stream()
+						.filter(requestResource -> requestResource.getResourcePin()
+								.equals(requestResourceObject.getResourcePin())
+								|| requestResource.getRequestMappingPath()
+										.equals(requestResourceObject.getRequestMappingPath()))
+						.findAny().isPresent()) {
+			throw new RuntimeException("have multiple request resourcePin or requestMappingPath:"
+					+ requestResourceObject.getResourcePin());
+		}
+	}
 }
