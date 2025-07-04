@@ -435,11 +435,11 @@ code       |name                                               |success         
 42070      |FlowLimiterRefused                                 |false            |200            |流量限制拒绝
 42080      |CountLimiterRefused                                |false            |200            |数量限制拒绝
 42090      |AuthenticationAccessKeyIllegal                     |false            |200            |身份认证身份标识非法
-42091      |AuthenticationTokenIllegal                         |false            |200            |身份认证token非法
+42091      |AuthenticationTokenIllegal                         |false            |200            |身份认证Token非法
 42092      |AuthenticationUserDisabled                         |false            |200            |身份认证用户被禁止
-42100      |AuthenticationJwtTokenIllegal                      |false            |200            |身份认证Token非法
-42101      |AuthenticationJwtTokenExpired                      |false            |200            |身份认证Token过期
-42102      |AuthenticationJwtTokenForbidden                    |false            |200            |身份认证Token验证未通过
+42100      |AuthenticationJwtTokenIllegal                      |false            |200            |身份认证JWT Token非法
+42101      |AuthenticationJwtTokenExpired                      |false            |200            |身份认证JWT Token过期
+42102      |AuthenticationJwtTokenForbidden                    |false            |200            |身份认证JWT Token验证未通过
 42110      |AuthenticationKeyPairTokenIllegal                  |false            |200            |身份认证密钥对非法
 42111      |AuthenticationKeyPairSecretKeyForbidden            |false            |200            |身份认证秘钥验证未通过
 42120      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
