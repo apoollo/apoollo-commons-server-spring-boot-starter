@@ -64,7 +64,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			throws IOException, ServletException {
 		String requestId = LangUtils.getUppercaseUUID();
 		String reuqestUri = request.getRequestURI();
-		String requestIp = IpUtils.tryGetRealIp(request);
+		String clientRealIp = IpUtils.tryGetClientRealIp(request);
 		RequestContext requestContext = RequestContext.reset(requestId, request.getContextPath(), reuqestUri,
 				requestContextInitail::newInstance);
 		LOGGER.info("请求进入标记");
@@ -75,13 +75,12 @@ public class RequestContextFilter extends AbstractSecureFilter {
 					"client request id illegal , value length must great equal 1 and less equal 32");
 		}
 		requestContext.setClientRequestId(clientRequestId);
-		requestContext.setRequestIp(requestIp);
-		requestContext.setRequestServerName(request.getServerName());
+		requestContext.setClientRealIp(clientRealIp);
 		if (null != clientRequestId) {
 			LOGGER.info("客户端请求ID：" + clientRequestId);
 		}
 		LOGGER.info("访问URI：" + reuqestUri);
-		LOGGER.info("访问IP：" + requestIp);
+		LOGGER.info("来访IP：" + clientRealIp);
 		requestContext.setRequestBody(ServletInputStreamHelper.getBodyByteArray(request));
 		requestContextSupport.doSupport(capacitySupport -> {
 			limiters.limit(request, response, requestContext, capacitySupport);

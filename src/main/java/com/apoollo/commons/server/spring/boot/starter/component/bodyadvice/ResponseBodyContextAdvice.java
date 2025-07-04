@@ -37,11 +37,8 @@ public class ResponseBodyContextAdvice implements ResponseBodyAdvice<Object> {
 	public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
 			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
 			ServerHttpResponse response) {
-		Object responseBody = requestContextSupport.getNormallyResponse(RequestContext.get(), body);
-		if (null == responseBody) {
-			responseBody = body;
-		}
-		return responseBody;
+		Object wrappedBody = requestContextSupport.getNormallyResponse(RequestContext.get(), body);
+		return null == wrappedBody ? body : wrappedBody;
 	}
 
 }
