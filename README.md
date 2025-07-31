@@ -195,9 +195,10 @@ user.setAuthorizationCondition(authenticationCondition);// 设置授权匹配条
 
 user.setSecretKeySsoSalt(LangUtils.getUppercaseUUID());//每次登录设置一个随机值，会支持单点登录
 
-// 同时设置以下两个字段不为null，response header "x-user-password-expired" 字段会标记 true 或者 false 提示用户修改密码
+// 同时设置以下两个字段不为null，response header "x-user-password-expire-remain-duration" 字段会返回密码过期时间的剩余时长毫秒数，来提示用户需要更改密码
 user.setPasswordLastUpdateTimestamp(System.currentTimeMillis());// 设置上次密码修改的时间戳，
 user.setPasswordValidMillis(1000L * 60 * 60 * 24 * 30);// 设置密码有效毫秒时长
+user.setEnableForceChangePassword(true);// 用户密码过期后，接口会强制用户更新密码，而不是返回提示更新时长，此字段依赖以上两个字段的值
 
 Stirng token = userManager.login(//
 	user,//身份信息
