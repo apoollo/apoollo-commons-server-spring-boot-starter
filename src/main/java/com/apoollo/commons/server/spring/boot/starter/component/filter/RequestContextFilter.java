@@ -86,12 +86,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			limiters.limit(request, response, requestContext, capacitySupport);
 		});
 		secureRequestResource.init(request, response, requestContext);
-		User user = secureUser.init(request, response, requestContext);
-		if (null != user && null != user.getPasswordLastUpdateTimestamp() && null != user.getPasswordValidMillis()) {
-			response.setHeader(RequestConstants.RESPONSE_HEADER_USER_PASSWORD_EXPIRED,
-					String.valueOf(user.getPasswordLastUpdateTimestamp() + user.getPasswordValidMillis() < System
-							.currentTimeMillis()));
-		}
+		secureUser.init(request, response, requestContext);
 		return new RequestContextHttpServletRequestWrapper(request, requestContext);
 	}
 
