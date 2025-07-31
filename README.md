@@ -369,7 +369,7 @@ userManager.setUser(user, 30L, TimeUnit.MINUTES);
 
 属性                                              |说明
 --------------------------------------------------|---------------------------------------------------------
-enableCapacity                                    |CAPACITY 的总开关，此字段设置为false，将会禁止所有的CAPACITY
+enableCapacity                                    |CAPACITY 开关，此字段设置为false，将会禁止当前CAPACITY的所有特性
 enableNonceLimiter                                |启用后，会验证 header 中的x-nonce、x-timestamp
 nonceLimiterDuration                              |nonce的有效时长
 nonceLimiterValidator                             |nonce的验证器实现类的Class, 自定义需要将实例注入到Spring环境中
