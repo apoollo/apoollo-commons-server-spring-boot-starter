@@ -442,8 +442,8 @@ code       |name                                               |success         
 42102      |AuthenticationJwtTokenForbidden                    |false            |200            |身份认证JWT Token验证未通过
 42110      |AuthenticationKeyPairTokenIllegal                  |false            |200            |身份认证密钥对非法
 42111      |AuthenticationKeyPairSecretKeyForbidden            |false            |200            |身份认证秘钥验证未通过
-42120      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
-42130      |UserPasswordExpired                                |false            |200            |用户密码已过期
+42120      |AuthenticationUserPasswordExpired                  |false            |200            |身份认证用户密码已过期
+42130      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
 42990      |ServerOverloaded                                   |false            |200            |服务器超过负载
 42998      |ParameterIllegal                                   |false            |200            |参数不合法
 42999      |BadRequest                                         |false            |200            |错误请求
