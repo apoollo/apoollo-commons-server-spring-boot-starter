@@ -443,7 +443,8 @@ code       |name                                               |success         
 42110      |AuthenticationKeyPairTokenIllegal                  |false            |200            |身份认证密钥对非法
 42111      |AuthenticationKeyPairSecretKeyForbidden            |false            |200            |身份认证秘钥验证未通过
 42120      |AuthorizationForbidden                             |false            |200            |请求资源未被授权
-42130      |ServerOverloaded                                   |false            |200            |服务器负载过高
+42130      |UserPasswordExpired                                |false            |200            |用户密码已过期
+42990      |ServerOverloaded                                   |false            |200            |服务器超过负载
 42998      |ParameterIllegal                                   |false            |200            |参数不合法
 42999      |BadRequest                                         |false            |200            |错误请求
 50000      |SystemError                                        |false            |200            |系统异常
