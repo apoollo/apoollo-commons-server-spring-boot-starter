@@ -116,6 +116,7 @@ spring:
           enabled: true
           max-active: 8
           max-idle: 8
+          min-idle: 8
           max-wait: 2000
           time-between-eviction-runs: 60000
         cluster:
