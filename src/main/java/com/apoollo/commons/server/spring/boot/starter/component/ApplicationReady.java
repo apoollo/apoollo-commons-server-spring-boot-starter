@@ -69,7 +69,7 @@ public class ApplicationReady implements ApplicationListener<ApplicationReadyEve
 	}
 
 	private void initLogging() {
-		LOGGER.info("Java File Encodiing:" + System.getProperty("file.encoding"));
+		LOGGER.info("Java File Encoding:" + System.getProperty("file.encoding"));
 		LOGGER.info("OS Name:" + System.getProperty("os.name"));
 		LOGGER.info("Java Version:" + System.getProperty("java.version"));
 		LOGGER.info("Commons Server Spring Boot Stater Started <<<!!!");
