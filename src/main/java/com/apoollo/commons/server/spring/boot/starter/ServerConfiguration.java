@@ -43,8 +43,8 @@ import com.apoollo.commons.util.request.context.RequestContextInitail;
 import com.apoollo.commons.util.request.context.access.RequestResource;
 import com.apoollo.commons.util.request.context.access.SecurePrincipal;
 import com.apoollo.commons.util.request.context.access.User;
-import com.apoollo.commons.util.request.context.core.AsyncLoggerWriter;
 import com.apoollo.commons.util.request.context.core.DefaultInstances;
+import com.apoollo.commons.util.request.context.core.DefaultLoggerWriter;
 import com.apoollo.commons.util.request.context.limiter.ContentEscapeHandler;
 import com.apoollo.commons.util.request.context.limiter.Limiters;
 import com.apoollo.commons.util.request.context.limiter.support.LimitersSupport;
@@ -91,7 +91,7 @@ public class ServerConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	LoggerWriter getLoggerWriter(List<RequestContextDataBus> requestContextDataBuses) {
-		return new AsyncLoggerWriter(requestContextDataBuses);
+		return new DefaultLoggerWriter(requestContextDataBuses);
 	}
 
 	@Bean

@@ -101,7 +101,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 			LOGGER.info("unlimit error", e);
 		}
 		try {
-			logWitter.write(requestContext);
+			logWitter.write(request, requestContext);
 			if (null != requestContext.getResponseTime()) {
 				LOGGER.info("total elapsedTime：" + requestContext.getElapsedTime() + "ms");
 			} else {
