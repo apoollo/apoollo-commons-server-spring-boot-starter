@@ -69,7 +69,7 @@ public class RequestContextFilter extends AbstractSecureFilter {
 				requestContextInitail::newInstance);
 		LOGGER.info("请求进入标记");
 		response.setHeader(RequestConstants.RESPONSE_HEADER_VERSION, Version.CURRENT_VERSION);
-		String clientRequestId = StringUtils.trim(request.getHeader(RequestConstants.REQUEST_HEADER_REQUEST_ID));
+		String clientRequestId = StringUtils.trim(request.getHeader(RequestConstants.REQUEST_HEADER_CLIENT_REQUEST_ID));
 		if (null != clientRequestId && (clientRequestId.length() > 32 || clientRequestId.length() < 1)) {
 			throw new AppClientRequestIdIllegalException(
 					"client request id illegal , value length must great equal 1 and less equal 32");
